@@ -1,52 +1,33 @@
 package com.ibndev.icebrowser;
 
+import static com.ibndev.icebrowser.browserparts.TabManager.FORM_FILE_CHOOSER;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.ActivityNotFoundException;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.net.http.SslCertificate;
-import android.net.http.SslError;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.CookieManager;
-import android.webkit.HttpAuthHandler;
-import android.webkit.SslErrorHandler;
-import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -67,11 +48,8 @@ import java.util.List;
 
 public class WebActivity extends Activity {
 
-    static final int FORM_FILE_CHOOSER = 1;
     private static final String TAG = WebActivity.class.getSimpleName();
     final int PERMISSION_REQUEST_DOWNLOAD = 3;
-    private final View[] fullScreenView = new View[1];
-    private final WebChromeClient.CustomViewCallback[] fullScreenCallback = new WebChromeClient.CustomViewCallback[1];
     ShowAndHideKeyboard showAndHideKeyboard;
     DownloadHelper downloadHelper;
     private FrameLayout webviews;
@@ -79,7 +57,6 @@ public class WebActivity extends Activity {
     private boolean isNightMode;
     private boolean isFullscreen;
     private SharedPreferences prefs;
-    private TextView searchCount;
     private EditText searchEdit;
     private SQLiteDatabase placesDb;
     private ValueCallback<Uri[]> fileUploadCallback;
@@ -87,34 +64,12 @@ public class WebActivity extends Activity {
     private final List<String> tabTitles = new ArrayList<>();
     private TabsAdapter adapter;
     private final ArrayList<TitleAndBundle> closedTabs = new ArrayList<>();
-    private final TabManager tabManager = new TabManager();
-
-//    public static class Tab {
-//        WebView webview;
-//        boolean isDesktopUA;
-//        public Tab(WebView w) {
-//            this.webview = w;
-//        }
-//    }
-//
-//    private final ArrayList<Tab> tabs = new ArrayList<>();
-//    private int currentTabIndex;
-//
-//    private Tab getCurrentTab() {
-//        return tabs.get(currentTabIndex);
-//    }
-//
-//    private WebView getCurrentWebView() {
-//        return getCurrentTab().webview;
-//    }
+    private TabManager tabManager;
 
 
     private void switchToTab(int tab) {
-        getCurrentWebView().setVisibility(View.GONE);
-        currentTabIndex = tab;
-        getCurrentWebView().setVisibility(View.VISIBLE);
-        et.setText(getCurrentWebView().getUrl());
-        getCurrentWebView().requestFocus();
+        tabManager.switchToTab(tab);
+        et.setText(tabManager.getCurrentWebView().getUrl());
     }
 
     private void updateFullScreen() {
@@ -161,13 +116,13 @@ public class WebActivity extends Activity {
         bottomBar();
 
         findViewById(R.id.more_button).setOnClickListener(view -> {
-            menuHelper.showPopupMenu(view, getCurrentWebView().getUrl(), getCurrentWebView().getTitle());
+            menuHelper.showPopupMenu(view, tabManager.getCurrentWebView().getUrl(), tabManager.getCurrentWebView().getTitle());
         });
 
         findViewById(R.id.tabs_button).setOnClickListener(view -> {
             tabTitles.clear();
-            for (int i = 0; i < tabs.size(); i++) {
-                tabTitles.add(tabs.get(i).webview.getTitle());
+            for (int i = 0; i < tabManager.tabs.size(); i++) {
+                tabTitles.add(tabManager.tabs.get(i).webview.getTitle());
             }
             adapter.notifyDataSetChanged();
             findViewById(R.id.tabs_layout).setVisibility(View.VISIBLE);
@@ -179,10 +134,10 @@ public class WebActivity extends Activity {
         isNightMode = prefs.getBoolean("night_mode", false);
 
         webviews = findViewById(R.id.webviews);
-        currentTabIndex = 0;
 
         et = findViewById(R.id.et);
 
+        tabManager = new TabManager(this, webviews, et, findViewById(R.id.progressbar), findViewById(R.id.tabs_number), showAndHideKeyboard, downloadHelper);
         // setup edit text
         et.setSelected(false);
         String initialUrl = getUrlFromIntent(getIntent());
@@ -192,15 +147,15 @@ public class WebActivity extends Activity {
             et.setSelection(text.length());
         }));
         et.setOnItemClickListener((parent, view, position, id) -> {
-            getCurrentWebView().requestFocus();
-            loadUrl(et.getText().toString(), getCurrentWebView());
+            tabManager.getCurrentWebView().requestFocus();
+            tabManager.loadUrl(et.getText().toString(), tabManager.getCurrentWebView());
         });
 
 
         et.setOnKeyListener((v, keyCode, event) -> {
             if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                loadUrl(et.getText().toString(), getCurrentWebView());
-                getCurrentWebView().requestFocus();
+                tabManager.loadUrl(et.getText().toString(), tabManager.getCurrentWebView());
+                tabManager.getCurrentWebView().requestFocus();
                 return true;
             } else {
                 return false;
@@ -215,375 +170,376 @@ public class WebActivity extends Activity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                getCurrentWebView().findAllAsync(s.toString());
+                tabManager.getCurrentWebView().findAllAsync(s.toString());
             }
 
             @Override
             public void afterTextChanged(Editable s) {
             }
         });
-        searchCount = findViewById(R.id.searchCount);
         findViewById(R.id.searchFindNext).setOnClickListener(v -> {
             showAndHideKeyboard.hideKeyboard();
-            getCurrentWebView().findNext(true);
+            tabManager.getCurrentWebView().findNext(true);
         });
 
         findViewById(R.id.searchFindPrev).setOnClickListener(v -> {
             showAndHideKeyboard.hideKeyboard();
-            getCurrentWebView().findNext(false);
+            tabManager.getCurrentWebView().findNext(false);
         });
 
         findViewById(R.id.searchClose).setOnClickListener(v -> {
-            getCurrentWebView().clearMatches();
+            tabManager.getCurrentWebView().clearMatches();
             searchEdit.setText("");
-            getCurrentWebView().requestFocus();
+            tabManager.getCurrentWebView().requestFocus();
             findViewById(R.id.searchPane).setVisibility(View.GONE);
             showAndHideKeyboard.hideKeyboard();
         });
 
 
-        newTab(et.getText().toString());
-        getCurrentWebView().setVisibility(View.VISIBLE);
-        getCurrentWebView().requestFocus();
+        tabManager.newTab(et.getText().toString());
+        tabManager.getCurrentWebView().setVisibility(View.VISIBLE);
+        tabManager.getCurrentWebView().requestFocus();
 
 
     }
 
-    private WebView createWebView(Bundle bundle) {
-        final ProgressBar progressBar = findViewById(R.id.progressbar);
+    //TODO: Move this class to TabManager from here
+//    private WebView createWebView(Bundle bundle) {
+//        final ProgressBar progressBar = findViewById(R.id.progressbar);
+//
+//        WebView webview = new WebView(this);
+//        if (bundle != null) {
+//            webview.restoreState(bundle);
+//        }
+//        webview.setBackgroundColor(isNightMode ? Color.BLACK : Color.WHITE);
+//        WebSettings settings = webview.getSettings();
+//        settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
+//        settings.setAllowUniversalAccessFromFileURLs(true);
+//        settings.setJavaScriptEnabled(true);
+//        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+//        settings.setDomStorageEnabled(true);
+//        settings.setBuiltInZoomControls(true);
+//        settings.setDisplayZoomControls(false);
+//        settings.setLoadWithOverviewMode(true);
+//        webview.setWebChromeClient(new WebChromeClient() {
+//            @Override
+//            public void onProgressChanged(WebView view, int newProgress) {
+//                super.onProgressChanged(view, newProgress);
+//                if (newProgress == 100) {
+//                    progressBar.setVisibility(View.GONE);
+//                } else {
+//                    progressBar.setProgress(newProgress);
+//                }
+//            }
+//
+//            @Override
+//            public void onShowCustomView(View view, CustomViewCallback callback) {
+//                fullScreenView[0] = view;
+//                fullScreenCallback[0] = callback;
+//                WebActivity.this.findViewById(R.id.main_layout).setVisibility(View.INVISIBLE);
+//                ViewGroup fullscreenLayout = WebActivity.this.findViewById(R.id.fullScreenVideo);
+//                fullscreenLayout.addView(view);
+//                fullscreenLayout.setVisibility(View.VISIBLE);
+//            }
+//
+//            @Override
+//            public void onHideCustomView() {
+//                if (fullScreenView[0] == null) return;
+//
+//                ViewGroup fullscreenLayout = WebActivity.this.findViewById(R.id.fullScreenVideo);
+//                fullscreenLayout.removeView(fullScreenView[0]);
+//                fullscreenLayout.setVisibility(View.GONE);
+//                fullScreenView[0] = null;
+//                fullScreenCallback[0] = null;
+//                WebActivity.this.findViewById(R.id.main_layout).setVisibility(View.VISIBLE);
+//            }
+//
+//            @Override
+//            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+//                if (fileUploadCallback != null) {
+//                    fileUploadCallback.onReceiveValue(null);
+//                }
+//
+//                fileUploadCallback = filePathCallback;
+//                Intent intent = fileChooserParams.createIntent();
+//                try {
+//                    fileUploadCallbackShouldReset = true;
+//                    startActivityForResult(intent, FORM_FILE_CHOOSER);
+//                    return true;
+//                } catch (ActivityNotFoundException e) {
+//                    // Continue below
+//                }
+//
+//                intent.setType("*/*");
+//                try {
+//                    fileUploadCallbackShouldReset = false;
+//                    startActivityForResult(intent, FORM_FILE_CHOOSER);
+//                    return true;
+//                } catch (ActivityNotFoundException e) {
+//                    // Continue below
+//                }
+//
+//                // Everything failed, let user know
+//                Toast.makeText(WebActivity.this, "Can't open file chooser", Toast.LENGTH_SHORT).show();
+//                fileUploadCallback = null;
+//                return false;
+//            }
+//        });
+//        webview.setWebViewClient(new WebViewClient() {
+//            final String[] sslErrors = {"Not yet valid", "Expired", "Hostname mismatch", "Untrusted CA", "Invalid date", "Unknown error"};
+//
+//            @Override
+//            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+//                progressBar.setProgress(0);
+//                progressBar.setVisibility(View.VISIBLE);
+//                if (view == tabManager.getCurrentWebView()) {
+//                    et.setText(url);
+//                    et.setSelection(0);
+//                    view.requestFocus();
+//                }
+//            }
+//
+//            @Override
+//            public void onPageFinished(WebView view, String url) {
+//                if (view == tabManager.getCurrentWebView()) {
+//                    // Don't use the argument url here since navigation to that URL might have been
+//                    // cancelled due to SSL error
+//                    if (et.getSelectionStart() == 0 && et.getSelectionEnd() == 0 && et.getText().toString().equals(view.getUrl())) {
+//                        // If user haven't started typing anything, focus on webview
+//                        view.requestFocus();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onReceivedHttpAuthRequest(WebView view, final HttpAuthHandler handler, String host, String realm) {
+//                new AlertDialog.Builder(WebActivity.this)
+//                        .setTitle(host)
+//                        .setView(R.layout.login_password)
+//                        .setCancelable(false)
+//                        .setPositiveButton("OK", (dialog, which) -> {
+//                            String username = ((EditText) ((Dialog) dialog).findViewById(R.id.username)).getText().toString();
+//                            String password = ((EditText) ((Dialog) dialog).findViewById(R.id.password)).getText().toString();
+//                            handler.proceed(username, password);
+//                        })
+//                        .setNegativeButton("Cancel", (dialog, which) -> handler.cancel()).show();
+//            }
+//
+//            @Override
+//            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+//
+//                return super.shouldInterceptRequest(view, request);
+//            }
+//
+//            @Override
+//            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//                // For intent:// URLs, redirect to browser_fallback_url if given
+//                if (url.startsWith("intent://")) {
+//                    int start = url.indexOf(";S.browser_fallback_url=");
+//                    if (start != -1) {
+//                        start += ";S.browser_fallback_url=".length();
+//                        int end = url.indexOf(';', start);
+//                        if (end != -1 && end != start) {
+//                            url = url.substring(start, end);
+//                            url = Uri.decode(url);
+//                            view.loadUrl(url);
+//                            return true;
+//                        }
+//                    }
+//                }
+//                return false;
+//            }
+//
+//            @Override
+//            public void onLoadResource(WebView view, String url) {
+//
+//            }
+//
+//            @Override
+//            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+//                int primaryError = error.getPrimaryError();
+//                String errorStr = primaryError >= 0 && primaryError < sslErrors.length ? sslErrors[primaryError] : "Unknown error " + primaryError;
+//                new AlertDialog.Builder(WebActivity.this)
+//                        .setTitle("Insecure connection")
+//                        .setMessage(String.format("Error: %s\nURL: %s\n\nCertificate:\n%s",
+//                                errorStr, error.getUrl(), WebCertificate.certificateToStr(error.getCertificate())))
+//                        .setPositiveButton("Proceed", (dialog, which) -> handler.proceed())
+//                        .setNegativeButton("Cancel", (dialog, which) -> handler.cancel())
+//                        .show();
+//            }
+//        });
+//        webview.setOnLongClickListener(v -> {
+//            String url = null, imageUrl = null;
+//            WebView.HitTestResult r = ((WebView) v).getHitTestResult();
+//            switch (r.getType()) {
+//                case WebView.HitTestResult.SRC_ANCHOR_TYPE:
+//                    url = r.getExtra();
+//                    break;
+//                case WebView.HitTestResult.IMAGE_TYPE:
+//                    imageUrl = r.getExtra();
+//                    break;
+//                case WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE:
+//                case WebView.HitTestResult.EMAIL_TYPE:
+//                case WebView.HitTestResult.UNKNOWN_TYPE:
+//                    Handler handler = new Handler();
+//                    Message message = handler.obtainMessage();
+//                    ((WebView) v).requestFocusNodeHref(message);
+//                    url = message.getData().getString("url");
+//                    if ("".equals(url)) {
+//                        url = null;
+//                    }
+//                    imageUrl = message.getData().getString("src");
+//                    if ("".equals(imageUrl)) {
+//                        imageUrl = null;
+//                    }
+//                    if (url == null && imageUrl == null) {
+//                        return false;
+//                    }
+//                    break;
+//                default:
+//                    return false;
+//            }
+//            showLongPressMenu(url, imageUrl);
+//            return true;
+//        });
+//        webview.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
+//            String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
+//            new AlertDialog.Builder(WebActivity.this)
+//                    .setTitle("Download")
+//                    .setMessage(String.format("Filename: %s\nSize: %.2f MB\nURL: %s",
+//                            filename,
+//                            contentLength / 1024.0 / 1024.0,
+//                            url))
+//                    .setPositiveButton("Download", (dialog, which) -> downloadHelper.startDownload(url, filename))
+//                    .setNeutralButton("Open", (dialog, which) -> {
+//                        Intent i = new Intent(Intent.ACTION_VIEW);
+//                        i.setData(Uri.parse(url));
+//                        try {
+//                            startActivity(i);
+//                        } catch (ActivityNotFoundException e) {
+//                            new AlertDialog.Builder(WebActivity.this)
+//                                    .setTitle("Open")
+//                                    .setMessage("Can't open files of this type. Try downloading instead.")
+//                                    .setPositiveButton("OK", (dialog1, which1) -> {
+//                                    })
+//                                    .show();
+//                        }
+//                    })
+//                    .setNegativeButton("Cancel", (dialog, which) -> {
+//                    })
+//                    .show();
+//        });
+//        webview.setFindListener((activeMatchOrdinal, numberOfMatches, isDoneCounting) ->
+//                searchCount.setText(numberOfMatches == 0 ? "Not found" :
+//                        String.format("%d / %d", activeMatchOrdinal + 1, numberOfMatches)));
+//        return webview;
+//    }
+//
+//    private void newTabCommon(WebView webview) {
+//        boolean isDesktopUA = !tabManager.tabs.isEmpty() && tabManager.getCurrentTab().isDesktopUA;
+//        webview.getSettings().setUserAgentString(isDesktopUA ? getString(R.string.desktopUA) : null);
+//        webview.getSettings().setUseWideViewPort(isDesktopUA);
+//        webview.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+//        webview.setVisibility(View.GONE);
+//        TabManager.Tab tab = new TabManager.Tab(webview);
+//        tab.isDesktopUA = isDesktopUA;
+//        tabManager.tabs.add(tab);
+//        webviews.addView(webview);
+//        setTabCountText(tabManager.tabs.size());
+//    }
+//    private void loadUrl(String url, WebView webview) {
+//        url = url.trim();
+//        if (url.isEmpty()) {
+//            url = "about:blank";
+//        }
+//        if (url.startsWith("about:") || url.startsWith("javascript:") || url.startsWith("file:") || url.startsWith("data:") ||
+//                (url.indexOf(' ') == -1 && Patterns.WEB_URL.matcher(url).matches())) {
+//            int indexOfHash = url.indexOf('#');
+//            String guess = URLUtil.guessUrl(url);
+//            if (indexOfHash != -1 && guess.indexOf('#') == -1) {
+//                // Hash exists in original URL but no hash in guessed URL
+//                url = guess + url.substring(indexOfHash);
+//            } else {
+//                url = guess;
+//            }
+//        } else {
+//            url = URLUtil.composeSearchUrl(url, "https://www.google.com/search?q=%s", "%s");
+//        }
+//
+//        webview.loadUrl(url);
+//
+//        showAndHideKeyboard.hideKeyboard();
+//    }
+//
+//    private void newTab(String url) {
+//        WebView webview = createWebView(null);
+//        newTabCommon(webview);
+//        loadUrl(url, webview);
+//    }
+//
+//    public void setTabCountText(int count) {
+//        TextView tabs_number = findViewById(R.id.tabs_number);
+//        tabs_number.setText(String.valueOf(count));
+//    }
+//
+//    private void showLongPressMenu(String linkUrl, String imageUrl) {
+//        String url;
+//        String title;
+//        String[] options = new String[]{"Open in new tab", "Copy URL", "Show full URL", "Download"};
+//
+//        if (imageUrl == null) {
+//            if (linkUrl == null) {
+//                throw new IllegalArgumentException("Bad null arguments in showLongPressMenu");
+//            } else {
+//                // Text link
+//                url = linkUrl;
+//                title = linkUrl;
+//            }
+//        } else {
+//            if (linkUrl == null) {
+//                // Image without link
+//                url = imageUrl;
+//                title = "Image: " + imageUrl;
+//            } else {
+//                // Image with link
+//                url = linkUrl;
+//                title = linkUrl;
+//                String[] newOptions = new String[options.length + 1];
+//                System.arraycopy(options, 0, newOptions, 0, options.length);
+//                newOptions[newOptions.length - 1] = "Image Options";
+//                options = newOptions;
+//            }
+//        }
+//        new AlertDialog.Builder(WebActivity.this).setTitle(title).setItems(options, (dialog, which) -> {
+//            switch (which) {
+//                case 0:
+//                    newTab(url);
+//                    break;
+//                case 1:
+//                    ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+//                    assert clipboard != null;
+//                    ClipData clipData = ClipData.newPlainText("URL", url);
+//                    clipboard.setPrimaryClip(clipData);
+//                    break;
+//                case 2:
+//                    new AlertDialog.Builder(WebActivity.this)
+//                            .setTitle("Full URL")
+//                            .setMessage(url)
+//                            .setPositiveButton("OK", (dialog1, which1) -> {
+//                            })
+//                            .show();
+//                    break;
+//                case 3:
+//                    downloadHelper.startDownload(url, null);
+//                    break;
+//                case 4:
+//                    showLongPressMenu(null, imageUrl);
+//                    break;
+//            }
+//        }).show();
+//    }
 
-        WebView webview = new WebView(this);
-        if (bundle != null) {
-            webview.restoreState(bundle);
-        }
-        webview.setBackgroundColor(isNightMode ? Color.BLACK : Color.WHITE);
-        WebSettings settings = webview.getSettings();
-        settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
-        settings.setAllowUniversalAccessFromFileURLs(true);
-        settings.setJavaScriptEnabled(true);
-        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        settings.setDomStorageEnabled(true);
-        settings.setBuiltInZoomControls(true);
-        settings.setDisplayZoomControls(false);
-        settings.setLoadWithOverviewMode(true);
-        webview.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public void onProgressChanged(WebView view, int newProgress) {
-                super.onProgressChanged(view, newProgress);
-                if (newProgress == 100) {
-                    progressBar.setVisibility(View.GONE);
-                } else {
-                    progressBar.setProgress(newProgress);
-                }
-            }
-
-            @Override
-            public void onShowCustomView(View view, CustomViewCallback callback) {
-                fullScreenView[0] = view;
-                fullScreenCallback[0] = callback;
-                WebActivity.this.findViewById(R.id.main_layout).setVisibility(View.INVISIBLE);
-                ViewGroup fullscreenLayout = WebActivity.this.findViewById(R.id.fullScreenVideo);
-                fullscreenLayout.addView(view);
-                fullscreenLayout.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onHideCustomView() {
-                if (fullScreenView[0] == null) return;
-
-                ViewGroup fullscreenLayout = WebActivity.this.findViewById(R.id.fullScreenVideo);
-                fullscreenLayout.removeView(fullScreenView[0]);
-                fullscreenLayout.setVisibility(View.GONE);
-                fullScreenView[0] = null;
-                fullScreenCallback[0] = null;
-                WebActivity.this.findViewById(R.id.main_layout).setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
-                if (fileUploadCallback != null) {
-                    fileUploadCallback.onReceiveValue(null);
-                }
-
-                fileUploadCallback = filePathCallback;
-                Intent intent = fileChooserParams.createIntent();
-                try {
-                    fileUploadCallbackShouldReset = true;
-                    startActivityForResult(intent, FORM_FILE_CHOOSER);
-                    return true;
-                } catch (ActivityNotFoundException e) {
-                    // Continue below
-                }
-
-                intent.setType("*/*");
-                try {
-                    fileUploadCallbackShouldReset = false;
-                    startActivityForResult(intent, FORM_FILE_CHOOSER);
-                    return true;
-                } catch (ActivityNotFoundException e) {
-                    // Continue below
-                }
-
-                // Everything failed, let user know
-                Toast.makeText(WebActivity.this, "Can't open file chooser", Toast.LENGTH_SHORT).show();
-                fileUploadCallback = null;
-                return false;
-            }
-        });
-        webview.setWebViewClient(new WebViewClient() {
-            final String[] sslErrors = {"Not yet valid", "Expired", "Hostname mismatch", "Untrusted CA", "Invalid date", "Unknown error"};
-
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                progressBar.setProgress(0);
-                progressBar.setVisibility(View.VISIBLE);
-                if (view == getCurrentWebView()) {
-                    et.setText(url);
-                    et.setSelection(0);
-                    view.requestFocus();
-                }
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                if (view == getCurrentWebView()) {
-                    // Don't use the argument url here since navigation to that URL might have been
-                    // cancelled due to SSL error
-                    if (et.getSelectionStart() == 0 && et.getSelectionEnd() == 0 && et.getText().toString().equals(view.getUrl())) {
-                        // If user haven't started typing anything, focus on webview
-                        view.requestFocus();
-                    }
-                }
-            }
-
-            @Override
-            public void onReceivedHttpAuthRequest(WebView view, final HttpAuthHandler handler, String host, String realm) {
-                new AlertDialog.Builder(WebActivity.this)
-                        .setTitle(host)
-                        .setView(R.layout.login_password)
-                        .setCancelable(false)
-                        .setPositiveButton("OK", (dialog, which) -> {
-                            String username = ((EditText) ((Dialog) dialog).findViewById(R.id.username)).getText().toString();
-                            String password = ((EditText) ((Dialog) dialog).findViewById(R.id.password)).getText().toString();
-                            handler.proceed(username, password);
-                        })
-                        .setNegativeButton("Cancel", (dialog, which) -> handler.cancel()).show();
-            }
-
-            @Override
-            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-
-                return super.shouldInterceptRequest(view, request);
-            }
-
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                // For intent:// URLs, redirect to browser_fallback_url if given
-                if (url.startsWith("intent://")) {
-                    int start = url.indexOf(";S.browser_fallback_url=");
-                    if (start != -1) {
-                        start += ";S.browser_fallback_url=".length();
-                        int end = url.indexOf(';', start);
-                        if (end != -1 && end != start) {
-                            url = url.substring(start, end);
-                            url = Uri.decode(url);
-                            view.loadUrl(url);
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-
-            @Override
-            public void onLoadResource(WebView view, String url) {
-
-            }
-
-            @Override
-            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                int primaryError = error.getPrimaryError();
-                String errorStr = primaryError >= 0 && primaryError < sslErrors.length ? sslErrors[primaryError] : "Unknown error " + primaryError;
-                new AlertDialog.Builder(WebActivity.this)
-                        .setTitle("Insecure connection")
-                        .setMessage(String.format("Error: %s\nURL: %s\n\nCertificate:\n%s",
-                                errorStr, error.getUrl(), WebCertificate.certificateToStr(error.getCertificate())))
-                        .setPositiveButton("Proceed", (dialog, which) -> handler.proceed())
-                        .setNegativeButton("Cancel", (dialog, which) -> handler.cancel())
-                        .show();
-            }
-        });
-        webview.setOnLongClickListener(v -> {
-            String url = null, imageUrl = null;
-            WebView.HitTestResult r = ((WebView) v).getHitTestResult();
-            switch (r.getType()) {
-                case WebView.HitTestResult.SRC_ANCHOR_TYPE:
-                    url = r.getExtra();
-                    break;
-                case WebView.HitTestResult.IMAGE_TYPE:
-                    imageUrl = r.getExtra();
-                    break;
-                case WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE:
-                case WebView.HitTestResult.EMAIL_TYPE:
-                case WebView.HitTestResult.UNKNOWN_TYPE:
-                    Handler handler = new Handler();
-                    Message message = handler.obtainMessage();
-                    ((WebView) v).requestFocusNodeHref(message);
-                    url = message.getData().getString("url");
-                    if ("".equals(url)) {
-                        url = null;
-                    }
-                    imageUrl = message.getData().getString("src");
-                    if ("".equals(imageUrl)) {
-                        imageUrl = null;
-                    }
-                    if (url == null && imageUrl == null) {
-                        return false;
-                    }
-                    break;
-                default:
-                    return false;
-            }
-            showLongPressMenu(url, imageUrl);
-            return true;
-        });
-        webview.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
-            String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
-            new AlertDialog.Builder(WebActivity.this)
-                    .setTitle("Download")
-                    .setMessage(String.format("Filename: %s\nSize: %.2f MB\nURL: %s",
-                            filename,
-                            contentLength / 1024.0 / 1024.0,
-                            url))
-                    .setPositiveButton("Download", (dialog, which) -> downloadHelper.startDownload(url, filename))
-                    .setNeutralButton("Open", (dialog, which) -> {
-                        Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse(url));
-                        try {
-                            startActivity(i);
-                        } catch (ActivityNotFoundException e) {
-                            new AlertDialog.Builder(WebActivity.this)
-                                    .setTitle("Open")
-                                    .setMessage("Can't open files of this type. Try downloading instead.")
-                                    .setPositiveButton("OK", (dialog1, which1) -> {
-                                    })
-                                    .show();
-                        }
-                    })
-                    .setNegativeButton("Cancel", (dialog, which) -> {
-                    })
-                    .show();
-        });
-        webview.setFindListener((activeMatchOrdinal, numberOfMatches, isDoneCounting) ->
-                searchCount.setText(numberOfMatches == 0 ? "Not found" :
-                        String.format("%d / %d", activeMatchOrdinal + 1, numberOfMatches)));
-        return webview;
-    }
-
-    private void newTabCommon(WebView webview) {
-        boolean isDesktopUA = !tabs.isEmpty() && getCurrentTab().isDesktopUA;
-        webview.getSettings().setUserAgentString(isDesktopUA ? getString(R.string.desktopUA) : null);
-        webview.getSettings().setUseWideViewPort(isDesktopUA);
-        webview.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        webview.setVisibility(View.GONE);
-        Tab tab = new Tab(webview);
-        tab.isDesktopUA = isDesktopUA;
-        tabs.add(tab);
-        webviews.addView(webview);
-        setTabCountText(tabs.size());
-    }
-
-    private void newTab(String url) {
-        WebView webview = createWebView(null);
-        newTabCommon(webview);
-        loadUrl(url, webview);
-    }
-
-    public void setTabCountText(int count) {
-        TextView tabs_number = findViewById(R.id.tabs_number);
-        tabs_number.setText(String.valueOf(count));
-    }
-
-    private void showLongPressMenu(String linkUrl, String imageUrl) {
-        String url;
-        String title;
-        String[] options = new String[]{"Open in new tab", "Copy URL", "Show full URL", "Download"};
-
-        if (imageUrl == null) {
-            if (linkUrl == null) {
-                throw new IllegalArgumentException("Bad null arguments in showLongPressMenu");
-            } else {
-                // Text link
-                url = linkUrl;
-                title = linkUrl;
-            }
-        } else {
-            if (linkUrl == null) {
-                // Image without link
-                url = imageUrl;
-                title = "Image: " + imageUrl;
-            } else {
-                // Image with link
-                url = linkUrl;
-                title = linkUrl;
-                String[] newOptions = new String[options.length + 1];
-                System.arraycopy(options, 0, newOptions, 0, options.length);
-                newOptions[newOptions.length - 1] = "Image Options";
-                options = newOptions;
-            }
-        }
-        new AlertDialog.Builder(WebActivity.this).setTitle(title).setItems(options, (dialog, which) -> {
-            switch (which) {
-                case 0:
-                    newTab(url);
-                    break;
-                case 1:
-                    ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                    assert clipboard != null;
-                    ClipData clipData = ClipData.newPlainText("URL", url);
-                    clipboard.setPrimaryClip(clipData);
-                    break;
-                case 2:
-                    new AlertDialog.Builder(WebActivity.this)
-                            .setTitle("Full URL")
-                            .setMessage(url)
-                            .setPositiveButton("OK", (dialog1, which1) -> {
-                            })
-                            .show();
-                    break;
-                case 3:
-                    downloadHelper.startDownload(url, null);
-                    break;
-                case 4:
-                    showLongPressMenu(null, imageUrl);
-                    break;
-            }
-        }).show();
-    }
-
-    private void loadUrl(String url, WebView webview) {
-        url = url.trim();
-        if (url.isEmpty()) {
-            url = "about:blank";
-        }
-        if (url.startsWith("about:") || url.startsWith("javascript:") || url.startsWith("file:") || url.startsWith("data:") ||
-                (url.indexOf(' ') == -1 && Patterns.WEB_URL.matcher(url).matches())) {
-            int indexOfHash = url.indexOf('#');
-            String guess = URLUtil.guessUrl(url);
-            if (indexOfHash != -1 && guess.indexOf('#') == -1) {
-                // Hash exists in original URL but no hash in guessed URL
-                url = guess + url.substring(indexOfHash);
-            } else {
-                url = guess;
-            }
-        } else {
-            url = URLUtil.composeSearchUrl(url, "https://www.google.com/search?q=%s", "%s");
-        }
-
-        webview.loadUrl(url);
-
-        showAndHideKeyboard.hideKeyboard();
-    }
+    //to here
 
     private void tabsLayout() {
         View tabs_layout = findViewById(R.id.tabs_layout);
@@ -593,8 +549,8 @@ public class WebActivity extends Activity {
         });
 
         tabs_layout.findViewById(R.id.tabs_new_tab).setOnClickListener(view -> {
-            newTab("google.com");
-            switchToTab(tabs.size() - 1);
+            tabManager.newTab("google.com");
+            switchToTab(tabManager.tabs.size() - 1);
             tabs_layout.setVisibility(View.GONE);
         });
 
@@ -630,20 +586,20 @@ public class WebActivity extends Activity {
         View bottom_bar = findViewById(R.id.bottom_bar);
 
         bottom_bar.findViewById(R.id.back_btn).setOnClickListener(view -> {
-            if (getCurrentWebView().canGoBack()) {
-                getCurrentWebView().goBack();
+            if (tabManager.getCurrentWebView().canGoBack()) {
+                tabManager.getCurrentWebView().goBack();
             }
         });
 
         bottom_bar.findViewById(R.id.forward_btn).setOnClickListener(view -> {
-            if (getCurrentWebView().canGoForward()) {
-                getCurrentWebView().goForward();
+            if (tabManager.getCurrentWebView().canGoForward()) {
+                tabManager.getCurrentWebView().goForward();
             }
         });
 
-        bottom_bar.findViewById(R.id.home_btn).setOnClickListener(view -> getCurrentWebView().loadUrl("https://google.com"));
+        bottom_bar.findViewById(R.id.home_btn).setOnClickListener(view -> tabManager.getCurrentWebView().loadUrl("https://google.com"));
 
-        bottom_bar.findViewById(R.id.refresh_btn).setOnClickListener(view -> getCurrentWebView().reload());
+        bottom_bar.findViewById(R.id.refresh_btn).setOnClickListener(view -> tabManager.getCurrentWebView().reload());
 
         bottom_bar.findViewById(R.id.menu_btn).setOnClickListener(view -> showBottomSheetMenu());
     }
@@ -656,11 +612,11 @@ public class WebActivity extends Activity {
         );
 
         bottomSheetView.findViewById(R.id.desktop).setOnClickListener(view -> {
-            Tab tab = getCurrentTab();
+            TabManager.Tab tab = tabManager.getCurrentTab();
             tab.isDesktopUA = !tab.isDesktopUA;
-            getCurrentWebView().getSettings().setUserAgentString(tab.isDesktopUA ? getString(R.string.desktopUA) : null);
-            getCurrentWebView().getSettings().setUseWideViewPort(tab.isDesktopUA);
-            getCurrentWebView().reload();
+            tabManager.getCurrentWebView().getSettings().setUserAgentString(tab.isDesktopUA ? getString(R.string.desktopUA) : null);
+            tabManager.getCurrentWebView().getSettings().setUseWideViewPort(tab.isDesktopUA);
+            tabManager.getCurrentWebView().reload();
 
             bottomSheetDialog.dismiss();
         });
@@ -678,7 +634,7 @@ public class WebActivity extends Activity {
         bottomSheetView.findViewById(R.id.share).setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-            intent.putExtra(Intent.EXTRA_TEXT, getCurrentWebView().getUrl());
+            intent.putExtra(Intent.EXTRA_TEXT,tabManager.getCurrentWebView().getUrl());
             intent.setType("text/plain");
             startActivity(Intent.createChooser(intent, "Share URL"));
 
@@ -695,18 +651,18 @@ public class WebActivity extends Activity {
         });
 
         bottomSheetView.findViewById(R.id.cookie).setOnClickListener(view -> {
-            if (CookieManager.getInstance().acceptThirdPartyCookies(getCurrentWebView())) {
+            if (CookieManager.getInstance().acceptThirdPartyCookies(tabManager.getCurrentWebView())) {
                 CookieManager cookieManager = CookieManager.getInstance();
-                boolean newValue = !cookieManager.acceptThirdPartyCookies(getCurrentWebView());
-                cookieManager.setAcceptThirdPartyCookies(getCurrentWebView(), newValue);
+                boolean newValue = !cookieManager.acceptThirdPartyCookies(tabManager.getCurrentWebView());
+                cookieManager.setAcceptThirdPartyCookies(tabManager.getCurrentWebView(), newValue);
             }
             bottomSheetDialog.dismiss();
         });
 
         bottomSheetView.findViewById(R.id.tab_info).setOnClickListener(view -> {
-            String s = "URL: " + getCurrentWebView().getUrl() + "\n";
-            s += "Title: " + getCurrentWebView().getTitle() + "\n\n";
-            SslCertificate certificate = getCurrentWebView().getCertificate();
+            String s = "URL: " + tabManager.getCurrentWebView().getUrl() + "\n";
+            s += "Title: " + tabManager.getCurrentWebView().getTitle() + "\n\n";
+            SslCertificate certificate =tabManager.getCurrentWebView().getCertificate();
             s += certificate == null ? "Not secure" : "Certificate:\n" + WebCertificate.certificateToStr(certificate);
 
             new AlertDialog.Builder(this)
@@ -770,7 +726,7 @@ public class WebActivity extends Activity {
                     cursor.moveToPosition(which);
                     @SuppressLint("Range") String url = cursor.getString(cursor.getColumnIndex("url"));
                     et.setText(url);
-                    loadUrl(url, getCurrentWebView());
+                    tabManager.loadUrl(url,tabManager.getCurrentWebView());
                 }, "title")
                 .create();
         dialog.getListView().setOnItemLongClickListener((parent, view, position, id) -> {
@@ -823,31 +779,31 @@ public class WebActivity extends Activity {
     }
 
     private void closeCurrentTab() {
-        if (getCurrentWebView().getUrl() != null && !getCurrentWebView().getUrl().equals("google.com")) {
+        if (tabManager.getCurrentWebView().getUrl() != null && !tabManager.getCurrentWebView().getUrl().equals("google.com")) {
             TitleAndBundle titleAndBundle = new TitleAndBundle();
-            titleAndBundle.title = getCurrentWebView().getTitle();
+            titleAndBundle.title =tabManager.getCurrentWebView().getTitle();
             titleAndBundle.bundle = new Bundle();
-            getCurrentWebView().saveState(titleAndBundle.bundle);
+           tabManager.getCurrentWebView().saveState(titleAndBundle.bundle);
             closedTabs.add(0, titleAndBundle);
             if (closedTabs.size() > 500) {
                 closedTabs.remove(closedTabs.size() - 1);
             }
         }
-        ((FrameLayout) findViewById(R.id.webviews)).removeView(getCurrentWebView());
-        getCurrentWebView().destroy();
-        tabs.remove(currentTabIndex);
-        if (currentTabIndex >= tabs.size()) {
-            currentTabIndex = tabs.size() - 1;
+        ((FrameLayout) findViewById(R.id.webviews)).removeView(tabManager.getCurrentWebView());
+       tabManager.getCurrentWebView().destroy();
+        tabManager.tabs.remove(tabManager.currentTabIndex);
+        if (tabManager.currentTabIndex >= tabManager.tabs.size()) {
+            tabManager.currentTabIndex = tabManager.tabs.size() - 1;
         }
-        if (currentTabIndex == -1) {
+        if (tabManager.currentTabIndex == -1) {
             // We just closed the last tab
-            newTab("google.com");
-            currentTabIndex = 0;
+            tabManager.newTab("google.com");
+            tabManager.currentTabIndex = 0;
         }
-        getCurrentWebView().setVisibility(View.VISIBLE);
-        et.setText(getCurrentWebView().getUrl());
-        setTabCountText(tabs.size());
-        getCurrentWebView().requestFocus();
+       tabManager.getCurrentWebView().setVisibility(View.VISIBLE);
+        et.setText(tabManager.getCurrentWebView().getUrl());
+        tabManager.setTabCountText(tabManager.tabs.size());
+       tabManager.getCurrentWebView().requestFocus();
     }
 
     @Override
@@ -882,18 +838,18 @@ public class WebActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         String url = getUrlFromIntent(intent);
         if (!url.isEmpty()) {
-            newTab("google.com");
-            switchToTab(tabs.size() - 1);
+            tabManager.newTab("google.com");
+            switchToTab(tabManager.tabs.size() - 1);
         }
     }
 
     @Override
     public void onBackPressed() {
-        if (findViewById(R.id.fullScreenVideo).getVisibility() == View.VISIBLE && fullScreenCallback[0] != null) {
-            fullScreenCallback[0].onCustomViewHidden();
-        } else if (getCurrentWebView().canGoBack()) {
-            getCurrentWebView().goBack();
-        } else if (tabs.size() > 1) {
+        if (findViewById(R.id.fullScreenVideo).getVisibility() == View.VISIBLE && tabManager.fullScreenCallback[0] != null) {
+            tabManager.fullScreenCallback[0].onCustomViewHidden();
+        } else if (tabManager.getCurrentWebView().canGoBack()) {
+           tabManager.getCurrentWebView().goBack();
+        } else if (tabManager.tabs.size() > 1) {
             closeCurrentTab();
         } else {
             super.onBackPressed();
