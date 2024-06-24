@@ -7,11 +7,9 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -20,7 +18,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.net.http.SslCertificate;
 import android.net.http.SslError;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -31,11 +28,8 @@ import android.util.Log;
 import android.util.Patterns;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.SslErrorHandler;
@@ -45,13 +39,11 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
-import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,189 +55,58 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.ibndev.icebrowser.browserparts.DownloadHelper;
 import com.ibndev.icebrowser.browserparts.PlacesDbHelper;
+import com.ibndev.icebrowser.browserparts.PopupMenuHelper;
 import com.ibndev.icebrowser.browserparts.SearchAutocompleteAdapter;
 import com.ibndev.icebrowser.browserparts.ShowAndHideKeyboard;
+import com.ibndev.icebrowser.browserparts.TabManager;
 import com.ibndev.icebrowser.browserparts.TabsAdapter;
 import com.ibndev.icebrowser.browserparts.WebCertificate;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class WebActivity extends Activity {
 
-    public static class Tab {
-        public Tab(WebView w) {
-            this.webview = w;
-        }
-
-        WebView webview;
-        boolean isDesktopUA;
-    }
-
+    static final int FORM_FILE_CHOOSER = 1;
+    private static final String TAG = WebActivity.class.getSimpleName();
+    final int PERMISSION_REQUEST_DOWNLOAD = 3;
     private final View[] fullScreenView = new View[1];
     private final WebChromeClient.CustomViewCallback[] fullScreenCallback = new WebChromeClient.CustomViewCallback[1];
-
-    private static final String TAG = WebActivity.class.getSimpleName();
-
-    static final String searchUrl = "https://www.google.com/search?q=%s";
-//    static final String searchCompleteUrl = "https://www.google.com/complete/search?client=firefox&q=%s";
-    static final String desktopUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36";
-    final int PERMISSION_REQUEST_DOWNLOAD = 3;
-    static final int FORM_FILE_CHOOSER = 1;
-
-    private ArrayList<Tab> tabs = new ArrayList<>();
-    private int currentTabIndex;
+    ShowAndHideKeyboard showAndHideKeyboard;
+    DownloadHelper downloadHelper;
     private FrameLayout webviews;
     private AutoCompleteTextView et;
     private boolean isNightMode;
     private boolean isFullscreen;
     private SharedPreferences prefs;
     private TextView searchCount;
-
     private EditText searchEdit;
-
     private SQLiteDatabase placesDb;
-
     private ValueCallback<Uri[]> fileUploadCallback;
     private boolean fileUploadCallbackShouldReset;
-
-    private static class MenuAction {
-
-        static HashMap<String, MenuAction> actions = new HashMap<>();
-
-        private MenuAction(String title, int icon, Runnable action) {
-            this(title, icon, action, null);
-        }
-
-        private MenuAction(String title, int icon, Runnable action, MyBooleanSupplier getState) {
-            this.title = title;
-            this.icon = icon;
-            this.action = action;
-            this.getState = getState;
-            actions.put(title, this);
-        }
-
-        @Override
-        public String toString() {
-            return title;
-        }
-
-        private String title;
-        private int icon;
-        private Runnable action;
-        private MyBooleanSupplier getState;
-    }
-
-    boolean isBookmarked = false;
-    private List<String> tabTitles = new ArrayList<>();
-    private RecyclerView recyclerView;
+    private final List<String> tabTitles = new ArrayList<>();
     private TabsAdapter adapter;
+    private final ArrayList<TitleAndBundle> closedTabs = new ArrayList<>();
+    private final TabManager tabManager = new TabManager();
 
-    private void showPopupMenu(View view) {
-        PopupMenu popupMenu = new PopupMenu(this, view);
-        MenuInflater inflater = popupMenu.getMenuInflater();
-        inflater.inflate(R.menu.top_bar_menu, popupMenu.getMenu());
-
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            popupMenu.setForceShowIcon(true);
-        } else {
-            try {
-                Field[] fields = popupMenu.getClass().getDeclaredFields();
-                for (Field field : fields) {
-                    if ("mPopup".equals(field.getName())) {
-                        field.setAccessible(true);
-                        Object menuPopupHelper = field.get(popupMenu);
-                        Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
-                        Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
-                        setForceIcons.invoke(menuPopupHelper, true);
-                        break;
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        isBookmarked = isUrlInBookmarks(getCurrentWebView().getUrl());
-
-
-        if (isBookmarked) {
-            popupMenu.getMenu().findItem(R.id.action_save_bookmark).setIcon(R.drawable.bookmark_saved);
-            popupMenu.getMenu().findItem(R.id.action_save_bookmark).setTitle("Remove Bookmark");
-        } else {
-            popupMenu.getMenu().findItem(R.id.action_save_bookmark).setIcon(R.drawable.add_);
-            popupMenu.getMenu().findItem(R.id.action_save_bookmark).setTitle("Save Bookmark");
-        }
-
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                return onOptionsItemSelected(item);
-            }
-        });
-        popupMenu.show();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_open_with) {
-            openUrlInApp();
-            return true;
-        } else if (item.getItemId() == R.id.action_save_bookmark) {
-            if (isBookmarked) {
-                deleteBookmark(getCurrentWebView().getUrl());
-                Toast.makeText(WebActivity.this, "Bookmark removed", Toast.LENGTH_SHORT).show();
-            } else {
-                addBookmark();
-                Toast.makeText(WebActivity.this, "Bookmark saved", Toast.LENGTH_SHORT).show();
-            }
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void deleteBookmark(String urlToCheck) {
-        if (placesDb == null) return;
-
-        // Use parameterized query to avoid SQL injection
-        placesDb.execSQL("DELETE FROM bookmarks WHERE url = ?", new Object[]{urlToCheck});
-    }
-
-
-    @SuppressWarnings("unchecked")
-    final MenuAction[] menuActions = new MenuAction[]{
-            new MenuAction("Night mode", R.drawable.night, this::toggleNightMode, () -> isNightMode),
-            new MenuAction("Full screen", R.drawable.fullscreen, this::toggleFullscreen, () -> isFullscreen),
-
-            new MenuAction("Delete all bookmarks", 0, this::deleteAllBookmarks),
-
-            new MenuAction("Clear history and cache", 0, this::clearHistoryCache),
-    };
-
-    static class TitleAndBundle {
-        String title;
-        Bundle bundle;
-    }
-
-    private ArrayList<TitleAndBundle> closedTabs = new ArrayList<>();
-
-    private Tab getCurrentTab() {
-        return tabs.get(currentTabIndex);
-    }
-
-    ShowAndHideKeyboard showAndHideKeyboard;
-
-
-    private WebView getCurrentWebView() {
-        return getCurrentTab().webview;
-    }
+//    public static class Tab {
+//        WebView webview;
+//        boolean isDesktopUA;
+//        public Tab(WebView w) {
+//            this.webview = w;
+//        }
+//    }
+//
+//    private final ArrayList<Tab> tabs = new ArrayList<>();
+//    private int currentTabIndex;
+//
+//    private Tab getCurrentTab() {
+//        return tabs.get(currentTabIndex);
+//    }
+//
+//    private WebView getCurrentWebView() {
+//        return getCurrentTab().webview;
+//    }
 
 
     private void switchToTab(int tab) {
@@ -265,9 +126,6 @@ public class WebActivity extends Activity {
             getWindow().getDecorView().setSystemUiVisibility(isFullscreen ? flags : 0);
         }
     }
-
-
-    DownloadHelper downloadHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -296,12 +154,15 @@ public class WebActivity extends Activity {
 
         showAndHideKeyboard = new ShowAndHideKeyboard(this, et);
         downloadHelper = new DownloadHelper(this);
+        PopupMenuHelper menuHelper = new PopupMenuHelper(this, placesDb);
 
         tabRecyclerView();
         tabsLayout();
         bottomBar();
 
-        findViewById(R.id.more_button).setOnClickListener(this::showPopupMenu);
+        findViewById(R.id.more_button).setOnClickListener(view -> {
+            menuHelper.showPopupMenu(view, getCurrentWebView().getUrl(), getCurrentWebView().getTitle());
+        });
 
         findViewById(R.id.tabs_button).setOnClickListener(view -> {
             tabTitles.clear();
@@ -384,7 +245,6 @@ public class WebActivity extends Activity {
         newTab(et.getText().toString());
         getCurrentWebView().setVisibility(View.VISIBLE);
         getCurrentWebView().requestFocus();
-        onNightModeChange();
 
 
     }
@@ -471,6 +331,8 @@ public class WebActivity extends Activity {
             }
         });
         webview.setWebViewClient(new WebViewClient() {
+            final String[] sslErrors = {"Not yet valid", "Expired", "Hostname mismatch", "Untrusted CA", "Invalid date", "Unknown error"};
+
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 progressBar.setProgress(0);
@@ -508,10 +370,6 @@ public class WebActivity extends Activity {
                         .setNegativeButton("Cancel", (dialog, which) -> handler.cancel()).show();
             }
 
-            final InputStream emptyInputStream = new ByteArrayInputStream(new byte[0]);
-
-            String lastMainPage = "";
-
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
 
@@ -541,8 +399,6 @@ public class WebActivity extends Activity {
             public void onLoadResource(WebView view, String url) {
 
             }
-
-            final String[] sslErrors = {"Not yet valid", "Expired", "Hostname mismatch", "Untrusted CA", "Invalid date", "Unknown error"};
 
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
@@ -624,10 +480,9 @@ public class WebActivity extends Activity {
         return webview;
     }
 
-
     private void newTabCommon(WebView webview) {
         boolean isDesktopUA = !tabs.isEmpty() && getCurrentTab().isDesktopUA;
-        webview.getSettings().setUserAgentString(isDesktopUA ? desktopUA : null);
+        webview.getSettings().setUserAgentString(isDesktopUA ? getString(R.string.desktopUA) : null);
         webview.getSettings().setUseWideViewPort(isDesktopUA);
         webview.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         webview.setVisibility(View.GONE);
@@ -648,7 +503,6 @@ public class WebActivity extends Activity {
         TextView tabs_number = findViewById(R.id.tabs_number);
         tabs_number.setText(String.valueOf(count));
     }
-
 
     private void showLongPressMenu(String linkUrl, String imageUrl) {
         String url;
@@ -707,26 +561,6 @@ public class WebActivity extends Activity {
         }).show();
     }
 
-
-
-
-    boolean hasOrRequestPermission(String permission, String explanation, int requestCode) {
-        if (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
-            // Permission already granted
-            return true;
-        }
-        if (explanation != null && shouldShowRequestPermissionRationale(permission)) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Permission Required")
-                    .setMessage(explanation)
-                    .setPositiveButton("OK", (dialog, which) -> requestPermissions(new String[]{permission}, requestCode))
-                    .show();
-            return false;
-        }
-        requestPermissions(new String[]{permission}, requestCode);
-        return false;
-    }
-
     private void loadUrl(String url, WebView webview) {
         url = url.trim();
         if (url.isEmpty()) {
@@ -743,7 +577,7 @@ public class WebActivity extends Activity {
                 url = guess;
             }
         } else {
-            url = URLUtil.composeSearchUrl(url, searchUrl, "%s");
+            url = URLUtil.composeSearchUrl(url, "https://www.google.com/search?q=%s", "%s");
         }
 
         webview.loadUrl(url);
@@ -767,9 +601,8 @@ public class WebActivity extends Activity {
         tabs_layout.findViewById(R.id.close_tabs_menu).setOnClickListener(view -> tabs_layout.setVisibility(View.GONE));
     }
 
-
     private void tabRecyclerView() {
-        recyclerView = findViewById(R.id.tabs_list);
+        RecyclerView recyclerView = findViewById(R.id.tabs_list);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new TabsAdapter(tabTitles, v -> {
@@ -815,7 +648,6 @@ public class WebActivity extends Activity {
         bottom_bar.findViewById(R.id.menu_btn).setOnClickListener(view -> showBottomSheetMenu());
     }
 
-
     private void showBottomSheetMenu() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(WebActivity.this);
         View bottomSheetView = LayoutInflater.from(WebActivity.this).inflate(
@@ -826,7 +658,7 @@ public class WebActivity extends Activity {
         bottomSheetView.findViewById(R.id.desktop).setOnClickListener(view -> {
             Tab tab = getCurrentTab();
             tab.isDesktopUA = !tab.isDesktopUA;
-            getCurrentWebView().getSettings().setUserAgentString(tab.isDesktopUA ? desktopUA : null);
+            getCurrentWebView().getSettings().setUserAgentString(tab.isDesktopUA ? getString(R.string.desktopUA) : null);
             getCurrentWebView().getSettings().setUseWideViewPort(tab.isDesktopUA);
             getCurrentWebView().reload();
 
@@ -918,7 +750,6 @@ public class WebActivity extends Activity {
         }
     }
 
-
     private void toggleFullscreen() {
         isFullscreen = !isFullscreen;
         updateFullScreen();
@@ -927,18 +758,6 @@ public class WebActivity extends Activity {
     private void toggleNightMode() {
         isNightMode = !isNightMode;
         prefs.edit().putBoolean("night_mode", isNightMode).apply();
-        onNightModeChange();
-    }
-
-
-    private boolean isUrlInBookmarks(String urlToCheck) {
-        if (placesDb == null) return false;
-        Cursor cursor = placesDb.rawQuery("SELECT 1 FROM bookmarks WHERE url = ?", new String[]{urlToCheck});
-
-        boolean exists = cursor.moveToFirst();
-        cursor.close();
-
-        return exists;
     }
 
     private void showBookmarks() {
@@ -1003,42 +822,6 @@ public class WebActivity extends Activity {
         dialog.show();
     }
 
-    private void addBookmark() {
-        if (placesDb == null) return;
-        ContentValues values = new ContentValues(2);
-        values.put("title", getCurrentWebView().getTitle());
-        values.put("url", getCurrentWebView().getUrl());
-        placesDb.insert("bookmarks", null, values);
-    }
-
-    private void deleteAllBookmarks() {
-        if (placesDb == null) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Bookmarks error")
-                    .setMessage("Can't open bookmarks database")
-                    .setPositiveButton("OK", (dialog, which) -> {
-                    })
-                    .show();
-            return;
-        }
-        new AlertDialog.Builder(this)
-                .setTitle("Delete all bookmarks?")
-                .setMessage("This action cannot be undone")
-                .setNegativeButton("Cancel", (dialog, which) -> {
-                })
-                .setPositiveButton("Delete All", (dialog, which) -> placesDb.execSQL("DELETE FROM bookmarks"))
-                .show();
-    }
-
-    private void clearHistoryCache() {
-        WebView v = getCurrentWebView();
-        v.clearCache(true);
-        v.clearFormData();
-        v.clearHistory();
-        CookieManager.getInstance().removeAllCookies(null);
-        WebStorage.getInstance().deleteAllData();
-    }
-
     private void closeCurrentTab() {
         if (getCurrentWebView().getUrl() != null && !getCurrentWebView().getUrl().equals("google.com")) {
             TitleAndBundle titleAndBundle = new TitleAndBundle();
@@ -1072,9 +855,7 @@ public class WebActivity extends Activity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST_DOWNLOAD) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, proceed with the download if needed
             } else {
-                // Permission denied, show a message to the user
                 new AlertDialog.Builder(this)
                         .setTitle("Permission Denied")
                         .setMessage("The app needs storage permission to download files.")
@@ -1084,6 +865,7 @@ public class WebActivity extends Activity {
             }
         }
     }
+
     private String getUrlFromIntent(Intent intent) {
         if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
             return intent.getDataString();
@@ -1105,52 +887,6 @@ public class WebActivity extends Activity {
         }
     }
 
-    private void onNightModeChange() {
-        if (isNightMode) {
-            int textColor = Color.rgb(0x61, 0x61, 0x5f);
-            int backgroundColor = Color.rgb(0x22, 0x22, 0x22);
-            et.setTextColor(textColor);
-            et.setBackgroundColor(backgroundColor);
-            searchEdit.setTextColor(textColor);
-            searchEdit.setBackgroundColor(backgroundColor);
-            findViewById(R.id.main_layout).setBackgroundColor(Color.BLACK);
-            findViewById(R.id.toolbar).setBackgroundColor(Color.BLACK);
-            ((ProgressBar) findViewById(R.id.progressbar)).setProgressTintList(ColorStateList.valueOf(Color.rgb(0, 0x66, 0)));
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            getWindow().setNavigationBarColor(Color.BLACK);
-        } else {
-            int textColor = Color.BLACK;
-            int backgroundColor = Color.rgb(0xe0, 0xe0, 0xe0);
-            et.setTextColor(textColor);
-            et.setBackgroundColor(backgroundColor);
-            searchEdit.setTextColor(textColor);
-            searchEdit.setBackgroundColor(backgroundColor);
-            findViewById(R.id.main_layout).setBackgroundColor(Color.WHITE);
-            findViewById(R.id.toolbar).setBackgroundColor(Color.rgb(0xe0, 0xe0, 0xe0));
-            ((ProgressBar) findViewById(R.id.progressbar)).setProgressTintList(ColorStateList.valueOf(Color.rgb(0, 0xcc, 0)));
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        }
-        for (int i = 0; i < tabs.size(); i++) {
-            tabs.get(i).webview.setBackgroundColor(isNightMode ? Color.BLACK : Color.WHITE);
-        }
-    }
-
-    private void openUrlInApp() {
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(getCurrentWebView().getUrl()));
-        try {
-            startActivity(i);
-        } catch (ActivityNotFoundException e) {
-            new AlertDialog.Builder(WebActivity.this)
-                    .setTitle("Open in app")
-                    .setMessage("No app can open this URL.")
-                    .setPositiveButton("OK", (dialog1, which1) -> {
-                    })
-                    .show();
-        }
-    }
-
-
     @Override
     public void onBackPressed() {
         if (findViewById(R.id.fullScreenVideo).getVisibility() == View.VISIBLE && fullScreenCallback[0] != null) {
@@ -1164,155 +900,52 @@ public class WebActivity extends Activity {
         }
     }
 
-
     interface MyBooleanSupplier {
         boolean getAsBoolean();
     }
 
-//    static class SearchAutocompleteAdapter extends BaseAdapter implements Filterable {
-//
-//        interface OnSearchCommitListener {
-//            void onSearchCommit(String text);
+
+
+    static class TitleAndBundle {
+        String title;
+        Bundle bundle;
+    }
+
+    //TODO: Need it sometime
+//    private void deleteAllBookmarks() {
+//        if (placesDb == null) {
+//            new AlertDialog.Builder(this)
+//                    .setTitle("Bookmarks error")
+//                    .setMessage("Can't open bookmarks database")
+//                    .setPositiveButton("OK", (dialog, which) -> {
+//                    })
+//                    .show();
+//            return;
 //        }
-//
-//        private final Context mContext;
-//        private final OnSearchCommitListener commitListener;
-//        private List<String> completions = new ArrayList<>();
-//
-//        SearchAutocompleteAdapter(Context context, OnSearchCommitListener commitListener) {
-//            mContext = context;
-//            this.commitListener = commitListener;
-//        }
-//
-//        @Override
-//        public int getCount() {
-//            return completions.size();
-//        }
-//
-//        @Override
-//        public Object getItem(int position) {
-//            return completions.get(position);
-//        }
-//
-//        @Override
-//        public long getItemId(int position) {
-//            return position;
-//        }
-//
-//        @SuppressLint("ClickableViewAccessibility")
-//        @Override
-//        @SuppressWarnings("ConstantConditions")
-//        public View getView(final int position, View convertView, ViewGroup parent) {
-//            if (convertView == null) {
-//                LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//                convertView = inflater.inflate(android.R.layout.simple_dropdown_item_1line, parent, false);
-//            }
-//            TextView v = convertView.findViewById(android.R.id.text1);
-//            v.setText(completions.get(position));
-//            Drawable d = mContext.getResources().getDrawable(R.drawable.commit_search, null);
-//            int size = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, mContext.getResources().getDisplayMetrics());
-//            d.setBounds(0, 0, size, size);
-//            v.setCompoundDrawables(null, null, d, null);
-//            //noinspection AndroidLintClickableViewAccessibility
-//            v.setOnTouchListener((v1, event) -> {
-//                if (event.getAction() != MotionEvent.ACTION_DOWN) {
-//                    return false;
-//                }
-//                TextView t = (TextView) v1;
-//                if (event.getX() > t.getWidth() - t.getCompoundPaddingRight()) {
-//                    commitListener.onSearchCommit(getItem(position).toString());
-//                    return true;
-//                }
-//                return false;
-//            });
-//            //noinspection AndroidLintClickableViewAccessibility
-//            parent.setOnTouchListener((dropdown, event) -> {
-//                if (event.getX() > dropdown.getWidth() - size * 2) {
-//                    return true;
-//                }
-//                return false;
-//            });
-//            return convertView;
-//        }
-//
-//        @Override
-//        public Filter getFilter() {
-//            return new Filter() {
-//                @Override
-//                protected FilterResults performFiltering(CharSequence constraint) {
-//                    // Invoked on a worker thread
-//                    FilterResults filterResults = new FilterResults();
-//                    if (constraint != null) {
-//                        List<String> results = getCompletions(constraint.toString());
-//                        filterResults.values = results;
-//                        filterResults.count = results.size();
-//                    }
-//                    return filterResults;
-//                }
-//
-//                @Override
-//                @SuppressWarnings("unchecked")
-//                protected void publishResults(CharSequence constraint, FilterResults results) {
-//                    if (results != null && results.count > 0) {
-//                        completions = (List<String>) results.values;
-//                        notifyDataSetChanged();
-//                    } else {
-//                        notifyDataSetInvalidated();
-//                    }
-//                }
-//            };
-//        }
-//
-//        // Runs on a worker thread
-//        private List<String> getCompletions(String text) {
-//            int total = 0;
-//            byte[] data = new byte[16384];
-//            try {
-//                URL url = new URL(URLUtil.composeSearchUrl(text, searchCompleteUrl, "%s"));
-//                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-//                try {
-//                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-//                    while (total <= data.length) {
-//                        int count = in.read(data, total, data.length - total);
-//                        if (count == -1) {
-//                            break;
-//                        }
-//                        total += count;
-//                    }
-//                    if (total == data.length) {
-//                        // overflow
-//                        return new ArrayList<>();
-//                    }
-//                } finally {
-//                    urlConnection.disconnect();
-//                }
-//            } catch (IOException e) {
-//                // Swallow exception and return empty list
-//                return new ArrayList<>();
-//            }
-//
-//            // Result looks like:
-//            // [ "original query", ["completion1", "completion2", ...], ...]
-//
-//            JSONArray jsonArray;
-//            try {
-//                jsonArray = new JSONArray(new String(data, StandardCharsets.UTF_8));
-//            } catch (JSONException e) {
-//                return new ArrayList<>();
-//            }
-//            jsonArray = jsonArray.optJSONArray(1);
-//            if (jsonArray == null) {
-//                return new ArrayList<>();
-//            }
-//            final int MAX_RESULTS = 10;
-//            List<String> result = new ArrayList<>(Math.min(jsonArray.length(), MAX_RESULTS));
-//            for (int i = 0; i < jsonArray.length() && result.size() < MAX_RESULTS; i++) {
-//                String s = jsonArray.optString(i);
-//                if (s != null && !s.isEmpty()) {
-//                    result.add(s);
-//                }
-//            }
-//            return result;
-//        }
+//        new AlertDialog.Builder(this)
+//                .setTitle("Delete all bookmarks?")
+//                .setMessage("This action cannot be undone")
+//                .setNegativeButton("Cancel", (dialog, which) -> {
+//                })
+//                .setPositiveButton("Delete All", (dialog, which) -> placesDb.execSQL("DELETE FROM bookmarks"))
+//                .show();
 //    }
+//
+//    private void clearHistoryCache() {
+//        WebView v = getCurrentWebView();
+//        v.clearCache(true);
+//        v.clearFormData();
+//        v.clearHistory();
+//        CookieManager.getInstance().removeAllCookies(null);
+//        WebStorage.getInstance().deleteAllData();
+//    }
+    //TODO: Maybe you need this
+//    final MenuAction[] menuActions = new MenuAction[]{
+//            new MenuAction("Night mode", R.drawable.night, this::toggleNightMode, () -> isNightMode),
+//            new MenuAction("Full screen", R.drawable.fullscreen, this::toggleFullscreen, () -> isFullscreen),
+//
+//            new MenuAction("Delete all bookmarks", 0, this::deleteAllBookmarks),
+//
+//            new MenuAction("Clear history and cache", 0, this::clearHistoryCache),
+//    };
 }

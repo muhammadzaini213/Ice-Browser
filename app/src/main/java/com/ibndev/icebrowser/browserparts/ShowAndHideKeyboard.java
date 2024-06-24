@@ -8,10 +8,12 @@ public class ShowAndHideKeyboard {
 
     Context context;
     AutoCompleteTextView et;
-    public ShowAndHideKeyboard(Context context, AutoCompleteTextView et){
+
+    public ShowAndHideKeyboard(Context context, AutoCompleteTextView et) {
         this.context = context;
         this.et = et;
     }
+
     public void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         assert imm != null;

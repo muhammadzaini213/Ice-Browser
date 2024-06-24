@@ -2,8 +2,6 @@ package com.ibndev.icebrowser.browserparts;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -33,15 +31,10 @@ import java.util.List;
 
 public class SearchAutocompleteAdapter extends BaseAdapter implements Filterable {
 
-    public interface OnSearchCommitListener {
-        void onSearchCommit(String text);
-    }
-
+    static final String searchCompleteUrl = "https://www.google.com/complete/search?client=firefox&q=%s";
     private final Context mContext;
     private final OnSearchCommitListener commitListener;
     private List<String> completions = new ArrayList<>();
-    static final String searchCompleteUrl = "https://www.google.com/complete/search?client=firefox&q=%s";
-
     public SearchAutocompleteAdapter(Context context, OnSearchCommitListener commitListener) {
         mContext = context;
         this.commitListener = commitListener;
@@ -161,6 +154,10 @@ public class SearchAutocompleteAdapter extends BaseAdapter implements Filterable
             }
         }
         return result;
+    }
+
+    public interface OnSearchCommitListener {
+        void onSearchCommit(String text);
     }
 }
 

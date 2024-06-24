@@ -1,17 +1,12 @@
 package com.ibndev.icebrowser;
 
-import android.app.DownloadManager;
 import android.os.Bundle;
-import android.os.Environment;
-import android.webkit.CookieManager;
-import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.SearchView;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.regex.Pattern;

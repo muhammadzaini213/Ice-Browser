@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.webkit.CookieManager;
@@ -13,9 +12,9 @@ import android.webkit.URLUtil;
 
 public class DownloadHelper {
 
-    private Activity activity;
-    private RequestPermission permissionHelper;
     private static final int PERMISSION_REQUEST_DOWNLOAD = 1001;
+    private final Activity activity;
+    private final RequestPermission permissionHelper;
 
     public DownloadHelper(Activity activity) {
         this.activity = activity;
