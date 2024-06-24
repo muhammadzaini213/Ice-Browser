@@ -6,21 +6,18 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DownloadManager;
-import android.app.LoaderManager;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -34,14 +31,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.Editable;
-import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Patterns;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -71,30 +66,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.view.menu.MenuBuilder;
-import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.ibndev.icebrowser.browserparts.PlacesDbHelper;
 import com.ibndev.icebrowser.browserparts.ShowAndHideKeyboard;
+import com.ibndev.icebrowser.browserparts.TabsAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
@@ -104,8 +90,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class WebActivity extends Activity {
 
@@ -129,20 +113,7 @@ public class WebActivity extends Activity {
 
     static final int PERMISSION_REQUEST_DOWNLOAD = 3;
 
-    static final String[] adblockRulesList = {
-            "https://easylist.to/easylist/easylist.txt",
-            "https://easylist.to/easylist/easyprivacy.txt",
-            "https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=1&mimetype=plaintext",    // Peter's
-            "https://easylist.to/easylist/fanboy-social.txt",
-            "https://easylist-downloads.adblockplus.org/advblock.txt",  // RU AdList
-    };
-
     static final int FORM_FILE_CHOOSER = 1;
-
-    static final int PERMISSION_REQUEST_EXPORT_BOOKMARKS = 1;
-    static final int PERMISSION_REQUEST_IMPORT_BOOKMARKS = 2;
-
-    private boolean isLogRequests;
 
     private ArrayList<Tab> tabs = new ArrayList<>();
     private int currentTabIndex;
@@ -151,9 +122,6 @@ public class WebActivity extends Activity {
     private boolean isNightMode;
     private boolean isFullscreen;
     private SharedPreferences prefs;
-    private boolean useAdBlocker;
-    private AdBlocker adBlocker;
-    private ArrayList<String> requestsLog;
     private TextView searchCount;
 
     private EditText searchEdit;
@@ -190,6 +158,11 @@ public class WebActivity extends Activity {
         private MyBooleanSupplier getState;
     }
 
+    boolean isBookmarked = false;
+    private List<String> tabTitles = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private TabsAdapter adapter;
+
     private void showPopupMenu(View view) {
         PopupMenu popupMenu = new PopupMenu(this, view);
         MenuInflater inflater = popupMenu.getMenuInflater();
@@ -216,13 +189,15 @@ public class WebActivity extends Activity {
             }
         }
 
-        boolean isBookmarked = isUrlInBookmarks(getCurrentWebView().getUrl());
+        isBookmarked = isUrlInBookmarks(getCurrentWebView().getUrl());
 
 
         if (isBookmarked) {
             popupMenu.getMenu().findItem(R.id.action_save_bookmark).setIcon(R.drawable.bookmark_saved);
+            popupMenu.getMenu().findItem(R.id.action_save_bookmark).setTitle("Remove Bookmark");
         } else {
             popupMenu.getMenu().findItem(R.id.action_save_bookmark).setIcon(R.drawable.add_);
+            popupMenu.getMenu().findItem(R.id.action_save_bookmark).setTitle("Save Bookmark");
         }
 
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -240,26 +215,32 @@ public class WebActivity extends Activity {
             openUrlInApp();
             return true;
         } else if (item.getItemId() == R.id.action_save_bookmark){
-            addBookmark();
-            Toast.makeText(WebActivity.this, "Bookmark saved", Toast.LENGTH_SHORT).show();
+            if(isBookmarked){
+                deleteBookmark(getCurrentWebView().getUrl());
+                Toast.makeText(WebActivity.this, "Bookmark removed", Toast.LENGTH_SHORT).show();
+            } else {
+                addBookmark();
+                Toast.makeText(WebActivity.this, "Bookmark saved", Toast.LENGTH_SHORT).show();
+            }
             return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
     }
 
+    private void deleteBookmark(String urlToCheck) {
+        if (placesDb == null) return;
+
+        // Use parameterized query to avoid SQL injection
+        placesDb.execSQL("DELETE FROM bookmarks WHERE url = ?", new Object[]{urlToCheck});
+    }
+
+
     @SuppressWarnings("unchecked")
     final MenuAction[] menuActions = new MenuAction[]{
-            new MenuAction("Ad Blocker", R.drawable.adblocker, this::toggleAdblocker, () -> useAdBlocker),
-            new MenuAction("Update adblock rules", 0, this::updateAdblockRules),
             new MenuAction("Night mode", R.drawable.night, this::toggleNightMode, () -> isNightMode),
-            new MenuAction("Show address bar", R.drawable.url_bar, this::toggleShowAddressBar, () -> et.getVisibility() == View.VISIBLE),
             new MenuAction("Full screen", R.drawable.fullscreen, this::toggleFullscreen, () -> isFullscreen),
 
-            new MenuAction("Bookmarks", R.drawable.bookmarks, this::showBookmarks),
-            new MenuAction("Add bookmark", R.drawable.bookmark_add, this::addBookmark),
-            new MenuAction("Export bookmarks", R.drawable.bookmarks_export, this::exportBookmarks),
-            new MenuAction("Import bookmarks", R.drawable.bookmarks_import, this::importBookmarks),
             new MenuAction("Delete all bookmarks", 0, this::deleteAllBookmarks),
 
             new MenuAction("Clear history and cache", 0, this::clearHistoryCache),
@@ -307,90 +288,6 @@ public class WebActivity extends Activity {
         }
     }
 
-    public void injectCSS(WebView webview) {
-        try {
-            String css = "*, :after, :before {background-color: #161a1e !important; color: #61615f !important; border-color: #212a32 !important; background-image:none !important; outline-color: #161a1e !important; z-index: 1 !important} " +
-                    "svg, img {filter: grayscale(100%) brightness(50%) !important; -webkit-filter: grayscale(100%) brightness(50%) !important} " +
-                    "input {background-color: black !important;}" +
-                    "select, option, textarea, button, input {color:#aaa !important; background-color: black !important; border:1px solid #212a32 !important}" +
-                    "a, a * {text-decoration: none !important; color:#32658b !important}" +
-                    "a:visited, a:visited * {color: #783b78 !important}" +
-                    "* {max-width: 100vw !important} pre {white-space: pre-wrap !important}";
-/*
-            String cssDolphin = "*,:before,:after,html *{color:#61615f!important;-webkit-border-image:none!important;border-image:none!important;background:none!important;background-image:none!important;box-shadow:none!important;text-shadow:none!important;border-color:#212a32!important}\n" +
-                    "\n" +
-                    "body{background-color:#000000!important}\n" +
-                    "html a,html a *{text-decoration:none!important;color:#394c65!important}\n" +
-                    "html a:hover,html a:hover *{color:#394c65!important;background:#1b1e23!important}\n" +
-                    "html a:visited,html a:visited *,html a:active,html a:active *{color:#58325b!important}\n" +
-                    "html select,html option,html textarea,html button{color:#aaa!important;border:1px solid #212a32!important;background:#161a1e!important;border-color:#212a32!important;border-style:solid}\n" +
-                    "html select:hover,html option:hover,html button:hover,html textarea:hover,html select:focus,html option:focus,html button:focus,html textarea:focus{color:#bbb!important;background:#161a1e!important;border-color:#777 #999 #999 #777 !important}\n" +
-                    "html input,html input[type=text],html input[type=search],html input[type=password]{color:#4e4e4e!important;background-color:#161a1e!important;box-shadow:1px 0 4px rgba(16,18,23,.75) inset,0 1px 4px rgba(16,18,23,.75) inset!important;border-color:#1a1c27!important;border-style:solid!important}\n" +
-                    "html input:focus,html input[type=text]:focus,html input[type=search]:focus,html input[type=password]:focus{color:#bbb!important;outline:none!important;background:#161a1e!important;border-color:#1a3973}\n" +
-                    "html input:hover,html select:hover,html option:hover,html button:hover,html textarea:hover,html input:focus,html select:focus,html option:focus,html button:focus,html textarea:focus{color:#bbb!important;background:#093681!important;opacity:0.4!important;border-color:#777 #999 #999 #777 !important}\n" +
-                    "html input[type=button],html input[type=submit],html input[type=reset],html input[type=image]{color:#4e4e4e!important;border-color:#888 #666 #666 #888 !important}\n" +
-                    "html input[type=button],html input[type=submit],html input[type=reset]{border:1px solid #212a32!important;background-image:0 color-stop(1,#181a23))!important}\n" +
-                    "html input[type=button]:hover,html input[type=submit]:hover,html input[type=reset]:hover,html input[type=image]:hover{border-color:#777 #999 #999 #777 !important}\n" +
-                    "html input[type=button]:hover,html input[type=submit]:hover,html input[type=reset]:hover{border:1px solid #666!important;background-image:0 color-stop(1,#262939))!important}\n" +
-                    "html img,html svg{opacity:.5!important;border-color:#111!important}\n" +
-                    "html ::-webkit-input-placeholder{color:#4e4e4e!important}\n";
-*/
-            final String styleElementId = "night_mode_style_4398357";   // should be unique
-            String js;
-            if (isNightMode) {
-                js = "if (document.head) {" +
-                        "if (!window.night_mode_id_list) night_mode_id_list = new Set();" +
-                        "var newset = new Set();" +
-                        "   for (var n of document.querySelectorAll(':not(a)')) { " +
-                        "     if (n.closest('a') != null) continue;" +
-                        "     if (!n.id) n.id = 'night_mode_id_' + (night_mode_id_list.size + newset.size);" +
-                        "     if (!night_mode_id_list.has(n.id)) newset.add(n.id); " +
-                        "   }" +
-                        "for (var item of newset) night_mode_id_list.add(item);" +
-                        "var style = document.getElementById('" + styleElementId + "');" +
-                        "if (!style) {" +
-                        "   style = document.createElement('style');" +
-                        "   style.id = '" + styleElementId + "';" +
-                        "   style.type = 'text/css';" +
-                        "   style.innerHTML = '" + css + "';" +
-                        "   document.head.appendChild(style);" +
-                        "}" +
-                        "   var css2 = ' ';" +
-                        "   for (var nid of newset) css2 += ('#' + nid + '#' + nid + ',');" +
-                        "   css2 += '#nonexistent {background-color: #161a1e !important; color: #61615f !important; border-color: #212a32 !important; background-image:none !important; outline-color: #161a1e !important; z-index: 1 !important}';" +
-                        "   style.innerHTML += css2;" +
-                        "}" +
-                        "var iframes = document.getElementsByTagName('iframe');" +
-                        "for (var i = 0; i < iframes.length; i++) {" +
-                        "   var fr = iframes[i];" +
-                        "   var style = fr.contentWindow.document.createElement('style');" +
-                        "   style.id = '" + styleElementId + "';" +
-                        "   style.type = 'text/css';" +
-                        "   style.innerHTML = '" + css + "';" +
-                        "   fr.contentDocument.head.appendChild(style);" +
-                        "}";
-            } else {
-                js = "if (document.head && document.getElementById('" + styleElementId + "')) {" +
-                        "   var style = document.getElementById('" + styleElementId + "');" +
-                        "   document.head.removeChild(style);" +
-                        "   window.night_mode_id_list = undefined;" +
-                        "}" +
-                        "var iframes = document.getElementsByTagName('iframe');" +
-                        "for (var i = 0; i < iframes.length; i++) {" +
-                        "   var fr = iframes[i];" +
-                        "   var style = fr.contentWindow.document.getElementById('" + styleElementId + "');" +
-                        "   fr.contentDocument.head.removeChild(style);" +
-                        "}";
-            }
-            webview.evaluateJavascript("javascript:(function() {" + js + "})()", null);
-            if (!getCurrentTab().isDesktopUA) {
-                webview.evaluateJavascript("javascript:document.querySelector('meta[name=viewport]').content='width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=1';", null);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -400,7 +297,6 @@ public class WebActivity extends Activity {
 
             @Override
             public void uncaughtException(Thread t, Throwable e) {
-                ExceptionLogger.logException(e);
                 defaultUEH.uncaughtException(t, e);
             }
         });
@@ -489,10 +385,12 @@ public class WebActivity extends Activity {
             showAndHideKeyboard.hideKeyboard();
             getCurrentWebView().findNext(true);
         });
+
         findViewById(R.id.searchFindPrev).setOnClickListener(v -> {
             showAndHideKeyboard.hideKeyboard();
             getCurrentWebView().findNext(false);
         });
+
         findViewById(R.id.searchClose).setOnClickListener(v -> {
             getCurrentWebView().clearMatches();
             searchEdit.setText("");
@@ -501,8 +399,6 @@ public class WebActivity extends Activity {
             showAndHideKeyboard.hideKeyboard();
         });
 
-        useAdBlocker = prefs.getBoolean("adblocker", true);
-        initAdblocker();
 
         newTab(et.getText().toString());
         getCurrentWebView().setVisibility(View.VISIBLE);
@@ -521,7 +417,7 @@ public class WebActivity extends Activity {
         }
         webview.setBackgroundColor(isNightMode ? Color.BLACK : Color.WHITE);
         WebSettings settings = webview.getSettings();
-        settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+        settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setJavaScriptEnabled(true);
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
@@ -533,7 +429,6 @@ public class WebActivity extends Activity {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-                injectCSS(view);
                 if (newProgress == 100) {
                     progressBar.setVisibility(View.GONE);
                 } else {
@@ -607,7 +502,6 @@ public class WebActivity extends Activity {
                     et.setSelection(0);
                     view.requestFocus();
                 }
-                injectCSS(view);
             }
 
             @Override
@@ -620,7 +514,6 @@ public class WebActivity extends Activity {
                         view.requestFocus();
                     }
                 }
-                injectCSS(view);
             }
 
             @Override
@@ -643,14 +536,7 @@ public class WebActivity extends Activity {
 
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                if (adBlocker != null) {
-                    if (request.isForMainFrame()) {
-                        lastMainPage = request.getUrl().toString();
-                    }
-                    if (adBlocker.shouldBlock(request.getUrl(), lastMainPage)) {
-                        return new WebResourceResponse("text/plain", "UTF-8", emptyInputStream);
-                    }
-                }
+
                 return super.shouldInterceptRequest(view, request);
             }
 
@@ -675,9 +561,7 @@ public class WebActivity extends Activity {
 
             @Override
             public void onLoadResource(WebView view, String url) {
-                if (isLogRequests) {
-                    requestsLog.add(url);
-                }
+
             }
 
             final String[] sslErrors = {"Not yet valid", "Expired", "Hostname mismatch", "Untrusted CA", "Invalid date", "Unknown error"};
@@ -1014,9 +898,7 @@ public class WebActivity extends Activity {
         });
 
         bottomSheetView.findViewById(R.id.adblock).setOnClickListener(view -> {
-            if (useAdBlocker) {
-                toggleAdblocker();
-            }
+
             bottomSheetDialog.dismiss();
         });
 
@@ -1063,6 +945,12 @@ public class WebActivity extends Activity {
 
             bottomSheetDialog.dismiss();
         });
+
+        bottomSheetView.findViewById(R.id.exit).setOnClickListener(view -> {
+            finishAffinity();
+            System.exit(0);
+        });
+
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
     }
@@ -1079,8 +967,6 @@ public class WebActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FORM_FILE_CHOOSER) {
             if (fileUploadCallback != null) {
-                // When the first file chooser activity fails to start due to an intent type not being a mime-type,
-                // we should not reset the callback since we'd be called back soon with the */* type.
                 if (fileUploadCallbackShouldReset) {
                     fileUploadCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
                     fileUploadCallback = null;
@@ -1092,17 +978,11 @@ public class WebActivity extends Activity {
     }
 
 
-    private List<String> tabTitles = new ArrayList<>();
-    private RecyclerView recyclerView;
-    private TabsAdapter adapter;
+
 
     private void toggleFullscreen() {
         isFullscreen = !isFullscreen;
         updateFullScreen();
-    }
-
-    private void toggleShowAddressBar() {
-        et.setVisibility(et.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
     }
 
     private void toggleNightMode() {
@@ -1111,47 +991,9 @@ public class WebActivity extends Activity {
         onNightModeChange();
     }
 
-    private void initAdblocker() {
-        if (useAdBlocker) {
-            adBlocker = new AdBlocker(getExternalFilesDir("adblock"));
-        } else {
-            adBlocker = null;
-        }
-    }
-
-    private void toggleAdblocker() {
-        useAdBlocker = !useAdBlocker;
-        initAdblocker();
-        prefs.edit().putBoolean("adblocker", useAdBlocker).apply();
-        Toast.makeText(WebActivity.this, "Ad Blocker " + (useAdBlocker ? "enabled" : "disabled"), Toast.LENGTH_SHORT).show();
-    }
-
-    private void updateAdblockRules() {
-        getLoaderManager().restartLoader(0, null, new LoaderManager.LoaderCallbacks<Integer>() {
-            @Override
-            public Loader<Integer> onCreateLoader(int id, Bundle args) {
-                return new AdblockRulesLoader(WebActivity.this, adblockRulesList, getExternalFilesDir("adblock"));
-            }
-
-            @SuppressLint("DefaultLocale")
-            @Override
-            public void onLoadFinished(Loader<Integer> loader, Integer data) {
-                Toast.makeText(WebActivity.this,
-                        String.format("Updated %d / %d adblock subscriptions", data, adblockRulesList.length),
-                        Toast.LENGTH_SHORT).show();
-                initAdblocker();
-            }
-
-            @Override
-            public void onLoaderReset(Loader<Integer> loader) {
-            }
-        });
-    }
 
     private boolean isUrlInBookmarks(String urlToCheck) {
         if (placesDb == null) return false;
-
-        // Use parameterized query to avoid SQL injection
         Cursor cursor = placesDb.rawQuery("SELECT 1 FROM bookmarks WHERE url = ?", new String[]{urlToCheck});
 
         boolean exists = cursor.moveToFirst();
@@ -1228,152 +1070,6 @@ public class WebActivity extends Activity {
         values.put("title", getCurrentWebView().getTitle());
         values.put("url", getCurrentWebView().getUrl());
         placesDb.insert("bookmarks", null, values);
-    }
-
-    private void exportBookmarks() {
-        if (placesDb == null) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Export bookmarks error")
-                    .setMessage("Can't open bookmarks database")
-                    .setPositiveButton("OK", (dialog, which) -> {
-                    })
-                    .show();
-            return;
-        }
-        if (!hasOrRequestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                null,
-                PERMISSION_REQUEST_EXPORT_BOOKMARKS)) {
-            return;
-        }
-        File file = new File(Environment.getExternalStorageDirectory(), "bookmarks.html");
-        if (file.exists()) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Export bookmarks")
-                    .setMessage("The file bookmarks.html already exists on SD card. Overwrite?")
-                    .setNegativeButton("Cancel", (dialog, which) -> {
-                    })
-                    .setPositiveButton("Overwrite", (dialog, which) -> {
-                        //noinspection ResultOfMethodCallIgnored
-                        file.delete();
-                        exportBookmarks();
-                    })
-                    .show();
-            return;
-        }
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-            bw.write("<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
-                    "<!-- This is an automatically generated file.\n" +
-                    "     It will be read and overwritten.\n" +
-                    "     DO NOT EDIT! -->\n" +
-                    "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n" +
-                    "<TITLE>Bookmarks</TITLE>\n" +
-                    "<H1>Bookmarks Menu</H1>\n" +
-                    "\n" +
-                    "<DL><p>\n");
-            try (Cursor cursor = placesDb.rawQuery("SELECT title, url FROM bookmarks", null)) {
-                final int titleIdx = cursor.getColumnIndex("title");
-                final int urlIdx = cursor.getColumnIndex("url");
-                while (cursor.moveToNext()) {
-                    bw.write("    <DT><A HREF=\"" + cursor.getString(urlIdx) + "\" ADD_DATE=\"0\" LAST_MODIFIED=\"0\">");
-                    bw.write(Html.escapeHtml(cursor.getString(titleIdx)));
-                    bw.write("</A>\n");
-                }
-            }
-            bw.write("</DL>\n");
-            bw.close();
-            Toast.makeText(this, "Bookmarks exported to bookmarks.html on SD card", Toast.LENGTH_LONG).show();
-        } catch (IOException e) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Export bookmarks error")
-                    .setMessage(e.toString())
-                    .setPositiveButton("OK", (dialog, which) -> {
-                    })
-                    .show();
-        }
-    }
-
-    @SuppressLint("DefaultLocale")
-    private void importBookmarks() {
-        if (placesDb == null) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Import bookmarks error")
-                    .setMessage("Can't open bookmarks database")
-                    .setPositiveButton("OK", (dialog, which) -> {
-                    })
-                    .show();
-            return;
-        }
-        if (!hasOrRequestPermission(Manifest.permission.READ_EXTERNAL_STORAGE,
-                null,
-                PERMISSION_REQUEST_IMPORT_BOOKMARKS)) {
-            return;
-        }
-        File file = new File(Environment.getExternalStorageDirectory(), "bookmarks.html");
-        StringBuilder sb = new StringBuilder();
-        try {
-            char[] buf = new char[16 * 1024];
-            FileInputStream fis = new FileInputStream(file);
-            BufferedReader br = new BufferedReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
-            int count;
-            while ((count = br.read(buf)) != -1) {
-                sb.append(buf, 0, count);
-            }
-            br.close();
-        } catch (FileNotFoundException e) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Import bookmarks error")
-                    .setMessage("Bookmarks should be placed in a bookmarks.html file on the SD Card")
-                    .setPositiveButton("OK", (dialog, which) -> {
-                    })
-                    .show();
-            return;
-        } catch (IOException e) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Import bookmarks error")
-                    .setMessage(e.toString())
-                    .setPositiveButton("OK", (dialog, which) -> {
-                    })
-                    .show();
-            return;
-        }
-
-        ArrayList<TitleAndUrl> bookmarks = new ArrayList<>();
-        Pattern pattern = Pattern.compile("<A HREF=\"([^\"]*)\"[^>]*>([^<]*)</A>");
-        Matcher matcher = pattern.matcher(sb);
-        while (matcher.find()) {
-            TitleAndUrl pair = new TitleAndUrl();
-            pair.url = matcher.group(1);
-            pair.title = matcher.group(2);
-            if (pair.url == null || pair.title == null) continue;
-            pair.title = Html.fromHtml(pair.title).toString();
-            bookmarks.add(pair);
-        }
-
-        if (bookmarks.isEmpty()) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Import bookmarks")
-                    .setMessage("No bookmarks found in bookmarks.html")
-                    .setPositiveButton("OK", (dialog, which) -> {
-                    })
-                    .show();
-            return;
-        }
-
-        try {
-            placesDb.beginTransaction();
-            SQLiteStatement stmt = placesDb.compileStatement("INSERT INTO bookmarks (title, url) VALUES (?,?)");
-            for (TitleAndUrl pair : bookmarks) {
-                stmt.bindString(1, pair.title);
-                stmt.bindString(2, pair.url);
-                stmt.execute();
-            }
-            placesDb.setTransactionSuccessful();
-            Toast.makeText(this, String.format("Imported %d bookmarks", bookmarks.size()), Toast.LENGTH_SHORT).show();
-        } finally {
-            placesDb.endTransaction();
-        }
     }
 
     private void deleteAllBookmarks() {
@@ -1480,7 +1176,6 @@ public class WebActivity extends Activity {
         }
         for (int i = 0; i < tabs.size(); i++) {
             tabs.get(i).webview.setBackgroundColor(isNightMode ? Color.BLACK : Color.WHITE);
-            injectCSS(tabs.get(i).webview);
         }
     }
 
@@ -1528,21 +1223,6 @@ public class WebActivity extends Activity {
         }
         requestPermissions(new String[]{permission}, requestCode);
         return false;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        switch (requestCode) {
-            case PERMISSION_REQUEST_EXPORT_BOOKMARKS:
-                exportBookmarks();
-                break;
-            case PERMISSION_REQUEST_IMPORT_BOOKMARKS:
-                importBookmarks();
-                break;
-        }
     }
 
     interface MyBooleanSupplier {
