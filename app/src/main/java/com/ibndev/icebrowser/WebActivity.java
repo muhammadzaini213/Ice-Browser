@@ -1,16 +1,13 @@
 package com.ibndev.icebrowser;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -20,13 +17,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.net.http.SslCertificate;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -34,12 +29,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Patterns;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -56,38 +49,30 @@ import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AutoCompleteTextView;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.FrameLayout;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.ibndev.icebrowser.browserparts.DownloadHelper;
 import com.ibndev.icebrowser.browserparts.PlacesDbHelper;
+import com.ibndev.icebrowser.browserparts.SearchAutocompleteAdapter;
 import com.ibndev.icebrowser.browserparts.ShowAndHideKeyboard;
 import com.ibndev.icebrowser.browserparts.TabsAdapter;
+import com.ibndev.icebrowser.browserparts.WebCertificate;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -108,11 +93,9 @@ public class WebActivity extends Activity {
     private static final String TAG = WebActivity.class.getSimpleName();
 
     static final String searchUrl = "https://www.google.com/search?q=%s";
-    static final String searchCompleteUrl = "https://www.google.com/complete/search?client=firefox&q=%s";
+//    static final String searchCompleteUrl = "https://www.google.com/complete/search?client=firefox&q=%s";
     static final String desktopUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36";
-
-    static final int PERMISSION_REQUEST_DOWNLOAD = 3;
-
+    final int PERMISSION_REQUEST_DOWNLOAD = 3;
     static final int FORM_FILE_CHOOSER = 1;
 
     private ArrayList<Tab> tabs = new ArrayList<>();
@@ -211,11 +194,11 @@ public class WebActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.action_open_with){
+        if (item.getItemId() == R.id.action_open_with) {
             openUrlInApp();
             return true;
-        } else if (item.getItemId() == R.id.action_save_bookmark){
-            if(isBookmarked){
+        } else if (item.getItemId() == R.id.action_save_bookmark) {
+            if (isBookmarked) {
                 deleteBookmark(getCurrentWebView().getUrl());
                 Toast.makeText(WebActivity.this, "Bookmark removed", Toast.LENGTH_SHORT).show();
             } else {
@@ -245,11 +228,6 @@ public class WebActivity extends Activity {
 
             new MenuAction("Clear history and cache", 0, this::clearHistoryCache),
     };
-
-    static class TitleAndUrl {
-        String title;
-        String url;
-    }
 
     static class TitleAndBundle {
         String title;
@@ -288,15 +266,18 @@ public class WebActivity extends Activity {
         }
     }
 
+
+    DownloadHelper downloadHelper;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            private Thread.UncaughtExceptionHandler defaultUEH = Thread.getDefaultUncaughtExceptionHandler();
+            private final Thread.UncaughtExceptionHandler defaultUEH = Thread.getDefaultUncaughtExceptionHandler();
 
             @Override
-            public void uncaughtException(Thread t, Throwable e) {
+            public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
                 defaultUEH.uncaughtException(t, e);
             }
         });
@@ -314,7 +295,7 @@ public class WebActivity extends Activity {
         et = findViewById(R.id.et);
 
         showAndHideKeyboard = new ShowAndHideKeyboard(this, et);
-
+        downloadHelper = new DownloadHelper(this);
 
         tabRecyclerView();
         tabsLayout();
@@ -474,9 +455,6 @@ public class WebActivity extends Activity {
                     // Continue below
                 }
 
-                // FileChooserParams.createIntent() copies the <input type=file> "accept" attribute to the intent's getType(),
-                // which can be e.g. ".png,.jpg" in addition to mime-type-style "image/*", however startActivityForResult()
-                // only accepts mime-type-style. Try with just */* instead.
                 intent.setType("*/*");
                 try {
                     fileUploadCallbackShouldReset = false;
@@ -573,7 +551,7 @@ public class WebActivity extends Activity {
                 new AlertDialog.Builder(WebActivity.this)
                         .setTitle("Insecure connection")
                         .setMessage(String.format("Error: %s\nURL: %s\n\nCertificate:\n%s",
-                                errorStr, error.getUrl(), certificateToStr(error.getCertificate())))
+                                errorStr, error.getUrl(), WebCertificate.certificateToStr(error.getCertificate())))
                         .setPositiveButton("Proceed", (dialog, which) -> handler.proceed())
                         .setNegativeButton("Cancel", (dialog, which) -> handler.cancel())
                         .show();
@@ -621,7 +599,7 @@ public class WebActivity extends Activity {
                             filename,
                             contentLength / 1024.0 / 1024.0,
                             url))
-                    .setPositiveButton("Download", (dialog, which) -> startDownload(url, filename))
+                    .setPositiveButton("Download", (dialog, which) -> downloadHelper.startDownload(url, filename))
                     .setNeutralButton("Open", (dialog, which) -> {
                         Intent i = new Intent(Intent.ACTION_VIEW);
                         i.setData(Uri.parse(url));
@@ -720,7 +698,7 @@ public class WebActivity extends Activity {
                             .show();
                     break;
                 case 3:
-                    startDownload(url, null);
+                    downloadHelper.startDownload(url, null);
                     break;
                 case 4:
                     showLongPressMenu(null, imageUrl);
@@ -729,63 +707,25 @@ public class WebActivity extends Activity {
         }).show();
     }
 
-    @SuppressLint("DefaultLocale")
-    private static String certificateToStr(SslCertificate certificate) {
-        if (certificate == null) {
-            return null;
-        }
-        String s = "";
-        SslCertificate.DName issuedTo = certificate.getIssuedTo();
-        if (issuedTo != null) {
-            s += "Issued to: " + issuedTo.getDName() + "\n";
-        }
-        SslCertificate.DName issuedBy = certificate.getIssuedBy();
-        if (issuedBy != null) {
-            s += "Issued by: " + issuedBy.getDName() + "\n";
-        }
-        Date issueDate = certificate.getValidNotBeforeDate();
-        if (issueDate != null) {
-            s += String.format("Issued on: %tF %tT %tz\n", issueDate, issueDate, issueDate);
-        }
-        Date expiryDate = certificate.getValidNotAfterDate();
-        if (expiryDate != null) {
-            s += String.format("Expires on: %tF %tT %tz\n", expiryDate, expiryDate, expiryDate);
-        }
-        return s;
-    }
 
-    private void startDownload(String url, String filename) {
-        if (!hasOrRequestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                null,
-                PERMISSION_REQUEST_DOWNLOAD)) {
-            return;
+
+
+    boolean hasOrRequestPermission(String permission, String explanation, int requestCode) {
+        if (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
+            // Permission already granted
+            return true;
         }
-        if (filename == null) {
-            filename = URLUtil.guessFileName(url, null, null);
-        }
-        DownloadManager.Request request;
-        try {
-            request = new DownloadManager.Request(Uri.parse(url));
-        } catch (IllegalArgumentException e) {
-            new AlertDialog.Builder(WebActivity.this)
-                    .setTitle("Can't Download URL")
-                    .setMessage(url)
-                    .setPositiveButton("OK", (dialog1, which1) -> {
-                    })
+        if (explanation != null && shouldShowRequestPermissionRationale(permission)) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Permission Required")
+                    .setMessage(explanation)
+                    .setPositiveButton("OK", (dialog, which) -> requestPermissions(new String[]{permission}, requestCode))
                     .show();
-            return;
+            return false;
         }
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
-        String cookie = CookieManager.getInstance().getCookie(url);
-        if (cookie != null) {
-            request.addRequestHeader("Cookie", cookie);
-        }
-        DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-        assert dm != null;
-        dm.enqueue(request);
+        requestPermissions(new String[]{permission}, requestCode);
+        return false;
     }
-
 
     private void loadUrl(String url, WebView webview) {
         url = url.trim();
@@ -875,6 +815,7 @@ public class WebActivity extends Activity {
         bottom_bar.findViewById(R.id.menu_btn).setOnClickListener(view -> showBottomSheetMenu());
     }
 
+
     private void showBottomSheetMenu() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(WebActivity.this);
         View bottomSheetView = LayoutInflater.from(WebActivity.this).inflate(
@@ -934,7 +875,7 @@ public class WebActivity extends Activity {
             String s = "URL: " + getCurrentWebView().getUrl() + "\n";
             s += "Title: " + getCurrentWebView().getTitle() + "\n\n";
             SslCertificate certificate = getCurrentWebView().getCertificate();
-            s += certificate == null ? "Not secure" : "Certificate:\n" + certificateToStr(certificate);
+            s += certificate == null ? "Not secure" : "Certificate:\n" + WebCertificate.certificateToStr(certificate);
 
             new AlertDialog.Builder(this)
                     .setTitle("Page info")
@@ -976,8 +917,6 @@ public class WebActivity extends Activity {
             }
         }
     }
-
-
 
 
     private void toggleFullscreen() {
@@ -1128,6 +1067,23 @@ public class WebActivity extends Activity {
         getCurrentWebView().requestFocus();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_DOWNLOAD) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, proceed with the download if needed
+            } else {
+                // Permission denied, show a message to the user
+                new AlertDialog.Builder(this)
+                        .setTitle("Permission Denied")
+                        .setMessage("The app needs storage permission to download files.")
+                        .setPositiveButton("OK", (dialog, which) -> {
+                        })
+                        .show();
+            }
+        }
+    }
     private String getUrlFromIntent(Intent intent) {
         if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
             return intent.getDataString();
@@ -1208,171 +1164,155 @@ public class WebActivity extends Activity {
         }
     }
 
-    boolean hasOrRequestPermission(String permission, String explanation, int requestCode) {
-        if (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
-            // Permission already granted
-            return true;
-        }
-        if (explanation != null && shouldShowRequestPermissionRationale(permission)) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Permission Required")
-                    .setMessage(explanation)
-                    .setPositiveButton("OK", (dialog, which) -> requestPermissions(new String[]{permission}, requestCode))
-                    .show();
-            return false;
-        }
-        requestPermissions(new String[]{permission}, requestCode);
-        return false;
-    }
 
     interface MyBooleanSupplier {
         boolean getAsBoolean();
     }
 
-    static class SearchAutocompleteAdapter extends BaseAdapter implements Filterable {
-
-        interface OnSearchCommitListener {
-            void onSearchCommit(String text);
-        }
-
-        private final Context mContext;
-        private final OnSearchCommitListener commitListener;
-        private List<String> completions = new ArrayList<>();
-
-        SearchAutocompleteAdapter(Context context, OnSearchCommitListener commitListener) {
-            mContext = context;
-            this.commitListener = commitListener;
-        }
-
-        @Override
-        public int getCount() {
-            return completions.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return completions.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @SuppressLint("ClickableViewAccessibility")
-        @Override
-        @SuppressWarnings("ConstantConditions")
-        public View getView(final int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(android.R.layout.simple_dropdown_item_1line, parent, false);
-            }
-            TextView v = convertView.findViewById(android.R.id.text1);
-            v.setText(completions.get(position));
-            Drawable d = mContext.getResources().getDrawable(R.drawable.commit_search, null);
-            int size = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, mContext.getResources().getDisplayMetrics());
-            d.setBounds(0, 0, size, size);
-            v.setCompoundDrawables(null, null, d, null);
-            //noinspection AndroidLintClickableViewAccessibility
-            v.setOnTouchListener((v1, event) -> {
-                if (event.getAction() != MotionEvent.ACTION_DOWN) {
-                    return false;
-                }
-                TextView t = (TextView) v1;
-                if (event.getX() > t.getWidth() - t.getCompoundPaddingRight()) {
-                    commitListener.onSearchCommit(getItem(position).toString());
-                    return true;
-                }
-                return false;
-            });
-            //noinspection AndroidLintClickableViewAccessibility
-            parent.setOnTouchListener((dropdown, event) -> {
-                if (event.getX() > dropdown.getWidth() - size * 2) {
-                    return true;
-                }
-                return false;
-            });
-            return convertView;
-        }
-
-        @Override
-        public Filter getFilter() {
-            return new Filter() {
-                @Override
-                protected FilterResults performFiltering(CharSequence constraint) {
-                    // Invoked on a worker thread
-                    FilterResults filterResults = new FilterResults();
-                    if (constraint != null) {
-                        List<String> results = getCompletions(constraint.toString());
-                        filterResults.values = results;
-                        filterResults.count = results.size();
-                    }
-                    return filterResults;
-                }
-
-                @Override
-                @SuppressWarnings("unchecked")
-                protected void publishResults(CharSequence constraint, FilterResults results) {
-                    if (results != null && results.count > 0) {
-                        completions = (List<String>) results.values;
-                        notifyDataSetChanged();
-                    } else {
-                        notifyDataSetInvalidated();
-                    }
-                }
-            };
-        }
-
-        // Runs on a worker thread
-        private List<String> getCompletions(String text) {
-            int total = 0;
-            byte[] data = new byte[16384];
-            try {
-                URL url = new URL(URLUtil.composeSearchUrl(text, searchCompleteUrl, "%s"));
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                try {
-                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-                    while (total <= data.length) {
-                        int count = in.read(data, total, data.length - total);
-                        if (count == -1) {
-                            break;
-                        }
-                        total += count;
-                    }
-                    if (total == data.length) {
-                        // overflow
-                        return new ArrayList<>();
-                    }
-                } finally {
-                    urlConnection.disconnect();
-                }
-            } catch (IOException e) {
-                // Swallow exception and return empty list
-                return new ArrayList<>();
-            }
-
-            // Result looks like:
-            // [ "original query", ["completion1", "completion2", ...], ...]
-
-            JSONArray jsonArray;
-            try {
-                jsonArray = new JSONArray(new String(data, StandardCharsets.UTF_8));
-            } catch (JSONException e) {
-                return new ArrayList<>();
-            }
-            jsonArray = jsonArray.optJSONArray(1);
-            if (jsonArray == null) {
-                return new ArrayList<>();
-            }
-            final int MAX_RESULTS = 10;
-            List<String> result = new ArrayList<>(Math.min(jsonArray.length(), MAX_RESULTS));
-            for (int i = 0; i < jsonArray.length() && result.size() < MAX_RESULTS; i++) {
-                String s = jsonArray.optString(i);
-                if (s != null && !s.isEmpty()) {
-                    result.add(s);
-                }
-            }
-            return result;
-        }
-    }
+//    static class SearchAutocompleteAdapter extends BaseAdapter implements Filterable {
+//
+//        interface OnSearchCommitListener {
+//            void onSearchCommit(String text);
+//        }
+//
+//        private final Context mContext;
+//        private final OnSearchCommitListener commitListener;
+//        private List<String> completions = new ArrayList<>();
+//
+//        SearchAutocompleteAdapter(Context context, OnSearchCommitListener commitListener) {
+//            mContext = context;
+//            this.commitListener = commitListener;
+//        }
+//
+//        @Override
+//        public int getCount() {
+//            return completions.size();
+//        }
+//
+//        @Override
+//        public Object getItem(int position) {
+//            return completions.get(position);
+//        }
+//
+//        @Override
+//        public long getItemId(int position) {
+//            return position;
+//        }
+//
+//        @SuppressLint("ClickableViewAccessibility")
+//        @Override
+//        @SuppressWarnings("ConstantConditions")
+//        public View getView(final int position, View convertView, ViewGroup parent) {
+//            if (convertView == null) {
+//                LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//                convertView = inflater.inflate(android.R.layout.simple_dropdown_item_1line, parent, false);
+//            }
+//            TextView v = convertView.findViewById(android.R.id.text1);
+//            v.setText(completions.get(position));
+//            Drawable d = mContext.getResources().getDrawable(R.drawable.commit_search, null);
+//            int size = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, mContext.getResources().getDisplayMetrics());
+//            d.setBounds(0, 0, size, size);
+//            v.setCompoundDrawables(null, null, d, null);
+//            //noinspection AndroidLintClickableViewAccessibility
+//            v.setOnTouchListener((v1, event) -> {
+//                if (event.getAction() != MotionEvent.ACTION_DOWN) {
+//                    return false;
+//                }
+//                TextView t = (TextView) v1;
+//                if (event.getX() > t.getWidth() - t.getCompoundPaddingRight()) {
+//                    commitListener.onSearchCommit(getItem(position).toString());
+//                    return true;
+//                }
+//                return false;
+//            });
+//            //noinspection AndroidLintClickableViewAccessibility
+//            parent.setOnTouchListener((dropdown, event) -> {
+//                if (event.getX() > dropdown.getWidth() - size * 2) {
+//                    return true;
+//                }
+//                return false;
+//            });
+//            return convertView;
+//        }
+//
+//        @Override
+//        public Filter getFilter() {
+//            return new Filter() {
+//                @Override
+//                protected FilterResults performFiltering(CharSequence constraint) {
+//                    // Invoked on a worker thread
+//                    FilterResults filterResults = new FilterResults();
+//                    if (constraint != null) {
+//                        List<String> results = getCompletions(constraint.toString());
+//                        filterResults.values = results;
+//                        filterResults.count = results.size();
+//                    }
+//                    return filterResults;
+//                }
+//
+//                @Override
+//                @SuppressWarnings("unchecked")
+//                protected void publishResults(CharSequence constraint, FilterResults results) {
+//                    if (results != null && results.count > 0) {
+//                        completions = (List<String>) results.values;
+//                        notifyDataSetChanged();
+//                    } else {
+//                        notifyDataSetInvalidated();
+//                    }
+//                }
+//            };
+//        }
+//
+//        // Runs on a worker thread
+//        private List<String> getCompletions(String text) {
+//            int total = 0;
+//            byte[] data = new byte[16384];
+//            try {
+//                URL url = new URL(URLUtil.composeSearchUrl(text, searchCompleteUrl, "%s"));
+//                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+//                try {
+//                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+//                    while (total <= data.length) {
+//                        int count = in.read(data, total, data.length - total);
+//                        if (count == -1) {
+//                            break;
+//                        }
+//                        total += count;
+//                    }
+//                    if (total == data.length) {
+//                        // overflow
+//                        return new ArrayList<>();
+//                    }
+//                } finally {
+//                    urlConnection.disconnect();
+//                }
+//            } catch (IOException e) {
+//                // Swallow exception and return empty list
+//                return new ArrayList<>();
+//            }
+//
+//            // Result looks like:
+//            // [ "original query", ["completion1", "completion2", ...], ...]
+//
+//            JSONArray jsonArray;
+//            try {
+//                jsonArray = new JSONArray(new String(data, StandardCharsets.UTF_8));
+//            } catch (JSONException e) {
+//                return new ArrayList<>();
+//            }
+//            jsonArray = jsonArray.optJSONArray(1);
+//            if (jsonArray == null) {
+//                return new ArrayList<>();
+//            }
+//            final int MAX_RESULTS = 10;
+//            List<String> result = new ArrayList<>(Math.min(jsonArray.length(), MAX_RESULTS));
+//            for (int i = 0; i < jsonArray.length() && result.size() < MAX_RESULTS; i++) {
+//                String s = jsonArray.optString(i);
+//                if (s != null && !s.isEmpty()) {
+//                    result.add(s);
+//                }
+//            }
+//            return result;
+//        }
+//    }
 }
