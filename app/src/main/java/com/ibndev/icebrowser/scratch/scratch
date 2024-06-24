@@ -1,0 +1,36 @@
+ private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        assert imm != null;
+        imm.hideSoftInputFromWindow(et.getWindowToken(), 0);
+    }
+
+    private void showKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        assert imm != null;
+        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
+    }
+
+
+    static class ArrayAdapterWithCurrentItem<T> extends ArrayAdapter<T> {
+            int currentIndex;
+
+            ArrayAdapterWithCurrentItem(@NonNull Context context, int resource, @NonNull T[] objects, int currentIndex) {
+                super(context, resource, objects);
+                this.currentIndex = currentIndex;
+            }
+
+            @NonNull
+            @Override
+            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView textView = view.findViewById(android.R.id.text1);
+                int icon = position == currentIndex ? android.R.drawable.ic_menu_mylocation : R.drawable.empty;
+                Drawable d = getContext().getResources().getDrawable(icon, null);
+                int size = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getContext().getResources().getDisplayMetrics());
+                d.setBounds(0, 0, size, size);
+                textView.setCompoundDrawablesRelative(d, null, null, null);
+                textView.setCompoundDrawablePadding(
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, getContext().getResources().getDisplayMetrics()));
+                return view;
+            }
+        }
