@@ -42,41 +42,26 @@ import java.util.ArrayList;
 
 public class TabManager {
     public static final int FORM_FILE_CHOOSER = 1;
-    private boolean fileUploadCallbackShouldReset;
-    private final WebActivity activity;
-    private final FrameLayout webviews;
-    private final EditText et;
-    private final ProgressBar progressBar;
-    private final TextView tabCountText;
-    private final ShowAndHideKeyboard showAndHideKeyboard;
-    private final DownloadHelper downloadHelper;
-    private final View[] fullScreenView = new View[1];
     public final WebChromeClient.CustomViewCallback[] fullScreenCallback = new WebChromeClient.CustomViewCallback[1];
-    private ValueCallback<Uri[]> fileUploadCallback;
-
-
-    public TabManager(WebActivity activity, FrameLayout webviews, AutoCompleteTextView et, ProgressBar progressBar, TextView tabCountText, ShowAndHideKeyboard showAndHideKeyboard, DownloadHelper downloadHelper) {
-        this.activity = activity;
-        this.webviews = webviews;
-        this.et = et;
-        this.progressBar = progressBar;
-        this.tabCountText = tabCountText;
-        this.showAndHideKeyboard = showAndHideKeyboard;
-        this.downloadHelper = downloadHelper;
-    }
-
-    public static class Tab {
-        public WebView webview;
-        public boolean isDesktopUA;
-
-
-        public Tab(WebView w) {
-            this.webview = w;
-        }
-    }
-
     public final ArrayList<Tab> tabs = new ArrayList<>();
+    final WebActivity activity;
+    final ShowAndHideKeyboard showAndHideKeyboard;
+    final DownloadHelper downloadHelper;
+    final View[] fullScreenView = new View[1];
     public int currentTabIndex;
+    ValueCallback<Uri[]> fileUploadCallback;
+    AutoCompleteTextView et;
+
+    private final ArrayList<TitleAndBundle> closedTabs = new ArrayList<>();
+
+
+    public TabManager(WebActivity activity, ShowAndHideKeyboard showAndHideKeyboard) {
+        this.activity = activity;
+        this.showAndHideKeyboard = showAndHideKeyboard;
+        downloadHelper = new DownloadHelper(activity);
+        et = activity.findViewById(R.id.et);
+
+    }
 
     public Tab getCurrentTab() {
         return tabs.get(currentTabIndex);
@@ -92,12 +77,14 @@ public class TabManager {
             currentTabIndex = tab;
             getCurrentWebView().setVisibility(View.VISIBLE);
             getCurrentWebView().requestFocus();
+            et.setText(getCurrentWebView().getUrl());
         } else {
             throw new IndexOutOfBoundsException("Invalid tab index");
         }
     }
 
     private void newTabCommon(WebView webview) {
+        final FrameLayout webviews = activity.findViewById(R.id.webviews);
         boolean isDesktopUA = !tabs.isEmpty() && getCurrentTab().isDesktopUA;
         webview.getSettings().setUserAgentString(isDesktopUA ? activity.getString(R.string.desktopUA) : null);
         webview.getSettings().setUseWideViewPort(isDesktopUA);
@@ -147,6 +134,7 @@ public class TabManager {
 
     public WebView createWebView(Bundle bundle, boolean isNightMode) {
         final ProgressBar progressBar = activity.findViewById(R.id.progressbar);
+        final AutoCompleteTextView et = activity.findViewById(R.id.et);
 
         WebView webview = new WebView(activity);
         if (bundle != null) {
@@ -205,7 +193,6 @@ public class TabManager {
                 fileUploadCallback = filePathCallback;
                 Intent intent = fileChooserParams.createIntent();
                 try {
-                    fileUploadCallbackShouldReset = true;
                     activity.startActivityForResult(intent, FORM_FILE_CHOOSER);
                     return true;
                 } catch (ActivityNotFoundException e) {
@@ -214,7 +201,6 @@ public class TabManager {
 
                 intent.setType("*/*");
                 try {
-                    fileUploadCallbackShouldReset = false;
                     activity.startActivityForResult(intent, FORM_FILE_CHOOSER);
                     return true;
                 } catch (ActivityNotFoundException e) {
@@ -435,6 +421,49 @@ public class TabManager {
                     break;
             }
         }).show();
+    }
+
+    public static class Tab {
+        public WebView webview;
+        public boolean isDesktopUA;
+
+
+        public Tab(WebView w) {
+            this.webview = w;
+        }
+    }
+
+    class TitleAndBundle {
+        String title;
+        Bundle bundle;
+    }
+
+    public void closeCurrentTab() {
+        if (getCurrentWebView().getUrl() != null && !getCurrentWebView().getUrl().equals("google.com")) {
+            TitleAndBundle titleAndBundle = new TitleAndBundle();
+            titleAndBundle.title = getCurrentWebView().getTitle();
+            titleAndBundle.bundle = new Bundle();
+            getCurrentWebView().saveState(titleAndBundle.bundle);
+            closedTabs.add(0, titleAndBundle);
+            if (closedTabs.size() > 500) {
+                closedTabs.remove(closedTabs.size() - 1);
+            }
+        }
+        ((FrameLayout) activity.findViewById(R.id.webviews)).removeView(getCurrentWebView());
+        getCurrentWebView().destroy();
+        tabs.remove(currentTabIndex);
+        if (currentTabIndex >= tabs.size()) {
+            currentTabIndex = tabs.size() - 1;
+        }
+        if (currentTabIndex == -1) {
+            // We just closed the last tab
+            newTab("google.com");
+            currentTabIndex = 0;
+        }
+        getCurrentWebView().setVisibility(View.VISIBLE);
+        et.setText(getCurrentWebView().getUrl());
+        setTabCountText(tabs.size());
+        getCurrentWebView().requestFocus();
     }
 
 }

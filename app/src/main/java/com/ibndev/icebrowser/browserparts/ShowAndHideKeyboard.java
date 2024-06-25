@@ -1,27 +1,28 @@
 package com.ibndev.icebrowser.browserparts;
 
-import android.content.Context;
+import android.app.Activity;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 
+import com.ibndev.icebrowser.R;
+
 public class ShowAndHideKeyboard {
 
-    Context context;
-    AutoCompleteTextView et;
+     Activity activity;
 
-    public ShowAndHideKeyboard(Context context, AutoCompleteTextView et) {
-        this.context = context;
-        this.et = et;
+    public ShowAndHideKeyboard(Activity activity) {
+        this.activity = activity;
     }
 
     public void hideKeyboard() {
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        AutoCompleteTextView et = activity.findViewById(R.id.et);
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         assert imm != null;
         imm.hideSoftInputFromWindow(et.getWindowToken(), 0);
     }
 
     public void showKeyboard() {
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         assert imm != null;
         imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
     }

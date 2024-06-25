@@ -35,6 +35,7 @@ public class SearchAutocompleteAdapter extends BaseAdapter implements Filterable
     private final Context mContext;
     private final OnSearchCommitListener commitListener;
     private List<String> completions = new ArrayList<>();
+
     public SearchAutocompleteAdapter(Context context, OnSearchCommitListener commitListener) {
         mContext = context;
         this.commitListener = commitListener;
