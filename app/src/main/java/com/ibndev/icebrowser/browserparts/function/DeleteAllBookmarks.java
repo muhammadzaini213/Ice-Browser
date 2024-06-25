@@ -5,8 +5,14 @@ import android.app.AlertDialog;
 import android.database.sqlite.SQLiteDatabase;
 
 public class DeleteAllBookmarks {
+    Activity activity;
+    SQLiteDatabase placesDb;
 
-    public void delete(Activity activity, SQLiteDatabase placesDb) {
+    public DeleteAllBookmarks(Activity activity, SQLiteDatabase placesDB){
+        this.activity = activity;
+        this.placesDb = placesDB;
+    }
+    public void delete() {
         if (placesDb == null) {
             new AlertDialog.Builder(activity)
                     .setTitle("Bookmarks error")

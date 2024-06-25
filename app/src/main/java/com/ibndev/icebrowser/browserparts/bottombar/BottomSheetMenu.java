@@ -10,6 +10,7 @@ import android.widget.ImageView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.ibndev.icebrowser.R;
+import com.ibndev.icebrowser.browserparts.settings.SettingsSheet;
 import com.ibndev.icebrowser.browserparts.topbar.tab.TabManager;
 import com.ibndev.icebrowser.browserparts.utilities.ShowAndHideKeyboard;
 
@@ -18,12 +19,14 @@ public class BottomSheetMenu {
     TabManager tabManager;
     BottomSheetFunctions functions;
     ShowAndHideKeyboard showAndHideKeyboard;
+    SettingsSheet settingsSheet;
 
     public BottomSheetMenu(Activity activity, TabManager tabManager, SQLiteDatabase placesDB) {
         this.activity = activity;
         this.tabManager = tabManager;
         showAndHideKeyboard = new ShowAndHideKeyboard(activity);
         functions = new BottomSheetFunctions(activity, tabManager, placesDB);
+        settingsSheet = new SettingsSheet(activity, tabManager, placesDB);
     }
 
     public void show() {
@@ -63,6 +66,11 @@ public class BottomSheetMenu {
 
         bottomSheetView.findViewById(R.id.tab_info).setOnClickListener(view -> {
             functions.tabInfo();
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetView.findViewById(R.id.settings).setOnClickListener(view -> {
+            settingsSheet.show();
             bottomSheetDialog.dismiss();
         });
 
