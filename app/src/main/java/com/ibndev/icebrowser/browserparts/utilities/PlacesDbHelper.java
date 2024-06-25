@@ -1,4 +1,4 @@
-package com.ibndev.icebrowser;
+package com.ibndev.icebrowser.browserparts.utilities;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,7 +9,7 @@ import java.io.File;
 public class PlacesDbHelper extends SQLiteOpenHelper {
     private static final int CURRENT_VERSION = 1;
 
-    PlacesDbHelper(Context context) {
+    public PlacesDbHelper(Context context) {
         super(context, new File(context.getExternalFilesDir(null), "places.sqlite").getAbsolutePath(), null, CURRENT_VERSION);
     }
 
