@@ -1,4 +1,4 @@
-package com.ibndev.icebrowser.browserparts;
+package com.ibndev.icebrowser.browserparts.topbar.autocomplete;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

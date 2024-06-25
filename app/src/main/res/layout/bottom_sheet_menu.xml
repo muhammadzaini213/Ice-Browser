@@ -17,7 +17,7 @@
         android:padding="10dp">
 
         <ImageView
-            android:id="@+id/desktop_img"
+            android:id="@+id/mode_img"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:src="@drawable/menu_dekstop"
@@ -36,7 +36,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/desktop_img" />
+            app:layout_constraintTop_toBottomOf="@+id/mode_img" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -107,7 +107,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/adblock"
+        android:id="@+id/cookie"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_row="0"
@@ -116,10 +116,10 @@
         android:padding="10dp">
 
         <ImageView
-            android:id="@+id/adblock_img"
+            android:id="@+id/cookie_img"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:src="@drawable/menu_adblock"
+            android:src="@drawable/menu_cookie"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -128,13 +128,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="Adblock"
+            android:text="Cookies"
             android:textColor="@color/white"
             android:textSize="18dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/adblock_img" />
+            app:layout_constraintTop_toBottomOf="@+id/cookie_img" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -204,7 +204,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cookie"
+        android:id="@+id/overlay"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_row="1"

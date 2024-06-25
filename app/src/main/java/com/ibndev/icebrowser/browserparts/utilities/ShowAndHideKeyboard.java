@@ -1,4 +1,4 @@
-package com.ibndev.icebrowser.browserparts;
+package com.ibndev.icebrowser.browserparts.utilities;
 
 import android.app.Activity;
 import android.view.inputmethod.InputMethodManager;
@@ -8,7 +8,7 @@ import com.ibndev.icebrowser.R;
 
 public class ShowAndHideKeyboard {
 
-     Activity activity;
+    Activity activity;
 
     public ShowAndHideKeyboard(Activity activity) {
         this.activity = activity;

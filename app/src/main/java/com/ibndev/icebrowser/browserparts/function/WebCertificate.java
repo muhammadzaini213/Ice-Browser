@@ -1,4 +1,4 @@
-package com.ibndev.icebrowser.browserparts;
+package com.ibndev.icebrowser.browserparts.function;
 
 import android.annotation.SuppressLint;
 import android.net.http.SslCertificate;

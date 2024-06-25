@@ -1,4 +1,4 @@
-package com.ibndev.icebrowser.browserparts;
+package com.ibndev.icebrowser.browserparts.utilities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -10,21 +10,24 @@ import android.os.Environment;
 import android.webkit.CookieManager;
 import android.webkit.URLUtil;
 
+import com.ibndev.icebrowser.browserparts.setup.permission.PermissionCodes;
+import com.ibndev.icebrowser.browserparts.setup.permission.RequestPermission;
+
 public class DownloadHelper {
 
-    private static final int PERMISSION_REQUEST_DOWNLOAD = 1001;
     private final Activity activity;
     private final RequestPermission permissionHelper;
 
     public DownloadHelper(Activity activity) {
         this.activity = activity;
         this.permissionHelper = new RequestPermission(activity);
+
     }
 
     public void startDownload(String url, String filename) {
         if (!permissionHelper.hasOrRequestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 null,
-                PERMISSION_REQUEST_DOWNLOAD)) {
+                PermissionCodes.PERMISSION_REQUEST_DOWNLOAD)) {
             return;
         }
         if (filename == null) {

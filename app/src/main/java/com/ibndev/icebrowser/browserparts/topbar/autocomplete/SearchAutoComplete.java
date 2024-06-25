@@ -1,4 +1,4 @@
-package com.ibndev.icebrowser.browserparts;
+package com.ibndev.icebrowser.browserparts.topbar.autocomplete;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,10 +10,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 
 import com.ibndev.icebrowser.R;
+import com.ibndev.icebrowser.browserparts.topbar.tab.TabManager;
+import com.ibndev.icebrowser.browserparts.utilities.ShowAndHideKeyboard;
 
 public class SearchAutoComplete {
 
-    public SearchAutoComplete(Activity activity, TabManager tabManager){
+    public SearchAutoComplete(Activity activity, TabManager tabManager) {
         AutoCompleteTextView et = activity.findViewById(R.id.et);
         ShowAndHideKeyboard showAndHideKeyboard = new ShowAndHideKeyboard(activity);
         et.setSelected(false);

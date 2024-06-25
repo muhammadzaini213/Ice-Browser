@@ -1,4 +1,4 @@
-package com.ibndev.icebrowser.browserparts;
+package com.ibndev.icebrowser.browserparts.topbar.tab;
 
 import android.app.Activity;
 import android.view.View;
@@ -7,9 +7,11 @@ import com.ibndev.icebrowser.R;
 
 public class TabsLayout {
     Activity activity;
-    public TabsLayout (Activity activity){
+
+    public TabsLayout(Activity activity) {
         this.activity = activity;
     }
+
     public void tabsLayout(TabManager tabManager) {
         View tabs_layout = activity.findViewById(R.id.tabs_layout);
 

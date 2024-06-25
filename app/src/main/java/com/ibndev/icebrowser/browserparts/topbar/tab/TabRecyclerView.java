@@ -1,4 +1,4 @@
-package com.ibndev.icebrowser.browserparts;
+package com.ibndev.icebrowser.browserparts.topbar.tab;
 
 import android.app.Activity;
 import android.view.View;

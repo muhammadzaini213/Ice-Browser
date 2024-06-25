@@ -1,4 +1,4 @@
-package com.ibndev.icebrowser.browserparts;
+package com.ibndev.icebrowser.browserparts.setup.permission;
 
 import android.app.Activity;
 import android.app.AlertDialog;

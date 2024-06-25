@@ -1,4 +1,4 @@
-package com.ibndev.icebrowser.browserparts;
+package com.ibndev.icebrowser.browserparts.utilities;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

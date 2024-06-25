@@ -1,4 +1,4 @@
-package com.ibndev.icebrowser.browserparts;
+package com.ibndev.icebrowser.browserparts.topbar.tab;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
@@ -37,6 +37,9 @@ import android.widget.Toast;
 
 import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.WebActivity;
+import com.ibndev.icebrowser.browserparts.function.WebCertificate;
+import com.ibndev.icebrowser.browserparts.utilities.DownloadHelper;
+import com.ibndev.icebrowser.browserparts.utilities.ShowAndHideKeyboard;
 
 import java.util.ArrayList;
 
@@ -48,18 +51,17 @@ public class TabManager {
     final ShowAndHideKeyboard showAndHideKeyboard;
     final DownloadHelper downloadHelper;
     final View[] fullScreenView = new View[1];
+    private final ArrayList<TitleAndBundle> closedTabs = new ArrayList<>();
     public int currentTabIndex;
     ValueCallback<Uri[]> fileUploadCallback;
     AutoCompleteTextView et;
 
-    private final ArrayList<TitleAndBundle> closedTabs = new ArrayList<>();
 
-
-    public TabManager(WebActivity activity, ShowAndHideKeyboard showAndHideKeyboard) {
+    public TabManager(WebActivity activity) {
         this.activity = activity;
-        this.showAndHideKeyboard = showAndHideKeyboard;
         downloadHelper = new DownloadHelper(activity);
         et = activity.findViewById(R.id.et);
+        showAndHideKeyboard = new ShowAndHideKeyboard(activity);
 
     }
 
@@ -423,21 +425,6 @@ public class TabManager {
         }).show();
     }
 
-    public static class Tab {
-        public WebView webview;
-        public boolean isDesktopUA;
-
-
-        public Tab(WebView w) {
-            this.webview = w;
-        }
-    }
-
-    class TitleAndBundle {
-        String title;
-        Bundle bundle;
-    }
-
     public void closeCurrentTab() {
         if (getCurrentWebView().getUrl() != null && !getCurrentWebView().getUrl().equals("google.com")) {
             TitleAndBundle titleAndBundle = new TitleAndBundle();
@@ -464,6 +451,21 @@ public class TabManager {
         et.setText(getCurrentWebView().getUrl());
         setTabCountText(tabs.size());
         getCurrentWebView().requestFocus();
+    }
+
+    public static class Tab {
+        public WebView webview;
+        public boolean isDesktopUA;
+
+
+        public Tab(WebView w) {
+            this.webview = w;
+        }
+    }
+
+    class TitleAndBundle {
+        String title;
+        Bundle bundle;
     }
 
 }

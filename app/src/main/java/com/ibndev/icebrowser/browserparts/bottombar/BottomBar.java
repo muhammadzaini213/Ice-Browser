@@ -1,15 +1,15 @@
-package com.ibndev.icebrowser.browserparts;
+package com.ibndev.icebrowser.browserparts.bottombar;
 
 import android.app.Activity;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.View;
 
 import com.ibndev.icebrowser.R;
+import com.ibndev.icebrowser.browserparts.topbar.tab.TabManager;
 
 public class BottomBar {
     public BottomBar(Activity activity, TabManager tabManager, SQLiteDatabase placesDb) {
-        ShowAndHideKeyboard showAndHideKeyboard = new ShowAndHideKeyboard(activity);
-        BottomSheetMenu bottomSheetMenu = new BottomSheetMenu();
+        BottomSheetMenu bottomSheetMenu = new BottomSheetMenu(activity, tabManager, placesDb);
 
         View bottom_bar = activity.findViewById(R.id.bottom_bar);
 
@@ -29,7 +29,7 @@ public class BottomBar {
 
         bottom_bar.findViewById(R.id.refresh_btn).setOnClickListener(view -> tabManager.getCurrentWebView().reload());
 
-        bottom_bar.findViewById(R.id.menu_btn).setOnClickListener(view -> bottomSheetMenu.show(activity, tabManager, showAndHideKeyboard, placesDb));
+        bottom_bar.findViewById(R.id.menu_btn).setOnClickListener(view -> bottomSheetMenu.show());
     }
 
 }

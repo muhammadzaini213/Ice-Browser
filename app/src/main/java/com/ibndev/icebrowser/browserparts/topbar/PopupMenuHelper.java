@@ -1,4 +1,4 @@
-package com.ibndev.icebrowser.browserparts;
+package com.ibndev.icebrowser.browserparts.topbar;
 
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
