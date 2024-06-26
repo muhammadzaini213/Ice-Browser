@@ -18,30 +18,29 @@ public class SettingsSheet {
     ClearBrowserData clearBrowserData;
     DeleteAllBookmarks deleteAllBookmarks;
 
-    public SettingsSheet(Activity activity, TabManager tabManager, SQLiteDatabase placesDB) {
+    public SettingsSheet(Activity activity, TabManager tabManager, SQLiteDatabase bookmarkDatabase) {
         this.activity = activity;
         this.tabManager = tabManager;
         clearBrowserData = new ClearBrowserData(tabManager);
-        deleteAllBookmarks = new DeleteAllBookmarks(activity, placesDB);
+        deleteAllBookmarks = new DeleteAllBookmarks(activity, bookmarkDatabase);
     }
 
     public void show() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(activity);
         @SuppressLint("InflateParams") View sheetView = LayoutInflater.from(activity).inflate(
-                R.layout.browser_settings_layout,
+                R.layout.activity_main_bottomsheet_settings,
                 null
         );
 
-        sheetView.findViewById(R.id.close_settings).setOnClickListener(view -> {
-            bottomSheetDialog.dismiss();
-        });
+        sheetView.findViewById(R.id.main_bottomsheet_settings_close_settings).setOnClickListener(view ->
+                bottomSheetDialog.dismiss());
 
-        sheetView.findViewById(R.id.clear_browser_data).setOnClickListener(view -> {
+        sheetView.findViewById(R.id.main_bottomsheet_settings_clear_browser_data).setOnClickListener(view -> {
             clearBrowserData.clearHistoryCache();
             bottomSheetDialog.dismiss();
         });
 
-        sheetView.findViewById(R.id.delete_all_bookmarks).setOnClickListener(view -> {
+        sheetView.findViewById(R.id.main_bottomsheet_settings_delete_all_bookmarks).setOnClickListener(view -> {
             deleteAllBookmarks.delete();
             bottomSheetDialog.dismiss();
         });

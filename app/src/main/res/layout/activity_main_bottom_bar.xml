@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:background="@color/background_dark"
+    android:orientation="horizontal"
+    android:weightSum="5"
+    app:layout_constraintBottom_toBottomOf="parent">
+
+    <ImageView
+        android:id="@+id/main_bottom_navbar_prev_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:contentDescription="@string/main_bottom_navbar_prev_btn_desc"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp"
+        android:src="@drawable/bottom_navbar_previous_icon" />
+
+    <ImageView
+        android:id="@+id/main_bottom_navbar_next_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:contentDescription="@string/main_bottom_navbar_next_btn_desc"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp"
+        android:src="@drawable/bottom_navbar_next_icon" />
+
+    <ImageView
+        android:id="@+id/main_bottom_navbar_home_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:contentDescription="@string/main_bottom_navbar_home_btn_desc"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp"
+        android:src="@drawable/bottom_navbar_home_icon" />
+
+    <ImageView
+        android:id="@+id/main_bottom_navbar_refresh_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:contentDescription="@string/main_bottom_navbar_refresh_btn_desc"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp"
+        android:src="@drawable/bottom_navbar_refresh_icon" />
+
+    <ImageView
+        android:id="@+id/main_bottom_navbar_menu_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:contentDescription="@string/main_bottom_navbar_menu_btn_desc"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp"
+        android:src="@drawable/bottom_navbar_menu_icon" />
+
+</LinearLayout>

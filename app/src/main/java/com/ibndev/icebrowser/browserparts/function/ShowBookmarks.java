@@ -14,20 +14,20 @@ import com.ibndev.icebrowser.browserparts.topbar.tab.TabManager;
 public class ShowBookmarks {
     Activity activity;
     TabManager tabManager;
-    SQLiteDatabase placesDb;
+    SQLiteDatabase bookmarkDatabase;
 
-    public ShowBookmarks(Activity activity, TabManager tabManager, SQLiteDatabase placesDb) {
+    public ShowBookmarks(Activity activity, TabManager tabManager, SQLiteDatabase bookmarkDatabase) {
         this.activity = activity;
         this.tabManager = tabManager;
-        this.placesDb = placesDb;
+        this.bookmarkDatabase = bookmarkDatabase;
     }
 
     public void showBookmarks() {
-        if (placesDb == null) return;
-        Cursor cursor = placesDb.rawQuery("SELECT title, url, id as _id FROM bookmarks", null);
-        AutoCompleteTextView et = activity.findViewById(R.id.et);
+        if (bookmarkDatabase == null) return;
+        Cursor cursor = bookmarkDatabase.rawQuery("SELECT title, url, id as _id FROM bookmarks", null);
+        AutoCompleteTextView et = activity.findViewById(R.id.main_top_navbar_autocomplete);
         AlertDialog dialog = new AlertDialog.Builder(activity)
-                .setTitle("Bookmarks")
+                .setTitle(activity.getString(R.string.bookmarks))
                 .setOnDismissListener(dlg -> cursor.close())
                 .setCursor(cursor, (dlg, which) -> {
                     cursor.moveToPosition(which);
@@ -44,42 +44,46 @@ public class ShowBookmarks {
             dialog.dismiss();
             new AlertDialog.Builder(activity)
                     .setTitle(title)
-                    .setItems(new String[]{"Rename", "Change URL", "Delete"}, (dlg, which) -> {
-                        switch (which) {
-                            case 0: {
-                                EditText editView = new EditText(activity);
-                                editView.setText(title);
-                                new AlertDialog.Builder(activity)
-                                        .setTitle("Rename bookmark")
-                                        .setView(editView)
-                                        .setPositiveButton("Rename", (renameDlg, which1) ->
-                                                placesDb.execSQL("UPDATE bookmarks SET title=? WHERE id=?",
-                                                        new Object[]{editView.getText(), rowId}))
-                                        .setNegativeButton("Cancel", (renameDlg, which1) -> {
-                                        })
-                                        .show();
-                                break;
-                            }
-                            case 1: {
-                                EditText editView = new EditText(activity);
-                                editView.setText(url);
-                                new AlertDialog.Builder(activity)
-                                        .setTitle("Change bookmark URL")
-                                        .setView(editView)
-                                        .setPositiveButton("Change URL", (renameDlg, which1) ->
-                                                placesDb.execSQL("UPDATE bookmarks SET url=? WHERE id=?",
-                                                        new Object[]{editView.getText(), rowId}))
-                                        .setNegativeButton("Cancel", (renameDlg, which1) -> {
-                                        })
-                                        .show();
-                                break;
-                            }
-                            case 2:
-                                placesDb.execSQL("DELETE FROM bookmarks WHERE id = ?",
-                                        new Object[]{rowId});
-                                break;
-                        }
-                    })
+                    .setItems(new String[]{
+                                    activity.getString(R.string.rename),
+                                    activity.getString(R.string.change_url),
+                                    activity.getString(R.string.delete)},
+                            (dlg, which) -> {
+                                switch (which) {
+                                    case 0: {
+                                        EditText editView = new EditText(activity);
+                                        editView.setText(title);
+                                        new AlertDialog.Builder(activity)
+                                                .setTitle(activity.getString(R.string.rename_bookmark))
+                                                .setView(editView)
+                                                .setPositiveButton(activity.getString(R.string.rename), (renameDlg, which1) ->
+                                                        bookmarkDatabase.execSQL("UPDATE bookmarks SET title=? WHERE id=?",
+                                                                new Object[]{editView.getText(), rowId}))
+                                                .setNegativeButton(activity.getString(R.string.cancel), (renameDlg, which1) -> {
+                                                })
+                                                .show();
+                                        break;
+                                    }
+                                    case 1: {
+                                        EditText editView = new EditText(activity);
+                                        editView.setText(url);
+                                        new AlertDialog.Builder(activity)
+                                                .setTitle(activity.getString(R.string.change_bookmark_url))
+                                                .setView(editView)
+                                                .setPositiveButton(activity.getString(R.string.change_url), (renameDlg, which1) ->
+                                                        bookmarkDatabase.execSQL("UPDATE bookmarks SET url=? WHERE id=?",
+                                                                new Object[]{editView.getText(), rowId}))
+                                                .setNegativeButton(activity.getString(R.string.cancel), (renameDlg, which1) -> {
+                                                })
+                                                .show();
+                                        break;
+                                    }
+                                    case 2:
+                                        bookmarkDatabase.execSQL("DELETE FROM bookmarks WHERE id = ?",
+                                                new Object[]{rowId});
+                                        break;
+                                }
+                            })
                     .show();
             return true;
         });

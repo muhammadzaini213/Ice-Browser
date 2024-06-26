@@ -16,7 +16,7 @@ import com.ibndev.icebrowser.browserparts.utilities.ShowAndHideKeyboard;
 public class SearchAutoComplete {
 
     public SearchAutoComplete(Activity activity, TabManager tabManager) {
-        AutoCompleteTextView et = activity.findViewById(R.id.et);
+        AutoCompleteTextView et = activity.findViewById(R.id.main_top_navbar_autocomplete);
         ShowAndHideKeyboard showAndHideKeyboard = new ShowAndHideKeyboard(activity);
         et.setSelected(false);
         String initialUrl = getUrlFromIntent(activity.getIntent());
@@ -41,7 +41,7 @@ public class SearchAutoComplete {
             }
         });
 
-        EditText searchEdit = activity.findViewById(R.id.searchEdit);
+        EditText searchEdit = activity.findViewById(R.id.main_top_navbar_search_edit);
         searchEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -56,21 +56,21 @@ public class SearchAutoComplete {
             public void afterTextChanged(Editable s) {
             }
         });
-        activity.findViewById(R.id.searchFindNext).setOnClickListener(v -> {
+        activity.findViewById(R.id.main_top_navbar_search_next).setOnClickListener(v -> {
             showAndHideKeyboard.hideKeyboard();
             tabManager.getCurrentWebView().findNext(true);
         });
 
-        activity.findViewById(R.id.searchFindPrev).setOnClickListener(v -> {
+        activity.findViewById(R.id.main_top_navbar_search_prev).setOnClickListener(v -> {
             showAndHideKeyboard.hideKeyboard();
             tabManager.getCurrentWebView().findNext(false);
         });
 
-        activity.findViewById(R.id.searchClose).setOnClickListener(v -> {
+        activity.findViewById(R.id.main_top_navbar_search_close).setOnClickListener(v -> {
             tabManager.getCurrentWebView().clearMatches();
             searchEdit.setText("");
             tabManager.getCurrentWebView().requestFocus();
-            activity.findViewById(R.id.searchPane).setVisibility(View.GONE);
+            activity.findViewById(R.id.main_top_navbar_search_pane).setVisibility(View.GONE);
             showAndHideKeyboard.hideKeyboard();
         });
 

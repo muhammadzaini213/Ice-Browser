@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_open_with"
-        android:icon="@drawable/open_with"
-        android:title="Open With"
+        android:icon="@drawable/top_menu_open_with_icon"
+        android:title="@string/open_with"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_save_bookmark"
-        android:icon="@drawable/add_"
-        android:title="Save Bookmark"
+        android:icon="@drawable/top_menu_bookmark_add_icon"
+        android:title="@string/save_bookmark"
         app:showAsAction="ifRoom" />
 
 </menu>

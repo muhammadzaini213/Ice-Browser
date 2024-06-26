@@ -17,83 +17,91 @@ import com.ibndev.icebrowser.browserparts.utilities.ShowAndHideKeyboard;
 public class BottomSheetMenu {
     Activity activity;
     TabManager tabManager;
-    BottomSheetFunctions functions;
+    BottomSheetMenuFunctions functions;
     ShowAndHideKeyboard showAndHideKeyboard;
     SettingsSheet settingsSheet;
+    BottomSheetDialog bottomSheetDialog;
+    View bottomSheetView;
 
-    public BottomSheetMenu(Activity activity, TabManager tabManager, SQLiteDatabase placesDB) {
+    @SuppressLint("InflateParams")
+    public BottomSheetMenu(Activity activity, TabManager tabManager, SQLiteDatabase bookmarkDatabase) {
         this.activity = activity;
         this.tabManager = tabManager;
         showAndHideKeyboard = new ShowAndHideKeyboard(activity);
-        functions = new BottomSheetFunctions(activity, tabManager, placesDB);
-        settingsSheet = new SettingsSheet(activity, tabManager, placesDB);
+        functions = new BottomSheetMenuFunctions(activity, tabManager, bookmarkDatabase);
+        settingsSheet = new SettingsSheet(activity, tabManager, bookmarkDatabase);
+
+        bottomSheetDialog = new BottomSheetDialog(activity);
+                bottomSheetView = LayoutInflater.from(activity).inflate(
+                R.layout.activity_main_bottomsheet_menu,
+                null
+        );
+        bottomSheetDialog.setContentView(bottomSheetView);
+
     }
 
     public void show() {
 
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(activity);
-        @SuppressLint("InflateParams") View bottomSheetView = LayoutInflater.from(activity).inflate(
-                R.layout.bottom_sheet_menu,
-                null
-        );
+
 
 
         setModeButton(bottomSheetView, bottomSheetDialog);
 
-        bottomSheetView.findViewById(R.id.bookmark).setOnClickListener(view -> {
+        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_open_bookmark).setOnClickListener(view -> {
             functions.showBookmarks();
             bottomSheetDialog.dismiss();
         });
 
 
-
         setCookieButton(bottomSheetView, bottomSheetDialog);
 
 
-        bottomSheetView.findViewById(R.id.share).setOnClickListener(view -> {
+        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_share).setOnClickListener(view -> {
             functions.share();
             bottomSheetDialog.dismiss();
         });
 
-        bottomSheetView.findViewById(R.id.find).setOnClickListener(view -> {
+        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_find).setOnClickListener(view -> {
             functions.find(showAndHideKeyboard);
             bottomSheetDialog.dismiss();
         });
 
-        bottomSheetView.findViewById(R.id.overlay).setOnClickListener(view -> {
-            bottomSheetDialog.dismiss();
-        });
+        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_overlay).setOnClickListener(view ->
+                bottomSheetDialog.dismiss());
 
-        bottomSheetView.findViewById(R.id.tab_info).setOnClickListener(view -> {
+        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_tab_info).setOnClickListener(view -> {
             functions.tabInfo();
             bottomSheetDialog.dismiss();
         });
 
-        bottomSheetView.findViewById(R.id.settings).setOnClickListener(view -> {
+        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_settings).setOnClickListener(view -> {
             settingsSheet.show();
             bottomSheetDialog.dismiss();
         });
 
-        bottomSheetView.findViewById(R.id.exit).setOnClickListener(view -> {
+        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_rate).setOnClickListener(view -> {
+           bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_exit_app).setOnClickListener(view -> {
             activity.finishAffinity();
             System.exit(0);
         });
 
-        bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
     }
 
     private void setModeButton(View bottomSheetView, BottomSheetDialog bottomSheetDialog) {
         TabManager.Tab tab = tabManager.getCurrentTab();
         tab.isDesktopUA = !tab.isDesktopUA;
-        ImageView icon = bottomSheetView.findViewById(R.id.mode_img);
+        ImageView icon = bottomSheetView.findViewById(R.id.main_bottomsheet_menu_mode_icon);
         if (tab.isDesktopUA) {
-            icon.setImageResource((R.drawable.menu_android));
+            icon.setImageResource((R.drawable.bottomsheet_menu_mode_android_icon));
         } else {
-            icon.setImageResource(R.drawable.menu_dekstop);
+            icon.setImageResource(R.drawable.bottomsheet_menu_mode_desktop_icon);
         }
 
-        bottomSheetView.findViewById(R.id.desktop).setOnClickListener(view -> {
+        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_mode).setOnClickListener(view -> {
             functions.switchUA(tab);
             bottomSheetDialog.dismiss();
         });
@@ -101,17 +109,17 @@ public class BottomSheetMenu {
 
 
     private void setCookieButton(View bottomSheetView, BottomSheetDialog bottomSheetDialog) {
-        ImageView icon = bottomSheetView.findViewById(R.id.cookie_img);
+        ImageView icon = bottomSheetView.findViewById(R.id.main_bottomsheet_menu_cookie_icon);
         CookieManager cookieManager = CookieManager.getInstance();
         boolean isCookieActive = cookieManager.acceptThirdPartyCookies(tabManager.getCurrentWebView());
 
-        if (isCookieActive){
-            icon.setImageResource(R.drawable.menu_cookie);
-        } else{
-            icon.setImageResource(R.drawable.menu_cookie_nonactive);
+        if (isCookieActive) {
+            icon.setImageResource(R.drawable.bottomsheet_menu_cookie_active_icon);
+        } else {
+            icon.setImageResource(R.drawable.bottomsheet_menu_cookie_nonactive_icon);
         }
 
-        bottomSheetView.findViewById(R.id.cookie).setOnClickListener(view -> {
+        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_cookie).setOnClickListener(view -> {
             functions.cookie(cookieManager, isCookieActive);
 
             bottomSheetDialog.dismiss();

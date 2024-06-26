@@ -2,8 +2,8 @@ package com.ibndev.icebrowser.browserparts.topbar.tab;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -29,25 +29,24 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ibndev.icebrowser.MainBrowserActivity;
 import com.ibndev.icebrowser.R;
-import com.ibndev.icebrowser.WebActivity;
 import com.ibndev.icebrowser.browserparts.function.WebCertificate;
+import com.ibndev.icebrowser.browserparts.setup.permission.PermissionCodes;
 import com.ibndev.icebrowser.browserparts.utilities.DownloadHelper;
 import com.ibndev.icebrowser.browserparts.utilities.ShowAndHideKeyboard;
 
 import java.util.ArrayList;
 
 public class TabManager {
-    public static final int FORM_FILE_CHOOSER = 1;
     public final WebChromeClient.CustomViewCallback[] fullScreenCallback = new WebChromeClient.CustomViewCallback[1];
     public final ArrayList<Tab> tabs = new ArrayList<>();
-    final WebActivity activity;
+    final MainBrowserActivity activity;
     final ShowAndHideKeyboard showAndHideKeyboard;
     final DownloadHelper downloadHelper;
     final View[] fullScreenView = new View[1];
@@ -57,10 +56,10 @@ public class TabManager {
     AutoCompleteTextView et;
 
 
-    public TabManager(WebActivity activity) {
+    public TabManager(MainBrowserActivity activity) {
         this.activity = activity;
         downloadHelper = new DownloadHelper(activity);
-        et = activity.findViewById(R.id.et);
+        et = activity.findViewById(R.id.main_top_navbar_autocomplete);
         showAndHideKeyboard = new ShowAndHideKeyboard(activity);
 
     }
@@ -86,7 +85,7 @@ public class TabManager {
     }
 
     private void newTabCommon(WebView webview) {
-        final FrameLayout webviews = activity.findViewById(R.id.webviews);
+        final FrameLayout webview_framelayout = activity.findViewById(R.id.main_framelayout_webview);
         boolean isDesktopUA = !tabs.isEmpty() && getCurrentTab().isDesktopUA;
         webview.getSettings().setUserAgentString(isDesktopUA ? activity.getString(R.string.desktopUA) : null);
         webview.getSettings().setUseWideViewPort(isDesktopUA);
@@ -95,7 +94,7 @@ public class TabManager {
         TabManager.Tab tab = new TabManager.Tab(webview);
         tab.isDesktopUA = isDesktopUA;
         tabs.add(tab);
-        webviews.addView(webview);
+        webview_framelayout.addView(webview);
         setTabCountText(tabs.size());
     }
 
@@ -130,13 +129,14 @@ public class TabManager {
     }
 
     public void setTabCountText(int count) {
-        TextView tabs_number = activity.findViewById(R.id.tabs_number);
+        TextView tabs_number = activity.findViewById(R.id.main_top_navbar_tabs_number);
         tabs_number.setText(String.valueOf(count));
     }
 
+    @SuppressLint({"SetJavaScriptEnabled", "DefaultLocale"})
     public WebView createWebView(Bundle bundle, boolean isNightMode) {
-        final ProgressBar progressBar = activity.findViewById(R.id.progressbar);
-        final AutoCompleteTextView et = activity.findViewById(R.id.et);
+        final ProgressBar progressBar = activity.findViewById(R.id.main_progressbar);
+        final AutoCompleteTextView et = activity.findViewById(R.id.main_top_navbar_autocomplete);
 
         WebView webview = new WebView(activity);
         if (bundle != null) {
@@ -144,7 +144,6 @@ public class TabManager {
         }
         WebSettings settings = webview.getSettings();
         webview.setBackgroundColor(isNightMode ? Color.BLACK : Color.WHITE);
-
         settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setJavaScriptEnabled(true);
@@ -168,8 +167,8 @@ public class TabManager {
             public void onShowCustomView(View view, CustomViewCallback callback) {
                 fullScreenView[0] = view;
                 fullScreenCallback[0] = callback;
-                activity.findViewById(R.id.main_layout).setVisibility(View.INVISIBLE);
-                ViewGroup fullscreenLayout = activity.findViewById(R.id.fullScreenVideo);
+                activity.findViewById(R.id.main_browser_layout).setVisibility(View.INVISIBLE);
+                ViewGroup fullscreenLayout = activity.findViewById(R.id.main_fullScreenVideo);
                 fullscreenLayout.addView(view);
                 fullscreenLayout.setVisibility(View.VISIBLE);
             }
@@ -178,12 +177,12 @@ public class TabManager {
             public void onHideCustomView() {
                 if (fullScreenView[0] == null) return;
 
-                ViewGroup fullscreenLayout = activity.findViewById(R.id.fullScreenVideo);
+                ViewGroup fullscreenLayout = activity.findViewById(R.id.main_fullScreenVideo);
                 fullscreenLayout.removeView(fullScreenView[0]);
                 fullscreenLayout.setVisibility(View.GONE);
                 fullScreenView[0] = null;
                 fullScreenCallback[0] = null;
-                activity.findViewById(R.id.main_layout).setVisibility(View.VISIBLE);
+                activity.findViewById(R.id.main_browser_layout).setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -195,7 +194,7 @@ public class TabManager {
                 fileUploadCallback = filePathCallback;
                 Intent intent = fileChooserParams.createIntent();
                 try {
-                    activity.startActivityForResult(intent, FORM_FILE_CHOOSER);
+                    activity.startActivityForResult(intent, PermissionCodes.FORM_FILE_CHOOSER);
                     return true;
                 } catch (ActivityNotFoundException e) {
                     // Continue below
@@ -203,14 +202,14 @@ public class TabManager {
 
                 intent.setType("*/*");
                 try {
-                    activity.startActivityForResult(intent, FORM_FILE_CHOOSER);
+                    activity.startActivityForResult(intent, PermissionCodes.FORM_FILE_CHOOSER);
                     return true;
                 } catch (ActivityNotFoundException e) {
                     // Continue below
                 }
 
                 // Everything failed, let user know
-                Toast.makeText(activity, "Can't open file chooser", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, activity.getString(R.string.file_chooser_open_fail), Toast.LENGTH_SHORT).show();
                 fileUploadCallback = null;
                 return false;
             }
@@ -243,16 +242,7 @@ public class TabManager {
 
             @Override
             public void onReceivedHttpAuthRequest(WebView view, final HttpAuthHandler handler, String host, String realm) {
-                new AlertDialog.Builder(activity)
-                        .setTitle(host)
-                        .setView(R.layout.login_password)
-                        .setCancelable(false)
-                        .setPositiveButton("OK", (dialog, which) -> {
-                            String username = ((EditText) ((Dialog) dialog).findViewById(R.id.username)).getText().toString();
-                            String password = ((EditText) ((Dialog) dialog).findViewById(R.id.password)).getText().toString();
-                            handler.proceed(username, password);
-                        })
-                        .setNegativeButton("Cancel", (dialog, which) -> handler.cancel()).show();
+
             }
 
             @Override
@@ -263,7 +253,6 @@ public class TabManager {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                // For intent:// URLs, redirect to browser_fallback_url if given
                 if (url.startsWith("intent://")) {
                     int start = url.indexOf(";S.browser_fallback_url=");
                     if (start != -1) {
@@ -285,16 +274,17 @@ public class TabManager {
 
             }
 
+            @SuppressLint("WebViewClientOnReceivedSslError")
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
                 int primaryError = error.getPrimaryError();
                 String errorStr = primaryError >= 0 && primaryError < sslErrors.length ? sslErrors[primaryError] : "Unknown error " + primaryError;
                 new AlertDialog.Builder(activity)
-                        .setTitle("Insecure connection")
+                        .setTitle(activity.getString(R.string.insecure_connection))
                         .setMessage(String.format("Error: %s\nURL: %s\n\nCertificate:\n%s",
                                 errorStr, error.getUrl(), WebCertificate.certificateToStr(error.getCertificate())))
-                        .setPositiveButton("Proceed", (dialog, which) -> handler.proceed())
-                        .setNegativeButton("Cancel", (dialog, which) -> handler.cancel())
+                        .setPositiveButton(activity.getString(R.string.proceed), (dialog, which) -> handler.proceed())
+                        .setNegativeButton(activity.getString(R.string.cancel), (dialog, which) -> handler.cancel())
                         .show();
             }
         });
@@ -335,33 +325,38 @@ public class TabManager {
         webview.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
             String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
             new AlertDialog.Builder(activity)
-                    .setTitle("Download")
-                    .setMessage(String.format("Filename: %s\nSize: %.2f MB\nURL: %s",
+                    .setTitle(activity.getString(R.string.download))
+                    .setMessage(String.format(
+                                    activity.getString(R.string.filename) +
+                                    "%s\n" +
+                                    activity.getString(R.string.size) +
+                                    "%.2f MB\n" +
+                                    activity.getString(R.string.url)+"%s",
                             filename,
                             contentLength / 1024.0 / 1024.0,
                             url))
-                    .setPositiveButton("Download", (dialog, which) -> downloadHelper.startDownload(url, filename))
-                    .setNeutralButton("Open", (dialog, which) -> {
+                    .setPositiveButton(activity.getString(R.string.download), (dialog, which) -> downloadHelper.startDownload(url, filename))
+                    .setNeutralButton(activity.getString(R.string.open), (dialog, which) -> {
                         Intent i = new Intent(Intent.ACTION_VIEW);
                         i.setData(Uri.parse(url));
                         try {
                             activity.startActivity(i);
                         } catch (ActivityNotFoundException e) {
                             new AlertDialog.Builder(activity)
-                                    .setTitle("Open")
-                                    .setMessage("Can't open files of this type. Try downloading instead.")
-                                    .setPositiveButton("OK", (dialog1, which1) -> {
+                                    .setTitle(activity.getString(R.string.open))
+                                    .setMessage(activity.getString(R.string.open_file_try_download))
+                                    .setPositiveButton(activity.getString(R.string.ok), (dialog1, which1) -> {
                                     })
                                     .show();
                         }
                     })
-                    .setNegativeButton("Cancel", (dialog, which) -> {
+                    .setNegativeButton(activity.getString(R.string.cancel), (dialog, which) -> {
                     })
                     .show();
         });
         webview.setFindListener((activeMatchOrdinal, numberOfMatches, isDoneCounting) -> {
-            TextView searchCount = activity.findViewById(R.id.searchCount);
-            searchCount.setText(numberOfMatches == 0 ? "Not found" :
+            TextView searchCount = activity.findViewById(R.id.main_top_navbar_search_count);
+            searchCount.setText(numberOfMatches == 0 ? activity.getString(R.string.not_found) :
                     String.format("%d / %d", activeMatchOrdinal + 1, numberOfMatches));
         });
 
@@ -371,7 +366,11 @@ public class TabManager {
     private void showLongPressMenu(String linkUrl, String imageUrl) {
         String url;
         String title;
-        String[] options = new String[]{"Open in new tab", "Copy URL", "Show full URL", "Download"};
+        String[] options = new String[]{
+                activity.getString(R.string.open_in_new_tab),
+                activity.getString(R.string.copy_url),
+                activity.getString(R.string.show_full_url),
+                activity.getString(R.string.download)};
 
         if (imageUrl == null) {
             if (linkUrl == null) {
@@ -385,14 +384,14 @@ public class TabManager {
             if (linkUrl == null) {
                 // Image without link
                 url = imageUrl;
-                title = "Image: " + imageUrl;
+                title = activity.getString(R.string.image) + imageUrl;
             } else {
                 // Image with link
                 url = linkUrl;
                 title = linkUrl;
                 String[] newOptions = new String[options.length + 1];
                 System.arraycopy(options, 0, newOptions, 0, options.length);
-                newOptions[newOptions.length - 1] = "Image Options";
+                newOptions[newOptions.length - 1] = activity.getString(R.string.image_options);
                 options = newOptions;
             }
         }
@@ -404,14 +403,14 @@ public class TabManager {
                 case 1:
                     ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(CLIPBOARD_SERVICE);
                     assert clipboard != null;
-                    ClipData clipData = ClipData.newPlainText("URL", url);
+                    ClipData clipData = ClipData.newPlainText(activity.getString(R.string.url), url);
                     clipboard.setPrimaryClip(clipData);
                     break;
                 case 2:
                     new AlertDialog.Builder(activity)
-                            .setTitle("Full URL")
+                            .setTitle(activity.getString(R.string.full_url))
                             .setMessage(url)
-                            .setPositiveButton("OK", (dialog1, which1) -> {
+                            .setPositiveButton(activity.getString(R.string.ok), (dialog1, which1) -> {
                             })
                             .show();
                     break;
@@ -436,7 +435,7 @@ public class TabManager {
                 closedTabs.remove(closedTabs.size() - 1);
             }
         }
-        ((FrameLayout) activity.findViewById(R.id.webviews)).removeView(getCurrentWebView());
+        ((FrameLayout) activity.findViewById(R.id.main_framelayout_webview)).removeView(getCurrentWebView());
         getCurrentWebView().destroy();
         tabs.remove(currentTabIndex);
         if (currentTabIndex >= tabs.size()) {
@@ -444,7 +443,7 @@ public class TabManager {
         }
         if (currentTabIndex == -1) {
             // We just closed the last tab
-            newTab("google.com");
+            newTab("https://google.com");
             currentTabIndex = 0;
         }
         getCurrentWebView().setVisibility(View.VISIBLE);
@@ -463,7 +462,7 @@ public class TabManager {
         }
     }
 
-    class TitleAndBundle {
+    static class TitleAndBundle {
         String title;
         Bundle bundle;
     }

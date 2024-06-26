@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ibndev.icebrowser.R;
@@ -23,9 +24,10 @@ public class TabsAdapter extends RecyclerView.Adapter<TabsAdapter.TabViewHolder>
         this.onCloseClickListener = onCloseClickListener;
     }
 
+    @NonNull
     @Override
     public TabViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tab, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_main_tabs_item_adapter, parent, false);
         return new TabViewHolder(v);
     }
 
@@ -51,9 +53,9 @@ public class TabsAdapter extends RecyclerView.Adapter<TabsAdapter.TabViewHolder>
 
         public TabViewHolder(View v) {
             super(v);
-            textView = v.findViewById(R.id.tab_title);
-            closeTab = v.findViewById(R.id.close_this_tab);
-            favicon = v.findViewById(R.id.favicon);
+            textView = v.findViewById(R.id.main_tabs_item_adapter_tab_title);
+            closeTab = v.findViewById(R.id.main_tabs_item_adapter_tab_close);
+            favicon = v.findViewById(R.id.main_tabs_item_adapter_favicon);
         }
     }
 }

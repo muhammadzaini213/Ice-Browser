@@ -1,5 +1,6 @@
 package com.ibndev.icebrowser.browserparts.topbar.tab;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.view.View;
 
@@ -14,6 +15,7 @@ public class TabRecyclerView {
 
     public TabsAdapter adapter;
 
+    @SuppressLint("NotifyDataSetChanged")
     public TabRecyclerView(Activity activity, TabManager tabManager, List<String> tabTitles) {
         RecyclerView recyclerView = activity.findViewById(R.id.tabs_list);
 
@@ -21,13 +23,13 @@ public class TabRecyclerView {
         adapter = new TabsAdapter(tabTitles, v -> {
             int position = (int) v.getTag();
             tabManager.switchToTab(position);
-            activity.findViewById(R.id.tabs_layout).setVisibility(View.GONE);
+            activity.findViewById(R.id.main_tabs_layout).setVisibility(View.GONE);
         }, v -> {
             int position = (int) v.getTag();
             tabManager.switchToTab(position);
 
             if (tabTitles.size() == 1) {
-                activity.findViewById(R.id.tabs_layout).setVisibility(View.GONE);
+                activity.findViewById(R.id.main_tabs_layout).setVisibility(View.GONE);
             }
             if (position >= 0 && position < tabTitles.size()) {
                 tabTitles.remove(position);

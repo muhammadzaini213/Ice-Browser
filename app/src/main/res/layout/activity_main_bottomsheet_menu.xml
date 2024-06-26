@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/background_dark"
+    android:columnCount="4"
+    android:paddingVertical="10dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_bottomsheet_menu_mode"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_row="0"
+        android:layout_column="0"
+        android:layout_columnWeight="1"
+        android:layout_margin="7dp"
+        android:background="@drawable/bottomsheet_menu_background_round"
+        android:backgroundTint="#2A2A2A"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/main_bottomsheet_menu_mode_icon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:contentDescription="@string/main_bottomsheet_menu_mode_icon_desc"
+            android:src="@drawable/bottomsheet_menu_mode_desktop_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/main_bottomsheet_menu_mode"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_mode_icon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_bottomsheet_menu_open_bookmark"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_row="0"
+        android:layout_column="1"
+        android:layout_columnWeight="1"
+        android:layout_margin="7dp"
+        android:background="@drawable/bottomsheet_menu_background_round"
+        android:backgroundTint="#2A2A2A"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/main_bottomsheet_menu_open_bookmark_icon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:contentDescription="@string/main_bottomsheet_menu_open_bookmarks_icon_desc"
+            android:src="@drawable/bottomsheet_menu_open_bookmark_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/main_bottomsheet_menu_open_bookmarks"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_open_bookmark_icon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_bottomsheet_menu_cookie"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_row="0"
+        android:layout_column="2"
+        android:layout_columnWeight="1"
+        android:layout_margin="7dp"
+        android:background="@drawable/bottomsheet_menu_background_round"
+        android:backgroundTint="#2A2A2A"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/main_bottomsheet_menu_cookie_icon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:contentDescription="@string/main_bottomsheet_menu_cookies_toggle_icon_desc"
+            android:src="@drawable/bottomsheet_menu_cookie_active_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/main_bottomsheet_menu_cookies_toggle"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_cookie_icon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_bottomsheet_menu_share"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_row="0"
+        android:layout_column="3"
+        android:layout_columnWeight="1"
+        android:layout_margin="7dp"
+        android:background="@drawable/bottomsheet_menu_background_round"
+        android:backgroundTint="#2A2A2A"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/main_bottomsheet_menu_share_icon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:contentDescription="@string/main_bottomsheet_menu_share_icon_desc"
+            android:src="@drawable/bottomsheet_menu_share_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/main_bottomsheet_menu_share"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_share_icon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_bottomsheet_menu_find"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_row="1"
+        android:layout_column="0"
+        android:layout_columnWeight="1"
+        android:layout_margin="7dp"
+        android:background="@drawable/bottomsheet_menu_background_round"
+        android:backgroundTint="#2A2A2A"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/main_bottomsheet_menu_find_icon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+
+            android:contentDescription="@string/main_bottomsheet_menu_find_icon_desc"
+            android:src="@drawable/bottomsheet_menu_find_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/main_bottomsheet_menu_find"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_find_icon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_bottomsheet_menu_overlay"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_row="1"
+        android:layout_column="1"
+        android:layout_columnWeight="1"
+        android:layout_margin="7dp"
+        android:background="@drawable/bottomsheet_menu_background_round"
+        android:backgroundTint="#2A2A2A"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/main_bottomsheet_menu_overlay_icon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+
+            android:contentDescription="@string/main_bottomsheet_menu_overlay_icon_desc"
+            android:src="@drawable/bottomsheet_menu_overlay_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/main_bottomsheet_menu_overlay"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_overlay_icon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_bottomsheet_menu_tab_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_row="1"
+        android:layout_column="2"
+        android:layout_columnWeight="1"
+        android:layout_margin="7dp"
+        android:background="@drawable/bottomsheet_menu_background_round"
+        android:backgroundTint="#2A2A2A"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp">
+
+
+        <ImageView
+            android:id="@+id/main_bottomsheet_menu_tab_info_icon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:contentDescription="@string/main_bottomsheet_menu_tab_info_icon_desc"
+            android:src="@drawable/bottomsheet_menu_tab_info_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/main_bottomsheet_menu_tab_info"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_tab_info_icon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_bottomsheet_menu_settings"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_row="1"
+        android:layout_column="3"
+        android:backgroundTint="#2A2A2A"
+        android:background="@drawable/bottomsheet_menu_background_round"
+        android:layout_margin="7dp"
+        android:layout_columnWeight="1"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/main_bottomsheet_menu_settings_icon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:contentDescription="@string/main_bottomsheet_menu_settings_icon_desc"
+            android:src="@drawable/bottomsheet_menu_settings_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/main_bottomsheet_menu_settings"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_settings_icon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_bottomsheet_menu_rate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_row="3"
+        android:layout_column="1"
+        android:layout_columnWeight="1"
+        android:layout_margin="7dp"
+        android:background="@drawable/bottomsheet_menu_background_round"
+        android:backgroundTint="#2A2A2A"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/main_bottomsheet_menu_rate_icon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:contentDescription="@string/main_bottomsheet_menu_rate_icon_desc"
+            android:src="@drawable/bottomsheet_menu_rate_us_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/main_bottomsheet_menu_rate"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_rate_icon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_bottomsheet_menu_exit_app"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_row="3"
+        android:layout_column="2"
+        android:layout_columnWeight="1"
+        android:layout_margin="7dp"
+        android:background="@drawable/bottomsheet_menu_background_round"
+        android:backgroundTint="#2A2A2A"
+        android:foreground="@drawable/ripple_rounded"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/main_bottomsheet_menu_exit_app_icon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:contentDescription="@string/main_bottomsheet_menu_exit_app_icon_desc"
+
+            android:src="@drawable/bottomsheet_menu_exit_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/main_bottomsheet_menu_exit_app"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_exit_app_icon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</GridLayout>

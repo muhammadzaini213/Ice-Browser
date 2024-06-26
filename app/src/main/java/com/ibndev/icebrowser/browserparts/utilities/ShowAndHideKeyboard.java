@@ -15,7 +15,7 @@ public class ShowAndHideKeyboard {
     }
 
     public void hideKeyboard() {
-        AutoCompleteTextView et = activity.findViewById(R.id.et);
+        AutoCompleteTextView et = activity.findViewById(R.id.main_top_navbar_autocomplete);
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         assert imm != null;
         imm.hideSoftInputFromWindow(et.getWindowToken(), 0);

@@ -24,12 +24,12 @@ import java.lang.reflect.Method;
 public class PopupMenuHelper {
 
     private final Context context;
-    private final SQLiteDatabase placesDb;
+    private final SQLiteDatabase bookmarkDatabase;
     private boolean isBookmarked = false;
 
-    public PopupMenuHelper(Context context, SQLiteDatabase placesDb) {
+    public PopupMenuHelper(Context context, SQLiteDatabase bookmarkDatabase) {
         this.context = context;
-        this.placesDb = placesDb;
+        this.bookmarkDatabase = bookmarkDatabase;
     }
 
     public void showPopupMenu(View view, String currentUrl, String currentTitle) {
@@ -46,33 +46,28 @@ public class PopupMenuHelper {
                     if ("mPopup".equals(field.getName())) {
                         field.setAccessible(true);
                         Object menuPopupHelper = field.get(popupMenu);
+                        assert menuPopupHelper != null;
                         Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
                         Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
                         setForceIcons.invoke(menuPopupHelper, true);
                         break;
                     }
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ignored) {
             }
         }
 
         isBookmarked = isUrlInBookmarks(currentUrl);
 
         if (isBookmarked) {
-            popupMenu.getMenu().findItem(R.id.action_save_bookmark).setIcon(R.drawable.bookmark_saved);
+            popupMenu.getMenu().findItem(R.id.action_save_bookmark).setIcon(R.drawable.top_menu_bookmark_saved_icon);
             popupMenu.getMenu().findItem(R.id.action_save_bookmark).setTitle("Remove Bookmark");
         } else {
-            popupMenu.getMenu().findItem(R.id.action_save_bookmark).setIcon(R.drawable.add_);
+            popupMenu.getMenu().findItem(R.id.action_save_bookmark).setIcon(R.drawable.top_menu_bookmark_add_icon);
             popupMenu.getMenu().findItem(R.id.action_save_bookmark).setTitle("Save Bookmark");
         }
 
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                return onOptionsItemSelected(item, currentUrl, currentTitle);
-            }
-        });
+        popupMenu.setOnMenuItemClickListener(item -> onOptionsItemSelected(item, currentUrl, currentTitle));
         popupMenu.show();
     }
 
@@ -95,8 +90,8 @@ public class PopupMenuHelper {
     }
 
     private boolean isUrlInBookmarks(String urlToCheck) {
-        if (placesDb == null) return false;
-        Cursor cursor = placesDb.rawQuery("SELECT 1 FROM bookmarks WHERE url = ?", new String[]{urlToCheck});
+        if (bookmarkDatabase == null) return false;
+        Cursor cursor = bookmarkDatabase.rawQuery("SELECT 1 FROM bookmarks WHERE url = ?", new String[]{urlToCheck});
 
         boolean exists = cursor.moveToFirst();
         cursor.close();
@@ -105,16 +100,16 @@ public class PopupMenuHelper {
     }
 
     private void addBookmark(String title, String url) {
-        if (placesDb == null) return;
+        if (bookmarkDatabase == null) return;
         ContentValues values = new ContentValues(2);
         values.put("title", title);
         values.put("url", url);
-        placesDb.insert("bookmarks", null, values);
+        bookmarkDatabase.insert("bookmarks", null, values);
     }
 
     private void deleteBookmark(String urlToCheck) {
-        if (placesDb == null) return;
-        placesDb.execSQL("DELETE FROM bookmarks WHERE url = ?", new Object[]{urlToCheck});
+        if (bookmarkDatabase == null) return;
+        bookmarkDatabase.execSQL("DELETE FROM bookmarks WHERE url = ?", new Object[]{urlToCheck});
     }
 
     private void openUrlInApp(String url) {

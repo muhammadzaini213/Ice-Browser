@@ -1,5 +1,6 @@
 package com.ibndev.icebrowser.browserparts.topbar.autocomplete;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
@@ -14,6 +15,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.ibndev.icebrowser.R;
 
@@ -56,6 +58,7 @@ public class SearchAutocompleteAdapter extends BaseAdapter implements Filterable
         return position;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @NonNull
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
@@ -65,10 +68,12 @@ public class SearchAutocompleteAdapter extends BaseAdapter implements Filterable
         }
         TextView v = convertView.findViewById(android.R.id.text1);
         v.setText(completions.get(position));
-        Drawable d = mContext.getResources().getDrawable(R.drawable.commit_search, null);
+        Drawable d = ResourcesCompat.getDrawable(mContext.getResources(), R.drawable.top_navbar_autocomplete_search, null);
         int size = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, mContext.getResources().getDisplayMetrics());
+        assert d != null;
         d.setBounds(0, 0, size, size);
         v.setCompoundDrawables(null, null, d, null);
+
         v.setOnTouchListener((v1, event) -> {
             if (event.getAction() != MotionEvent.ACTION_DOWN) {
                 return false;
