@@ -18,6 +18,7 @@ import android.os.Message;
 import android.util.Patterns;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.CookieManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.SslErrorHandler;
 import android.webkit.URLUtil;
@@ -56,6 +57,7 @@ public class TabManager {
     AutoCompleteTextView et;
 
 
+
     public TabManager(MainBrowserActivity activity) {
         this.activity = activity;
         downloadHelper = new DownloadHelper(activity);
@@ -88,7 +90,6 @@ public class TabManager {
         final FrameLayout webview_framelayout = activity.findViewById(R.id.main_framelayout_webview);
         boolean isDesktopUA = !tabs.isEmpty() && getCurrentTab().isDesktopUA;
         webview.getSettings().setUserAgentString(isDesktopUA ? activity.getString(R.string.desktopUA) : null);
-        webview.getSettings().setUseWideViewPort(isDesktopUA);
         webview.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         webview.setVisibility(View.GONE);
         TabManager.Tab tab = new TabManager.Tab(webview);
@@ -116,7 +117,6 @@ public class TabManager {
         } else {
             url = URLUtil.composeSearchUrl(url, "https://www.google.com/search?q=%s", "%s");
         }
-
         webview.loadUrl(url);
 
         showAndHideKeyboard.hideKeyboard();
@@ -151,7 +151,10 @@ public class TabManager {
         settings.setDomStorageEnabled(true);
         settings.setBuiltInZoomControls(true);
         settings.setDisplayZoomControls(false);
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+        settings.setSupportMultipleWindows(true);
         settings.setLoadWithOverviewMode(true);
+        settings.setUseWideViewPort(true);
         webview.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
@@ -422,6 +425,7 @@ public class TabManager {
                     break;
             }
         }).show();
+
     }
 
     public void closeCurrentTab() {

@@ -4,8 +4,7 @@ import android.app.Activity;
 import android.view.View;
 
 import com.ibndev.icebrowser.R;
-import com.ibndev.icebrowser.browserparts.bottombar.BottomSheetMenu;
-import com.ibndev.icebrowser.browserparts.bottombar.BottomSheetMore;
+import com.ibndev.icebrowser.browserparts.bottombar.bottomsheetmore.BottomSheetMore;
 
 public class TabsLayout {
     Activity activity;

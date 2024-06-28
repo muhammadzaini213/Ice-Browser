@@ -1,4 +1,4 @@
-package com.ibndev.icebrowser.browserparts.bottombar;
+package com.ibndev.icebrowser.browserparts.bottombar.bottomsheetmenu;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -27,13 +27,13 @@ public class BottomSheetMenuFunctions {
 
     }
 
-    public void switchUA(TabManager.Tab tab) {
-        if (tab.isDesktopUA) {
+    public void switchUA(boolean isDesktopUA) {
+        if (!isDesktopUA) {
             tabManager.getCurrentWebView().getSettings().setUserAgentString(activity.getString(R.string.desktopUA));
         } else {
             tabManager.getCurrentWebView().getSettings().setUserAgentString(null);
         }
-        tabManager.getCurrentWebView().getSettings().setUseWideViewPort(tab.isDesktopUA);
+
         tabManager.getCurrentWebView().reload();
     }
 

@@ -1,5 +1,6 @@
 package com.ibndev.icebrowser.browserparts.topbar.tab;
 
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +16,13 @@ import java.util.List;
 
 public class TabsAdapter extends RecyclerView.Adapter<TabsAdapter.TabViewHolder> {
     private final List<String> tabTitles;
+    private final List<Bitmap> faviconBitmap;
     private final View.OnClickListener onItemClickListener;
     private final View.OnClickListener onCloseClickListener;
 
-    public TabsAdapter(List<String> tabTitles, View.OnClickListener onItemClickListener, View.OnClickListener onCloseClickListener) {
+    public TabsAdapter(List<Bitmap> faviconBitmap, List<String> tabTitles, View.OnClickListener onItemClickListener, View.OnClickListener onCloseClickListener) {
         this.tabTitles = tabTitles;
+        this.faviconBitmap = faviconBitmap;
         this.onItemClickListener = onItemClickListener;
         this.onCloseClickListener = onCloseClickListener;
     }
@@ -38,7 +41,7 @@ public class TabsAdapter extends RecyclerView.Adapter<TabsAdapter.TabViewHolder>
         holder.itemView.setOnClickListener(onItemClickListener);
         holder.closeTab.setTag(position);
         holder.closeTab.setOnClickListener(onCloseClickListener);
-
+        holder.favicon.setImageBitmap(faviconBitmap.get(position));
     }
 
     @Override

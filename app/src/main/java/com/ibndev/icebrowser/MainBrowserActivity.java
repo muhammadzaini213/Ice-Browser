@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -32,6 +33,7 @@ import java.util.List;
 public class MainBrowserActivity extends Activity {
 
     private final List<String> tabTitles = new ArrayList<>();
+    private final List<Bitmap> tabFavicon = new ArrayList<>();
     SearchAutoComplete autoComplete;
     TabRecyclerView recyclerView;
     private SQLiteDatabase bookmarkDatabase;
@@ -54,16 +56,17 @@ public class MainBrowserActivity extends Activity {
 
 
         tabManager = new TabManager(this);
-        recyclerView = new TabRecyclerView(this, tabManager, tabTitles);
+        recyclerView = new TabRecyclerView(this, tabManager, tabTitles, tabFavicon);
         autoComplete = new SearchAutoComplete(this, tabManager);
 
 
         new TabsLayout(this).tabsLayout(tabManager);
         new BottomBar(this, tabManager, bookmarkDatabase);
-        new TopBar(this, tabManager, recyclerView, tabTitles, menuHelper);
+        new TopBar(this, tabManager, recyclerView, tabTitles, tabFavicon, menuHelper);
 
         AutoCompleteTextView et = findViewById(R.id.main_top_navbar_autocomplete);
         tabManager.newTab(et.getText().toString());
+
         tabManager.getCurrentWebView().setVisibility(View.VISIBLE);
         tabManager.getCurrentWebView().requestFocus();
 

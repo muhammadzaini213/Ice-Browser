@@ -8,7 +8,10 @@
     <color name="black">#FF000000</color>
 
     <color name="background_dark">#131313</color>
+    <color name="background_normal">#2A2A2A</color>
+    <color name="background_active">#616161</color>
     <color name="icon_color">#BFBFBF</color>
+
     <color name="dark_blue">#2541B2</color>
     <color name="medium_blue">#1768AC</color>
     <color name="blue">#06BEE1</color>

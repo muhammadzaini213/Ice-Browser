@@ -2,6 +2,7 @@ package com.ibndev.icebrowser.browserparts.topbar.tab;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,11 +17,11 @@ public class TabRecyclerView {
     public TabsAdapter adapter;
 
     @SuppressLint("NotifyDataSetChanged")
-    public TabRecyclerView(Activity activity, TabManager tabManager, List<String> tabTitles) {
+    public TabRecyclerView(Activity activity, TabManager tabManager, List<String> tabTitles, List<Bitmap> tabFavicon) {
         RecyclerView recyclerView = activity.findViewById(R.id.tabs_list);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
-        adapter = new TabsAdapter(tabTitles, v -> {
+        adapter = new TabsAdapter(tabFavicon,tabTitles, v -> {
             int position = (int) v.getTag();
             tabManager.switchToTab(position);
             activity.findViewById(R.id.main_tabs_layout).setVisibility(View.GONE);

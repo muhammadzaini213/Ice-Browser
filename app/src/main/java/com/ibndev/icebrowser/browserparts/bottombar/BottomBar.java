@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.view.View;
 
 import com.ibndev.icebrowser.R;
+import com.ibndev.icebrowser.browserparts.bottombar.bottomsheetmenu.BottomSheetMenu;
 import com.ibndev.icebrowser.browserparts.topbar.tab.TabManager;
 
 public class BottomBar {

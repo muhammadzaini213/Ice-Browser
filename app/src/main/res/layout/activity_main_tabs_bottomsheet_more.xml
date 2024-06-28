@@ -3,19 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="20dp"
     android:background="@color/background_dark"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingVertical="20dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/main_bottomsheet_menu_title"
+            android:id="@+id/main_tabs_more_bottomsheet_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/main_bottomsheet_menu_title"
+            android:text="@string/main_tabs_more_bottomsheet_title"
             android:textColor="@color/white"
             android:textSize="30sp"
             android:textStyle="bold"
@@ -24,13 +24,13 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
-            android:id="@+id/main_bottomsheet_menu_close"
+            android:id="@+id/main_tabs_more_bottomsheet_close"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="16dp"
             android:foreground="@drawable/ripple_rounded"
-            android:contentDescription="@string/main_bottomsheet_menu_close_icon"
-            android:src="@drawable/bottomsheet_menu_close_icon"
+            android:contentDescription="@string/main_tabs_more_bottomsheet_close_icon"
+            android:src="@drawable/tabs_more_bottomsheet_close_icon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -43,7 +43,7 @@
         android:paddingVertical="10dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/main_bottomsheet_menu_mode"
+            android:id="@+id/main_tabs_more_toggle_javascript"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_row="0"
@@ -51,16 +51,16 @@
             android:layout_columnWeight="1"
             android:layout_margin="7dp"
             android:background="@drawable/bottomsheet_menu_background_round"
-            android:backgroundTint="@color/background_normal"
+            android:backgroundTint="#2A2A2A"
             android:foreground="@drawable/ripple_rounded"
             android:padding="10dp">
 
             <ImageView
-                android:id="@+id/main_bottomsheet_menu_mode_icon"
+                android:id="@+id/main_tabs_more_toggle_javascript_icon"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:contentDescription="@string/main_bottomsheet_menu_mode_icon_desc"
-                android:src="@drawable/bottomsheet_menu_mode_desktop_icon"
+                android:contentDescription="@string/main_tabs_more_javascript_toggle_title"
+                android:src="@drawable/tabs_more_toggle_javascript_icon"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -69,19 +69,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="@string/main_bottomsheet_menu_mode"
+                android:text="@string/main_tabs_more_javascript_toggle_title"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_mode_icon" />
+                app:layout_constraintTop_toBottomOf="@+id/main_tabs_more_toggle_javascript_icon" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/main_bottomsheet_menu_open_bookmark"
+            android:id="@+id/main_tabs_more_toggle_cache"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_row="0"
@@ -89,36 +90,37 @@
             android:layout_columnWeight="1"
             android:layout_margin="7dp"
             android:background="@drawable/bottomsheet_menu_background_round"
-            android:backgroundTint="@color/background_normal"
+            android:backgroundTint="#2A2A2A"
             android:foreground="@drawable/ripple_rounded"
             android:padding="10dp">
 
             <ImageView
-                android:id="@+id/main_bottomsheet_menu_open_bookmark_icon"
+                android:id="@+id/main_tabs_more_toggle_cache_icon"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:contentDescription="@string/main_bottomsheet_menu_open_bookmarks_icon_desc"
-                android:src="@drawable/bottomsheet_menu_open_bookmark_icon"
+                android:contentDescription="@string/main_tabs_more_cache_toggle_title"
+                android:src="@drawable/tabs_more_toggle_cache_icon"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="@string/main_bottomsheet_menu_open_bookmarks"
+                android:text="@string/main_tabs_more_cache_toggle_title"
+                android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_open_bookmark_icon" />
+                app:layout_constraintTop_toBottomOf="@+id/main_tabs_more_toggle_cache_icon" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/main_bottomsheet_menu_cookie"
+            android:id="@+id/main_tabs_more_toggle_css"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_row="0"
@@ -126,36 +128,38 @@
             android:layout_columnWeight="1"
             android:layout_margin="7dp"
             android:background="@drawable/bottomsheet_menu_background_round"
-            android:backgroundTint="@color/background_normal"
+            android:backgroundTint="#2A2A2A"
             android:foreground="@drawable/ripple_rounded"
             android:padding="10dp">
 
             <ImageView
-                android:id="@+id/main_bottomsheet_menu_cookie_icon"
+                android:id="@+id/main_tabs_more_toggle_css_icon"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:contentDescription="@string/main_bottomsheet_menu_cookies_toggle_icon_desc"
-                android:src="@drawable/bottomsheet_menu_cookie_icon"
+                android:contentDescription="@string/main_tabs_more_css_toggle_title"
+                android:src="@drawable/tabs_more_toggle_css_icon"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="@string/main_bottomsheet_menu_cookies_toggle"
+                android:text="@string/main_tabs_more_css_toggle_title"
+                android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_cookie_icon" />
+                app:layout_constraintTop_toBottomOf="@+id/main_tabs_more_toggle_css_icon" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/main_bottomsheet_menu_share"
+            android:id="@+id/main_tabs_more_toggle_dom_storage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_row="0"
@@ -163,36 +167,37 @@
             android:layout_columnWeight="1"
             android:layout_margin="7dp"
             android:background="@drawable/bottomsheet_menu_background_round"
-            android:backgroundTint="@color/background_normal"
+            android:backgroundTint="#2A2A2A"
             android:foreground="@drawable/ripple_rounded"
             android:padding="10dp">
 
             <ImageView
-                android:id="@+id/main_bottomsheet_menu_share_icon"
+                android:id="@+id/main_tabs_more_toggle_dom_storage_icon"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:contentDescription="@string/main_bottomsheet_menu_share_icon_desc"
-                android:src="@drawable/bottomsheet_menu_share_icon"
+                android:contentDescription="@string/main_tabs_more_dom_storage_toggle_title"
+                android:src="@drawable/tabs_more_toggle_dom_storage_icon"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="@string/main_bottomsheet_menu_share"
+                android:text="@string/main_tabs_more_dom_storage_toggle_title"
+                android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_share_icon" />
+                app:layout_constraintTop_toBottomOf="@+id/main_tabs_more_toggle_dom_storage_icon" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/main_bottomsheet_menu_find"
+            android:id="@+id/main_tabs_more_toggle_overview"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_row="1"
@@ -200,17 +205,16 @@
             android:layout_columnWeight="1"
             android:layout_margin="7dp"
             android:background="@drawable/bottomsheet_menu_background_round"
-            android:backgroundTint="@color/background_normal"
+            android:backgroundTint="#2A2A2A"
             android:foreground="@drawable/ripple_rounded"
             android:padding="10dp">
 
             <ImageView
-                android:id="@+id/main_bottomsheet_menu_find_icon"
+                android:id="@+id/main_tabs_more_toggle_overview_icon"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-
-                android:contentDescription="@string/main_bottomsheet_menu_find_icon_desc"
-                android:src="@drawable/bottomsheet_menu_find_icon"
+                android:contentDescription="@string/main_tabs_more_overview_toggle_title"
+                android:src="@drawable/tabs_more_toggle_overview_icon"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -219,19 +223,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="@string/main_bottomsheet_menu_find"
+                android:text="@string/main_tabs_more_overview_toggle_title"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_find_icon" />
+                app:layout_constraintTop_toBottomOf="@+id/main_tabs_more_toggle_overview_icon" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/main_bottomsheet_menu_overlay"
+            android:id="@+id/main_tabs_more_toggle_zoom"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_row="1"
@@ -239,17 +244,16 @@
             android:layout_columnWeight="1"
             android:layout_margin="7dp"
             android:background="@drawable/bottomsheet_menu_background_round"
-            android:backgroundTint="@color/background_normal"
+            android:backgroundTint="#2A2A2A"
             android:foreground="@drawable/ripple_rounded"
             android:padding="10dp">
 
             <ImageView
-                android:id="@+id/main_bottomsheet_menu_overlay_icon"
+                android:id="@+id/main_tabs_more_toggle_zoom_icon"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-
-                android:contentDescription="@string/main_bottomsheet_menu_overlay_icon_desc"
-                android:src="@drawable/bottomsheet_menu_overlay_icon"
+                android:contentDescription="@string/main_tabs_more_zoom_toggle_title"
+                android:src="@drawable/tabs_more_toggle_zoom_icon"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -258,19 +262,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="@string/main_bottomsheet_menu_overlay"
+                android:text="@string/main_tabs_more_zoom_toggle_title"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_overlay_icon" />
+                app:layout_constraintTop_toBottomOf="@+id/main_tabs_more_toggle_zoom_icon" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/main_bottomsheet_menu_tab_info"
+            android:id="@+id/main_tabs_more_toggle_image"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_row="1"
@@ -278,17 +282,16 @@
             android:layout_columnWeight="1"
             android:layout_margin="7dp"
             android:background="@drawable/bottomsheet_menu_background_round"
-            android:backgroundTint="@color/background_normal"
+            android:backgroundTint="#2A2A2A"
             android:foreground="@drawable/ripple_rounded"
             android:padding="10dp">
 
-
             <ImageView
-                android:id="@+id/main_bottomsheet_menu_tab_info_icon"
+                android:id="@+id/main_tabs_more_toggle_image_icon"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:contentDescription="@string/main_bottomsheet_menu_tab_info_icon_desc"
-                android:src="@drawable/bottomsheet_menu_tab_info_icon"
+                android:contentDescription="@string/main_tabs_more_image_toggle_title"
+                android:src="@drawable/tabs_more_toggle_image_icon"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -297,19 +300,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="@string/main_bottomsheet_menu_tab_info"
+                android:text="@string/main_tabs_more_image_toggle_title"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_tab_info_icon" />
+                app:layout_constraintTop_toBottomOf="@+id/main_tabs_more_toggle_image_icon" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/main_bottomsheet_menu_settings"
+            android:id="@+id/main_tabs_more_toggle_loader"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_row="1"
@@ -317,53 +320,16 @@
             android:layout_columnWeight="1"
             android:layout_margin="7dp"
             android:background="@drawable/bottomsheet_menu_background_round"
-            android:backgroundTint="@color/background_normal"
+            android:backgroundTint="#2A2A2A"
             android:foreground="@drawable/ripple_rounded"
             android:padding="10dp">
 
             <ImageView
-                android:id="@+id/main_bottomsheet_menu_settings_icon"
+                android:id="@+id/main_tabs_more_toggle_loader_icon"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:contentDescription="@string/main_bottomsheet_menu_settings_icon_desc"
-                android:src="@drawable/bottomsheet_menu_settings_icon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="@string/main_bottomsheet_menu_settings"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_settings_icon" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/main_bottomsheet_menu_rate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_row="3"
-            android:layout_column="1"
-            android:layout_columnWeight="1"
-            android:layout_margin="7dp"
-            android:background="@drawable/bottomsheet_menu_background_round"
-            android:backgroundTint="@color/background_normal"
-            android:foreground="@drawable/ripple_rounded"
-            android:padding="10dp">
-
-            <ImageView
-                android:id="@+id/main_bottomsheet_menu_rate_icon"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:contentDescription="@string/main_bottomsheet_menu_rate_icon_desc"
-                android:src="@drawable/bottomsheet_menu_rate_us_icon"
+                android:contentDescription="@string/main_tabs_more_loader_toggle_title"
+                android:src="@drawable/tabs_more_toggle_loader_icon"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -372,59 +338,176 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="@string/main_bottomsheet_menu_rate"
+                android:text="@string/main_tabs_more_loader_toggle_title"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_rate_icon" />
+                app:layout_constraintTop_toBottomOf="@+id/main_tabs_more_toggle_loader_icon" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/main_bottomsheet_menu_exit_app"
+            android:id="@+id/main_tabs_more_toggle_popup"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_row="3"
-            android:layout_column="2"
+            android:layout_row="2"
+            android:layout_column="0"
             android:layout_columnWeight="1"
             android:layout_margin="7dp"
             android:background="@drawable/bottomsheet_menu_background_round"
-            android:backgroundTint="@color/background_normal"
+            android:backgroundTint="#2A2A2A"
             android:foreground="@drawable/ripple_rounded"
             android:padding="10dp">
 
             <ImageView
-                android:id="@+id/main_bottomsheet_menu_exit_app_icon"
+                android:id="@+id/main_tabs_more_toggle_popup_icon"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:contentDescription="@string/main_bottomsheet_menu_exit_app_icon_desc"
-                android:src="@drawable/bottomsheet_menu_exit_icon"
+                android:contentDescription="@string/main_tabs_more_popup_toggle_title"
+                android:src="@drawable/tabs_more_toggle_popup_icon"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="@string/main_bottomsheet_menu_exit_app"
+                android:text="@string/main_tabs_more_popup_toggle_title"
+                android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_bottomsheet_menu_exit_app_icon" />
+                app:layout_constraintTop_toBottomOf="@+id/main_tabs_more_toggle_popup_icon" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/main_tabs_more_toggle_text_decrease"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_row="2"
+            android:layout_column="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="7dp"
+            android:background="@drawable/bottomsheet_menu_background_round"
+            android:backgroundTint="#2A2A2A"
+            android:foreground="@drawable/ripple_rounded"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/main_tabs_more_toggle_text_decrease_icon"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:contentDescription="@string/main_tabs_more_text_decrease_toggle_title"
+                android:src="@drawable/tabs_more_toggle_text_decrease_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/main_tabs_more_text_decrease_toggle_title"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/main_tabs_more_toggle_text_decrease_icon" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/main_tabs_more_toggle_text_normal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_row="2"
+            android:layout_column="2"
+            android:layout_columnWeight="1"
+            android:layout_margin="7dp"
+            android:background="@drawable/bottomsheet_menu_background_round"
+            android:backgroundTint="#2A2A2A"
+            android:foreground="@drawable/ripple_rounded"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/main_tabs_more_toggle_text_normal_icon"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:contentDescription="@string/main_tabs_more_text_normal_toggle_title"
+                android:src="@drawable/tabs_more_toggle_text_normal_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/main_tabs_more_text_normal_toggle_title"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/main_tabs_more_toggle_text_normal_icon" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/main_tabs_more_toggle_text_increase"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_row="2"
+            android:layout_column="3"
+            android:layout_columnWeight="1"
+            android:layout_margin="7dp"
+            android:background="@drawable/bottomsheet_menu_background_round"
+            android:backgroundTint="#2A2A2A"
+            android:foreground="@drawable/ripple_rounded"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/main_tabs_more_toggle_text_increase_icon"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:contentDescription="@string/main_tabs_more_text_increase_toggle_title"
+                android:src="@drawable/tabs_more_toggle_text_increase_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/main_tabs_more_text_increase_toggle_title"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/main_tabs_more_toggle_text_increase_icon" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </GridLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/icon_color"
-        android:layout_margin="10dp"/>
+        android:layout_margin="10dp"
+        android:background="@color/icon_color" />
 
 </LinearLayout>

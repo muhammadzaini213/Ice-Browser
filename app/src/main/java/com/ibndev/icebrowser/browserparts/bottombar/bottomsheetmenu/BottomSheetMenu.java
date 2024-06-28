@@ -1,18 +1,23 @@
-package com.ibndev.icebrowser.browserparts.bottombar;
+package com.ibndev.icebrowser.browserparts.bottombar.bottomsheetmenu;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.CookieManager;
-import android.widget.ImageView;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.browserparts.settings.SettingsSheet;
 import com.ibndev.icebrowser.browserparts.topbar.tab.TabManager;
 import com.ibndev.icebrowser.browserparts.utilities.ShowAndHideKeyboard;
+
+import java.util.Objects;
 
 public class BottomSheetMenu {
     Activity activity;
@@ -42,10 +47,9 @@ public class BottomSheetMenu {
 
     public void show() {
 
+        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_close).setOnClickListener(view -> bottomSheetDialog.dismiss());
 
-
-
-        setModeButton(bottomSheetView, bottomSheetDialog);
+        setModeButton(bottomSheetView);
 
         bottomSheetView.findViewById(R.id.main_bottomsheet_menu_open_bookmark).setOnClickListener(view -> {
             functions.showBookmarks();
@@ -53,8 +57,7 @@ public class BottomSheetMenu {
         });
 
 
-        setCookieButton(bottomSheetView, bottomSheetDialog);
-
+        setCookieButton(bottomSheetView);
 
         bottomSheetView.findViewById(R.id.main_bottomsheet_menu_share).setOnClickListener(view -> {
             functions.share();
@@ -79,9 +82,7 @@ public class BottomSheetMenu {
             bottomSheetDialog.dismiss();
         });
 
-        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_rate).setOnClickListener(view -> {
-           bottomSheetDialog.dismiss();
-        });
+        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_rate).setOnClickListener(view -> bottomSheetDialog.dismiss());
 
         bottomSheetView.findViewById(R.id.main_bottomsheet_menu_exit_app).setOnClickListener(view -> {
             activity.finishAffinity();
@@ -91,38 +92,37 @@ public class BottomSheetMenu {
         bottomSheetDialog.show();
     }
 
-    private void setModeButton(View bottomSheetView, BottomSheetDialog bottomSheetDialog) {
-        TabManager.Tab tab = tabManager.getCurrentTab();
-        tab.isDesktopUA = !tab.isDesktopUA;
-        ImageView icon = bottomSheetView.findViewById(R.id.main_bottomsheet_menu_mode_icon);
-        if (tab.isDesktopUA) {
-            icon.setImageResource((R.drawable.bottomsheet_menu_mode_android_icon));
+    private void setModeButton(View bottomSheetView) {
+        ConstraintLayout layout = bottomSheetView.findViewById(R.id.main_bottomsheet_menu_mode);
+        boolean isDesktopUA = Objects.equals(tabManager.getCurrentWebView().getSettings().getUserAgentString(), activity.getString(R.string.desktopUA));
+        if (isDesktopUA) {
+            layout.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.background_active)));
         } else {
-            icon.setImageResource(R.drawable.bottomsheet_menu_mode_desktop_icon);
+            layout.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.background_normal)));
         }
 
         bottomSheetView.findViewById(R.id.main_bottomsheet_menu_mode).setOnClickListener(view -> {
-            functions.switchUA(tab);
-            bottomSheetDialog.dismiss();
+            functions.switchUA(isDesktopUA);
+            setModeButton(bottomSheetView);
         });
     }
 
 
-    private void setCookieButton(View bottomSheetView, BottomSheetDialog bottomSheetDialog) {
-        ImageView icon = bottomSheetView.findViewById(R.id.main_bottomsheet_menu_cookie_icon);
+    private void setCookieButton(View bottomSheetView) {
+        ConstraintLayout layout = bottomSheetView.findViewById(R.id.main_bottomsheet_menu_cookie);
+
         CookieManager cookieManager = CookieManager.getInstance();
         boolean isCookieActive = cookieManager.acceptThirdPartyCookies(tabManager.getCurrentWebView());
 
         if (isCookieActive) {
-            icon.setImageResource(R.drawable.bottomsheet_menu_cookie_active_icon);
+            layout.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.background_active)));
         } else {
-            icon.setImageResource(R.drawable.bottomsheet_menu_cookie_nonactive_icon);
+            layout.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.background_normal)));
         }
 
         bottomSheetView.findViewById(R.id.main_bottomsheet_menu_cookie).setOnClickListener(view -> {
             functions.cookie(cookieManager, isCookieActive);
-
-            bottomSheetDialog.dismiss();
+            setCookieButton(bottomSheetView);
         });
     }
 }

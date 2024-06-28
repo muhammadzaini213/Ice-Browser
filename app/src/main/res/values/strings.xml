@@ -64,15 +64,25 @@
     <string name="main_tabs_more_bottomsheet_title">Customize Tab</string>
 
     <string name="main_tabs_more_javascript_toggle_title">Javascript</string>
-    <string name="main_tabs_more_javascript_toggle_desc">Enable javascript to make sure website works smoothly.</string>
-
+    <string name="main_tabs_more_css_toggle_title">CSS</string>
     <string name="main_tabs_more_cache_toggle_title">Cache</string>
-    <string name="main_tabs_more_cache_toggle_desc">Disable this to free more storage, website may load slower.</string>
+    <string name="main_tabs_more_dom_storage_toggle_title">DOM</string>
+
+    <string name="main_tabs_more_overview_toggle_title">Overview</string>
+    <string name="main_tabs_more_zoom_toggle_title">Zoom</string>
+    <string name="main_tabs_more_image_toggle_title">Image</string>
+    <string name="main_tabs_more_loader_toggle_title">Loader</string>
+
+    <string name="main_tabs_more_popup_toggle_title">Popup</string>
+    <string name="main_tabs_more_text_decrease_toggle_title">Small Text</string>
+    <string name="main_tabs_more_text_normal_toggle_title">Normal Text</string>
+    <string name="main_tabs_more_text_increase_toggle_title">Big Text</string>
+
 
     <string name="main_tabs_more_use_this_settings_for">Use this settings for: </string>
 
     <string name="main_tabs_more_only_this_tab_checklist_desc">This tab</string>
-    <string name="main_tabs_more_new_tab_checklist_desc">New tab</string>
+    <string name="main_tabs_more_for_new_tab_checklist_desc">New tab</string>
     <string name="main_tabs_more_for_all_tabs_checklist_desc">All tabs</string>
 
     <string name="main_tabs_more_save_current_settings_checklist_title">Save settings</string>
@@ -94,7 +104,10 @@
 
 
     <!-- main bottomsheet title text-->
-    <string name="main_bottomsheet_menu_mode">Mode</string>
+    <string name="main_bottomsheet_menu_close_icon">Close Quick Settings</string>
+    <string name="main_bottomsheet_menu_title">Quick Settings</string>
+
+    <string name="main_bottomsheet_menu_mode">Desktop</string>
     <string name="main_bottomsheet_menu_open_bookmarks">Bookmark</string>
     <string name="main_bottomsheet_menu_cookies_toggle">Cookies</string>
     <string name="main_bottomsheet_menu_share">Share</string>
