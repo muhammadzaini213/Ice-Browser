@@ -16,16 +16,16 @@ import android.widget.AutoCompleteTextView;
 
 import androidx.annotation.NonNull;
 
-import com.ibndev.icebrowser.browserparts.bottombar.BottomBar;
-import com.ibndev.icebrowser.browserparts.setup.FullScreen;
-import com.ibndev.icebrowser.browserparts.setup.permission.PermissionCodes;
-import com.ibndev.icebrowser.browserparts.topbar.PopupMenuHelper;
-import com.ibndev.icebrowser.browserparts.topbar.TopBar;
-import com.ibndev.icebrowser.browserparts.topbar.autocomplete.SearchAutoComplete;
-import com.ibndev.icebrowser.browserparts.topbar.tab.TabManager;
-import com.ibndev.icebrowser.browserparts.topbar.tab.TabRecyclerView;
-import com.ibndev.icebrowser.browserparts.topbar.tab.TabsLayout;
-import com.ibndev.icebrowser.browserparts.utilities.BookmarkDatabase;
+import com.ibndev.icebrowser.browserparts.bottom.navbar.BottomBar;
+import com.ibndev.icebrowser.setup.FullScreen;
+import com.ibndev.icebrowser.setup.permission.PermissionCodes;
+import com.ibndev.icebrowser.browserparts.top.TopPopupMenu;
+import com.ibndev.icebrowser.browserparts.top.TopBar;
+import com.ibndev.icebrowser.browserparts.top.autocomplete.SearchAutoComplete;
+import com.ibndev.icebrowser.browserparts.top.tab.TabManager;
+import com.ibndev.icebrowser.browserparts.top.tab.setup.TabRecyclerView;
+import com.ibndev.icebrowser.browserparts.top.tab.setup.TabsLayout;
+import com.ibndev.icebrowser.utilities.BookmarkDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,7 @@ public class MainBrowserActivity extends Activity {
         setContentView(R.layout.activity_main);
 
 
-        PopupMenuHelper menuHelper = new PopupMenuHelper(this, bookmarkDatabase);
+        TopPopupMenu menuHelper = new TopPopupMenu(this, bookmarkDatabase);
 
         getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(visibility -> new FullScreen(getWindow()));
 

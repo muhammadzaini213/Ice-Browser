@@ -15,6 +15,8 @@
     <string name="url">URL: </string>
     <string name="open">Open</string>
     <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="not_found">Not found</string>
     <string name="open_in_new_tab">Open in new tab</string>
     <string name="copy_url">Copy URL</string>
@@ -139,5 +141,17 @@
     <string name="main_bottomsheet_settings_delete_all_bookmarks_title">Delete All Bookmarks</string>
     <string name="main_bottomsheet_settings_delete_all_bookmarks_desc">Delete all save bookmarks.</string>
 
+    <!-- main bottomsheet bookmark description-->
+    <string name="main_bottomsheet_bookmark_title">Bookmarks</string>
 
+    <string name="main_bottomsheet_bookmark_close_icon_desc">Close bookmark</string>
+
+
+    <!-- main exit dialog description-->
+    <string name="main_exit_dialog_title_desc">Do you want to exit?</string>
+    <string name="main_exit_dialog_icon_desc">Close exit dialog</string>
+
+    <!-- main bookmark bottomsheet description-->
+    <string name="main_bookmark_item_adapter_favicon_desc">Favicon</string>
+    <string name="main_bookmark_item_adapter_tab_menu_desc">Close bookmarks</string>
 </resources>
