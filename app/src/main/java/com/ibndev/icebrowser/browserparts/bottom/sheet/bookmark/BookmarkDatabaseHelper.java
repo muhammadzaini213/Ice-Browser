@@ -1,6 +1,7 @@
 package com.ibndev.icebrowser.browserparts.bottom.sheet.bookmark;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -33,5 +34,6 @@ public class BookmarkDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKMARKS);
         onCreate(db);
     }
+
 }
 

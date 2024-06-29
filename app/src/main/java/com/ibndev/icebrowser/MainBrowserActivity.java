@@ -50,7 +50,7 @@ public class MainBrowserActivity extends Activity {
         setContentView(R.layout.activity_main);
 
 
-        TopPopupMenu menuHelper = new TopPopupMenu(this, bookmarkDatabase);
+        TopPopupMenu menuHelper = new TopPopupMenu(this);
 
         getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(visibility -> new FullScreen(getWindow()));
 

@@ -154,4 +154,5 @@
     <!-- main bookmark bottomsheet description-->
     <string name="main_bookmark_item_adapter_favicon_desc">Favicon</string>
     <string name="main_bookmark_item_adapter_tab_menu_desc">Close bookmarks</string>
+    <string name="main_bottomsheet_bookmark_empty_text_desc">You haven\'t saved any bookmark yet</string>
 </resources>

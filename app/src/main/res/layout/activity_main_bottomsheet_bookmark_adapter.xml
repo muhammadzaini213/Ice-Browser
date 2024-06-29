@@ -6,6 +6,7 @@
     android:paddingHorizontal="20dp"
     android:layout_margin="10dp"
     android:maxHeight="300dp"
+    android:id="@+id/main_bottomsheet_bookmark_adapter_layout"
     android:background="@drawable/bottomsheet_menu_background_round"
     android:backgroundTint="#555555"
     android:foreground="@drawable/ripple_rounded"
@@ -21,23 +22,47 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/main_bookmark_item_adapter_tab_title"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
+        android:orientation="vertical"
         android:layout_marginEnd="50dp"
-        android:paddingVertical="20dp"
-        android:text=""
-        android:textColor="@color/white"
-        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/main_bookmark_item_adapter_tab_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingTop="7dp"
+            android:paddingBottom="2dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/main_bookmark_item_adapter_tab_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingTop="2dp"
+            android:paddingBottom="7dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
 
     <ImageView
-        android:id="@+id/main_bookmark_item_adapter_tab_menu"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:id="@+id/main_bookmark_item_adapter_menu"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:foreground="@drawable/ripple_rounded"
         android:contentDescription="@string/main_bookmark_item_adapter_tab_menu_desc"
         android:src="@drawable/tabs_bookmark_item_menu_icon"

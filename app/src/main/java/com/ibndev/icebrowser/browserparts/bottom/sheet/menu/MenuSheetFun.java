@@ -11,6 +11,7 @@ import android.widget.EditText;
 
 import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.browserparts.bottom.sheet.bookmark.BookmarkDatabaseHelper;
+import com.ibndev.icebrowser.browserparts.bottom.sheet.bookmark.BookmarkSheet;
 import com.ibndev.icebrowser.browserparts.bottom.sheet.settings.ShowBookmarks;
 import com.ibndev.icebrowser.utilities.WebCertificate;
 import com.ibndev.icebrowser.browserparts.top.tab.TabManager;
@@ -19,12 +20,12 @@ import com.ibndev.icebrowser.utilities.ShowAndHideKeyboard;
 public class MenuSheetFun {
     Activity activity;
     TabManager tabManager;
-    ShowBookmarks showBookmarks;
+    BookmarkSheet bookmarkSheet;
 
     public MenuSheetFun(Activity activity, TabManager tabManager, SQLiteDatabase bookmarkDatabase) {
         this.activity = activity;
         this.tabManager = tabManager;
-        showBookmarks = new ShowBookmarks(activity, tabManager, bookmarkDatabase);
+        bookmarkSheet = new BookmarkSheet(activity, tabManager, bookmarkDatabase);
 
 
 
@@ -41,7 +42,7 @@ public class MenuSheetFun {
     }
 
     public void showBookmarks() {
-        showBookmarks.showBookmarks();
+        bookmarkSheet.show();
     }
 
 
