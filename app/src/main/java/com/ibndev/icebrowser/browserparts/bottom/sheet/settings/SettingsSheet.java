@@ -2,7 +2,6 @@ package com.ibndev.icebrowser.browserparts.bottom.sheet.settings;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -16,11 +15,11 @@ public class SettingsSheet {
     ClearBrowserData clearBrowserData;
     DeleteAllBookmarks deleteAllBookmarks;
 
-    public SettingsSheet(Activity activity, TabManager tabManager, SQLiteDatabase bookmarkDatabase) {
+    public SettingsSheet(Activity activity, TabManager tabManager) {
         this.activity = activity;
         this.tabManager = tabManager;
         clearBrowserData = new ClearBrowserData(tabManager);
-        deleteAllBookmarks = new DeleteAllBookmarks(activity, bookmarkDatabase);
+        deleteAllBookmarks = new DeleteAllBookmarks(activity);
     }
 
     public void show() {

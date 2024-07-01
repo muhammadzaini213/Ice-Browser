@@ -3,7 +3,6 @@ package com.ibndev.icebrowser.browserparts.bottom.sheet.menu;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.res.ColorStateList;
-import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.CookieManager;
@@ -29,20 +28,27 @@ public class MenuSheet {
     BottomSheetDialog bottomSheetDialog;
     View bottomSheetView;
 
+
+    ExitDialog exitDialog;
+
     @SuppressLint("InflateParams")
-    public MenuSheet(Activity activity, TabManager tabManager, SQLiteDatabase bookmarkDatabase) {
+    public MenuSheet(Activity activity, TabManager tabManager) {
         this.activity = activity;
         this.tabManager = tabManager;
         showAndHideKeyboard = new ShowAndHideKeyboard(activity);
-        functions = new MenuSheetFun(activity, tabManager, bookmarkDatabase);
-        settingsSheet = new SettingsSheet(activity, tabManager, bookmarkDatabase);
+        functions = new MenuSheetFun(activity, tabManager);
+        settingsSheet = new SettingsSheet(activity, tabManager);
 
-        bottomSheetDialog = new BottomSheetDialog(activity);
-        bottomSheetView = LayoutInflater.from(activity).inflate(
-                R.layout.activity_main_bottomsheet_menu,
-                null
-        );
-        bottomSheetDialog.setContentView(bottomSheetView);
+
+        if (bottomSheetDialog == null) {
+            bottomSheetDialog = new BottomSheetDialog(activity);
+            bottomSheetView = LayoutInflater.from(activity).inflate(
+                    R.layout.activity_main_bottomsheet_menu,
+                    null
+            );
+            bottomSheetDialog.setContentView(bottomSheetView);
+        }
+
 
     }
 
@@ -70,8 +76,10 @@ public class MenuSheet {
             bottomSheetDialog.dismiss();
         });
 
-        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_overlay).setOnClickListener(view ->
-                bottomSheetDialog.dismiss());
+        bottomSheetView.findViewById(R.id.main_bottomsheet_menu_overlay).setOnClickListener(view -> {
+            functions.overlay();
+            bottomSheetDialog.dismiss();
+        });
 
         bottomSheetView.findViewById(R.id.main_bottomsheet_menu_tab_info).setOnClickListener(view -> {
             functions.tabInfo();
@@ -86,7 +94,12 @@ public class MenuSheet {
         bottomSheetView.findViewById(R.id.main_bottomsheet_menu_rate).setOnClickListener(view -> bottomSheetDialog.dismiss());
 
         bottomSheetView.findViewById(R.id.main_bottomsheet_menu_exit_app).setOnClickListener(view -> {
-            new ExitDialog(activity).show();
+            if (exitDialog == null) {
+                exitDialog = new ExitDialog(activity);
+                exitDialog.show();
+            } else {
+                exitDialog.show();
+            }
             bottomSheetDialog.dismiss();
         });
 

@@ -28,10 +28,9 @@ import java.lang.reflect.Method;
 public class TopPopupMenu {
 
     private final Context context;
-    private boolean isBookmarked = false;
-
     BookmarkDatabaseHelper dbHelper;
     SQLiteDatabase database;
+    private boolean isBookmarked = false;
 
     public TopPopupMenu(Context context) {
         this.context = context;

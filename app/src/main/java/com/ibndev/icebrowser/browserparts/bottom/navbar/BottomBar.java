@@ -1,7 +1,6 @@
 package com.ibndev.icebrowser.browserparts.bottom.navbar;
 
 import android.app.Activity;
-import android.database.sqlite.SQLiteDatabase;
 import android.view.View;
 
 import com.ibndev.icebrowser.R;
@@ -9,8 +8,8 @@ import com.ibndev.icebrowser.browserparts.bottom.sheet.menu.MenuSheet;
 import com.ibndev.icebrowser.browserparts.top.tab.TabManager;
 
 public class BottomBar {
-    public BottomBar(Activity activity, TabManager tabManager, SQLiteDatabase bookmarkDatabase) {
-        MenuSheet menuSheet = new MenuSheet(activity, tabManager, bookmarkDatabase);
+    public BottomBar(Activity activity, TabManager tabManager) {
+        MenuSheet menuSheet = new MenuSheet(activity, tabManager);
 
         View bottom_bar = activity.findViewById(R.id.main_bottom_bar);
 

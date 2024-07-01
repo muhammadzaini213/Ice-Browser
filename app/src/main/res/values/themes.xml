@@ -1,6 +1,6 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
-    <style name="Theme.IceBrowser" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.IceBrowser" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_200</item>
         <item name="colorPrimaryVariant">@color/black</item>
@@ -12,9 +12,20 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="android:itemTextAppearance">@style/PopupMenuText</item>
+        <item name="android:itemBackground">@color/background_active</item>
+
+        <item name="android:alertDialogTheme">@style/AlertDialog</item>
     </style>
-    
-    <style name="DarkDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:background">@color/background_dark</item>
+
+    <style name="PopupMenuText" parent="@android:style/TextAppearance.Widget.IconMenu.Item">
+        <item name="android:textColor">@color/white</item>
     </style>
+
+    <style name="AlertDialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+        <item name="android:windowBackground">@color/background_dark</item>
+        <item name="android:textAppearance">@style/PopupMenuText</item>
+        <item name="android:textColorPrimary">@color/white</item>
+    </style>
+
 </resources>

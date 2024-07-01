@@ -36,10 +36,10 @@ import android.widget.Toast;
 
 import com.ibndev.icebrowser.MainBrowserActivity;
 import com.ibndev.icebrowser.R;
-import com.ibndev.icebrowser.utilities.WebCertificate;
 import com.ibndev.icebrowser.setup.permission.PermissionCodes;
 import com.ibndev.icebrowser.utilities.DownloadHelper;
 import com.ibndev.icebrowser.utilities.ShowAndHideKeyboard;
+import com.ibndev.icebrowser.utilities.WebCertificate;
 
 import java.util.ArrayList;
 
@@ -54,7 +54,6 @@ public class TabManager {
     public int currentTabIndex;
     ValueCallback<Uri[]> fileUploadCallback;
     AutoCompleteTextView et;
-
 
 
     public TabManager(MainBrowserActivity activity) {
@@ -329,11 +328,11 @@ public class TabManager {
             new AlertDialog.Builder(activity)
                     .setTitle(activity.getString(R.string.download))
                     .setMessage(String.format(
-                                    activity.getString(R.string.filename) +
+                            activity.getString(R.string.filename) +
                                     "%s\n" +
                                     activity.getString(R.string.size) +
                                     "%.2f MB\n" +
-                                    activity.getString(R.string.url)+"%s",
+                                    activity.getString(R.string.url) + "%s",
                             filename,
                             contentLength / 1024.0 / 1024.0,
                             url))

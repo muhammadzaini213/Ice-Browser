@@ -17,7 +17,7 @@ public class ExitDialog extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_exit_dialog);
+        setContentView(R.layout.activity_main_exit_dialog_confirmation);
 
         findViewById(R.id.main_exit_dialog_yes).setOnClickListener(view -> {
             activity.finishAffinity();

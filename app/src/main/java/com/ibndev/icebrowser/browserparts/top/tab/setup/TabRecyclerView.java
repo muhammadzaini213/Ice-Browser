@@ -22,7 +22,7 @@ public class TabRecyclerView {
         RecyclerView recyclerView = activity.findViewById(R.id.tabs_list);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
-        adapter = new TabsAdapter(tabFavicon,tabTitles, v -> {
+        adapter = new TabsAdapter(tabFavicon, tabTitles, v -> {
             int position = (int) v.getTag();
             tabManager.switchToTab(position);
             activity.findViewById(R.id.main_tabs_layout).setVisibility(View.GONE);

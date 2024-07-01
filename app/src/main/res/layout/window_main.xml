@@ -1,0 +1,59 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/window_main_browser_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/window_main_framelayout_webview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="68dp"
+            />
+
+        <include
+            android:id="@+id/window_main_top_bar_layout"
+            layout="@layout/window_main_top_navbar" />
+
+        <ProgressBar
+            android:id="@+id/window_main_progressbar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:max="100"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/window_main_top_bar_layout" />
+
+        <ImageView
+            android:id="@+id/window_resizer"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="@string/window_main_resizer"
+            android:src="@drawable/window_resize"
+            android:rotation="-45"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <include
+        android:id="@+id/window_main_tabs_layout"
+        layout="@layout/activity_main_tabs"
+        android:visibility="gone" />
+
+    <FrameLayout
+        android:id="@+id/main_fullScreenVideo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+    </FrameLayout>
+</FrameLayout>
+

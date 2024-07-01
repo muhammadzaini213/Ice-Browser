@@ -24,7 +24,7 @@ public class TopBar {
             }
 
             tabFavicon.clear();
-            for (int i = 0; i < tabManager.tabs.size(); i++){
+            for (int i = 0; i < tabManager.tabs.size(); i++) {
                 tabFavicon.add(tabManager.tabs.get(i).webview.getFavicon());
             }
             recyclerView.adapter.notifyDataSetChanged();

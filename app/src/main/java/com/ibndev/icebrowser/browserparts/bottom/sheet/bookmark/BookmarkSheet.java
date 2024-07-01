@@ -1,18 +1,11 @@
 package com.ibndev.icebrowser.browserparts.bottom.sheet.bookmark;
 
-import static com.ibndev.icebrowser.browserparts.bottom.sheet.bookmark.BookmarkDatabaseHelper.COLUMN_URL;
-import static com.ibndev.icebrowser.browserparts.bottom.sheet.bookmark.BookmarkDatabaseHelper.TABLE_BOOKMARKS;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.WebView;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,18 +15,17 @@ import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.browserparts.top.tab.TabManager;
 
 public class BookmarkSheet {
+    private static final String TABLE_BOOKMARKS = "bookmarks";
     Activity activity;
     TabManager tabManager;
     BottomSheetDialog bookmarkSheetDialog;
     View bottomSheetView;
-
-    private static final String TABLE_BOOKMARKS = "bookmarks";
-    private static final String COLUMN_URL = "url";
-
+    BookmarkAdapter adapter;
     BookmarkDatabaseHelper dbHelper;
     SQLiteDatabase database;
 
-    public BookmarkSheet(Activity activity, TabManager tabManager, SQLiteDatabase bookmarkDatabase) {
+    @SuppressLint("InflateParams")
+    public BookmarkSheet(Activity activity, TabManager tabManager) {
         this.activity = activity;
         this.tabManager = tabManager;
 
@@ -53,21 +45,9 @@ public class BookmarkSheet {
 
         if (database == null) return;
         Cursor cursor = database.rawQuery("SELECT title, url, id as _id FROM bookmarks", null);
-        BookmarkAdapter adapter = new BookmarkAdapter(activity, cursor, new BookmarkAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(String url) {
-
-            }
-
-            @Override
-            public void onItemLongClick(int id, String title, String url) {
-
-            }
-
-        }, tabManager);
+        adapter = new BookmarkAdapter(activity, cursor, tabManager, this);
 
         recyclerView.setAdapter(adapter);
-
 
         if (isDatabaseEmpty()) {
             recyclerView.setVisibility(View.GONE);
@@ -77,8 +57,8 @@ public class BookmarkSheet {
             bottomSheetView.findViewById(R.id.main_bottomsheet_bookmark_empty_text).setVisibility(View.GONE);
         }
 
-
         bookmarkSheetDialog.show();
+
     }
 
     private boolean isDatabaseEmpty() {

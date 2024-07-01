@@ -39,6 +39,8 @@
     <string name="delete_all_bookmark_confirmation_desc">This action cannot be undone</string>
     <string name="delete_all">Delete all</string>
 
+    <string name="permission_req">Permission Required</string>
+
     <!-- main top bar content description-->
     <string name="main_top_navbar_tab_box_icon_desc">Tabs</string>
     <string name="main_top_navbar_menu_button_desc">Top menu</string>
@@ -147,12 +149,27 @@
     <string name="main_bottomsheet_bookmark_close_icon_desc">Close bookmark</string>
 
 
-    <!-- main exit dialog description-->
+    <!-- main dialog description-->
     <string name="main_exit_dialog_title_desc">Do you want to exit?</string>
-    <string name="main_exit_dialog_icon_desc">Close exit dialog</string>
+    <string name="main_bookmark_delete_confirmation_dialog_title_desc">Are you sure?</string>
+    <string name="main_bookmark_menu_dialog_title_desc">Select action</string>
+
+    <string name="main_bookmark_rename_dialog_title_desc">Rename Bookmark</string>
+    <string name="main_bookmark_rename_edittext_hint">Enter bookmark name…</string>
+
+    <string name="main_bookmark_change_url_dialog_title_desc">Change URL</string>
+    <string name="main_bookmark_change_url_edittext_hint">Enter bookmark url…</string>
 
     <!-- main bookmark bottomsheet description-->
     <string name="main_bookmark_item_adapter_favicon_desc">Favicon</string>
     <string name="main_bookmark_item_adapter_tab_menu_desc">Close bookmarks</string>
     <string name="main_bottomsheet_bookmark_empty_text_desc">You haven\'t saved any bookmark yet</string>
+
+
+    <!-- floating window content-->
+
+    <!-- floating window top navbar-->
+    <string name="window_main_top_navbar_close_button_desc">Close button</string>
+    <string name="window_main_top_navbar_menu_button_desc">Open Menu</string>
+    <string name="window_main_resizer">Resize</string>
 </resources>

@@ -2,32 +2,30 @@ package com.ibndev.icebrowser.browserparts.bottom.sheet.menu;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.http.SslCertificate;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.widget.EditText;
 
 import com.ibndev.icebrowser.R;
-import com.ibndev.icebrowser.browserparts.bottom.sheet.bookmark.BookmarkDatabaseHelper;
 import com.ibndev.icebrowser.browserparts.bottom.sheet.bookmark.BookmarkSheet;
-import com.ibndev.icebrowser.browserparts.bottom.sheet.settings.ShowBookmarks;
-import com.ibndev.icebrowser.utilities.WebCertificate;
 import com.ibndev.icebrowser.browserparts.top.tab.TabManager;
+import com.ibndev.icebrowser.floatingparts.FloatingWindow;
+import com.ibndev.icebrowser.setup.permission.CheckOverlayPermission;
 import com.ibndev.icebrowser.utilities.ShowAndHideKeyboard;
+import com.ibndev.icebrowser.utilities.WebCertificate;
 
 public class MenuSheetFun {
     Activity activity;
     TabManager tabManager;
     BookmarkSheet bookmarkSheet;
 
-    public MenuSheetFun(Activity activity, TabManager tabManager, SQLiteDatabase bookmarkDatabase) {
+    public MenuSheetFun(Activity activity, TabManager tabManager) {
         this.activity = activity;
         this.tabManager = tabManager;
-        bookmarkSheet = new BookmarkSheet(activity, tabManager, bookmarkDatabase);
-
-
+        bookmarkSheet = new BookmarkSheet(activity, tabManager);
 
     }
 
@@ -69,18 +67,30 @@ public class MenuSheetFun {
         }
     }
 
+
+
+    public void overlay(){
+        CheckOverlayPermission permission = new CheckOverlayPermission(activity);
+        if(!permission.isPermissionGranted()){
+            permission.requestOverlayDisplayPermission();
+            return;
+        }
+        Intent intent = new Intent(activity, FloatingWindow.class);
+        activity.startService(intent);
+    }
+
     public void tabInfo() {
         String s = "URL: " + tabManager.getCurrentWebView().getUrl() + "\n";
         s += "Title: " + tabManager.getCurrentWebView().getTitle() + "\n\n";
         SslCertificate certificate = tabManager.getCurrentWebView().getCertificate();
         s += certificate == null ? "Not secure" : "Certificate:\n" + WebCertificate.certificateToStr(certificate);
 
-        new AlertDialog.Builder(activity)
-                .setTitle("Page info")
-                .setMessage(s)
-                .setPositiveButton("OK", (dialog, which) -> {
-                })
-                .show();
+        AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
+        alertDialog.setTitle("Page info");
+        alertDialog.setMessage(s);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (dialogInterface, i) -> alertDialog.dismiss());
+
+        alertDialog.show();
     }
 
 

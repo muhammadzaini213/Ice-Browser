@@ -18,8 +18,8 @@ public class MoreSheetFun {
         tabManager.getCurrentWebView().getSettings().setJavaScriptEnabled(!isActive);
     }
 
-    public void toggleCSS(boolean isActive){
-        if(isActive){
+    public void toggleCSS(boolean isActive) {
+        if (isActive) {
             String disableCSS = "    document.querySelectorAll('link[rel=\"stylesheet\"]').forEach(link => {\n" +
                     "        link.disabled = true;\n" +
                     "    });\n" +
@@ -73,25 +73,25 @@ public class MoreSheetFun {
         tabManager.getCurrentWebView().getSettings().setBlockNetworkLoads(isActive);
     }
 
-    public void togglePopup(boolean isActive){
+    public void togglePopup(boolean isActive) {
         tabManager.getCurrentWebView().getSettings().setSupportMultipleWindows(!isActive);
         tabManager.getCurrentWebView().getSettings().setJavaScriptCanOpenWindowsAutomatically(!isActive);
     }
 
-    public void toggleSmallText(boolean isActive){
-        if(!isActive){
+    public void toggleSmallText(boolean isActive) {
+        if (!isActive) {
             tabManager.getCurrentWebView().getSettings().setTextZoom(70);
         }
     }
 
-    public void toggleNormalText(boolean isActive){
-        if(!isActive){
+    public void toggleNormalText(boolean isActive) {
+        if (!isActive) {
             tabManager.getCurrentWebView().getSettings().setTextZoom(100);
         }
     }
 
-    public void toggleBigText(boolean isActive){
-        if(!isActive){
+    public void toggleBigText(boolean isActive) {
+        if (!isActive) {
             tabManager.getCurrentWebView().getSettings().setTextZoom(130);
         }
     }

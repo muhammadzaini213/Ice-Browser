@@ -105,7 +105,6 @@ public class MoreSheet {
     }
 
 
-
     private void cache(WebSettings webSettings) {
         ConstraintLayout layout = layout(R.id.main_tabs_more_toggle_cache);
         boolean isActive = webSettings.getCacheMode() == WebSettings.LOAD_DEFAULT;
@@ -178,7 +177,7 @@ public class MoreSheet {
         });
     }
 
-    private void popup(WebSettings webSettings){
+    private void popup(WebSettings webSettings) {
         ConstraintLayout layout = layout(R.id.main_tabs_more_toggle_popup);
         boolean isActive = (webSettings.getJavaScriptCanOpenWindowsAutomatically()
                 && webSettings.supportMultipleWindows());
@@ -227,7 +226,7 @@ public class MoreSheet {
         });
     }
 
-    private void text(WebSettings webSettings){
+    private void text(WebSettings webSettings) {
         textBig(webSettings);
         textNormal(webSettings);
         textSmall(webSettings);
