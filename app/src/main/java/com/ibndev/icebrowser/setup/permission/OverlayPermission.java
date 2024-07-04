@@ -5,16 +5,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
 import com.ibndev.icebrowser.R;
 
-public class CheckOverlayPermission {
+public class OverlayPermission {
     Activity activity;
 
-    public CheckOverlayPermission(Activity activity){
+    public OverlayPermission(Activity activity){
         this.activity = activity;
     }
 
@@ -26,7 +25,7 @@ public class CheckOverlayPermission {
         alertDialog.setCancelable(true);
         alertDialog.setTitle(activity.getString(R.string.permission_req));
         alertDialog.setMessage("");
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (dialogInterface, i) -> {
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.ok), (dialogInterface, i) -> {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" +
                             activity.getPackageName()));

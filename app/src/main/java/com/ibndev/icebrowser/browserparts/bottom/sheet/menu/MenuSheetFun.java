@@ -13,7 +13,7 @@ import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.browserparts.bottom.sheet.bookmark.BookmarkSheet;
 import com.ibndev.icebrowser.browserparts.top.tab.TabManager;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
-import com.ibndev.icebrowser.setup.permission.CheckOverlayPermission;
+import com.ibndev.icebrowser.setup.permission.OverlayPermission;
 import com.ibndev.icebrowser.utilities.ShowAndHideKeyboard;
 import com.ibndev.icebrowser.utilities.WebCertificate;
 
@@ -43,7 +43,6 @@ public class MenuSheetFun {
         bookmarkSheet.show();
     }
 
-
     public void share() {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
@@ -51,7 +50,6 @@ public class MenuSheetFun {
         intent.setType("text/plain");
         activity.startActivity(Intent.createChooser(intent, "Share URL"));
     }
-
 
     public void find(ShowAndHideKeyboard showAndHideKeyboard) {
         EditText searchEdit = activity.findViewById(R.id.main_top_navbar_search_edit);
@@ -67,10 +65,8 @@ public class MenuSheetFun {
         }
     }
 
-
-
     public void overlay(){
-        CheckOverlayPermission permission = new CheckOverlayPermission(activity);
+        OverlayPermission permission = new OverlayPermission(activity);
         if(!permission.isPermissionGranted()){
             permission.requestOverlayDisplayPermission();
             return;
@@ -80,15 +76,15 @@ public class MenuSheetFun {
     }
 
     public void tabInfo() {
-        String s = "URL: " + tabManager.getCurrentWebView().getUrl() + "\n";
-        s += "Title: " + tabManager.getCurrentWebView().getTitle() + "\n\n";
+        String s = activity.getString(R.string.url) + tabManager.getCurrentWebView().getUrl() + "\n";
+        s += activity.getString(R.string.title) + tabManager.getCurrentWebView().getTitle() + "\n\n";
         SslCertificate certificate = tabManager.getCurrentWebView().getCertificate();
         s += certificate == null ? "Not secure" : "Certificate:\n" + WebCertificate.certificateToStr(certificate);
 
         AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
-        alertDialog.setTitle("Page info");
+        alertDialog.setTitle(activity.getString(R.string.main_bottomsheet_menu_tab_info_icon_desc));
         alertDialog.setMessage(s);
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (dialogInterface, i) -> alertDialog.dismiss());
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.ok), (dialogInterface, i) -> alertDialog.dismiss());
 
         alertDialog.show();
     }

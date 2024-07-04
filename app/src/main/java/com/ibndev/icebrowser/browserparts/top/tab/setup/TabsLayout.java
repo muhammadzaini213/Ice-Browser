@@ -18,9 +18,7 @@ public class TabsLayout {
         View tabs_layout = activity.findViewById(R.id.main_tabs_layout);
         MoreSheet moreSheet = new MoreSheet(activity, tabManager);
 
-        tabs_layout.findViewById(R.id.main_tabs_more).setOnClickListener(view -> {
-            moreSheet.show();
-        });
+        tabs_layout.findViewById(R.id.main_tabs_more).setOnClickListener(view -> moreSheet.show());
 
         tabs_layout.findViewById(R.id.main_tabs_new_tab).setOnClickListener(view -> {
             tabManager.newTab("google.com");

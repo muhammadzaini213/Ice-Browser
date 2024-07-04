@@ -10,17 +10,18 @@ import android.os.Environment;
 import android.webkit.CookieManager;
 import android.webkit.URLUtil;
 
+import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.setup.permission.PermissionCodes;
-import com.ibndev.icebrowser.setup.permission.RequestPermission;
+import com.ibndev.icebrowser.setup.permission.StoragePermission;
 
 public class DownloadHelper {
 
     private final Activity activity;
-    private final RequestPermission permissionHelper;
+    private final StoragePermission permissionHelper;
 
     public DownloadHelper(Activity activity) {
         this.activity = activity;
-        this.permissionHelper = new RequestPermission(activity);
+        this.permissionHelper = new StoragePermission(activity);
 
     }
 
@@ -38,9 +39,9 @@ public class DownloadHelper {
             request = new DownloadManager.Request(Uri.parse(url));
         } catch (IllegalArgumentException e) {
             new AlertDialog.Builder(activity)
-                    .setTitle("Can't Download URL")
+                    .setTitle(activity.getString(R.string.download_fail))
                     .setMessage(url)
-                    .setPositiveButton("OK", (dialog1, which1) -> {
+                    .setPositiveButton(activity.getString(R.string.ok), (dialog1, which1) -> {
                     })
                     .show();
             return;
@@ -49,7 +50,7 @@ public class DownloadHelper {
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
         String cookie = CookieManager.getInstance().getCookie(url);
         if (cookie != null) {
-            request.addRequestHeader("Cookie", cookie);
+            request.addRequestHeader(activity.getString(R.string.cookie), cookie);
         }
         DownloadManager dm = (DownloadManager) activity.getSystemService(Context.DOWNLOAD_SERVICE);
         assert dm != null;

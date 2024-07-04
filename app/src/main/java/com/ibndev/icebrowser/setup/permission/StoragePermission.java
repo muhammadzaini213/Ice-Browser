@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 
-public class RequestPermission {
+import com.ibndev.icebrowser.R;
+
+public class StoragePermission {
 
     private final Activity activity;
 
-    public RequestPermission(Activity activity) {
+    public StoragePermission(Activity activity) {
         this.activity = activity;
     }
 
@@ -19,9 +21,9 @@ public class RequestPermission {
         }
         if (explanation != null && activity.shouldShowRequestPermissionRationale(permission)) {
             new AlertDialog.Builder(activity)
-                    .setTitle("Permission Required")
+                    .setTitle(activity.getString(R.string.permission_req))
                     .setMessage(explanation)
-                    .setPositiveButton("OK", (dialog, which) -> activity.requestPermissions(new String[]{permission}, requestCode))
+                    .setPositiveButton(activity.getString(R.string.ok), (dialog, which) -> activity.requestPermissions(new String[]{permission}, requestCode))
                     .show();
             return false;
         }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_previous"
+        android:title="@string/window_popup_browser_menu_item_prev"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_forward"
+        android:title="@string/window_popup_browser_menu_item_forward"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_home"
+        android:title="@string/window_popup_browser_menu_item_home"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_refresh"
+        android:title="@string/window_popup_browser_menu_item_refresh"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_tabs"
+        android:title="@string/window_popup_browser_menu_item_tabs"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_browser_menu_more"
+        android:title="@string/window_popup_browser_menu_item_more"
+        app:showAsAction="ifRoom" />
+
+</menu>

@@ -68,10 +68,10 @@ public class TopPopupMenu {
 
         if (isBookmarked) {
             popupMenu.getMenu().findItem(R.id.action_save_bookmark).setIcon(R.drawable.top_menu_bookmark_saved_icon);
-            popupMenu.getMenu().findItem(R.id.action_save_bookmark).setTitle("Remove Bookmark");
+            popupMenu.getMenu().findItem(R.id.action_save_bookmark).setTitle(context.getString(R.string.remove_bookmark));
         } else {
             popupMenu.getMenu().findItem(R.id.action_save_bookmark).setIcon(R.drawable.top_menu_bookmark_add_icon);
-            popupMenu.getMenu().findItem(R.id.action_save_bookmark).setTitle("Save Bookmark");
+            popupMenu.getMenu().findItem(R.id.action_save_bookmark).setTitle(context.getString(R.string.save_bookmark));
         }
 
         popupMenu.setOnMenuItemClickListener(item -> onOptionsItemSelected(item, currentUrl, currentTitle));
@@ -85,10 +85,10 @@ public class TopPopupMenu {
         } else if (item.getItemId() == R.id.action_save_bookmark) {
             if (isBookmarked) {
                 deleteBookmark(currentUrl);
-                Toast.makeText(context, "Bookmark removed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.bookmark_removed), Toast.LENGTH_SHORT).show();
             } else {
                 addBookmark(currentTitle, currentUrl);
-                Toast.makeText(context, "Bookmark saved", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.bookmark_saved), Toast.LENGTH_SHORT).show();
             }
             return true;
         } else {
@@ -127,9 +127,9 @@ public class TopPopupMenu {
             context.startActivity(i);
         } catch (ActivityNotFoundException e) {
             new AlertDialog.Builder(context)
-                    .setTitle("Open in app")
-                    .setMessage("No app can open this URL.")
-                    .setPositiveButton("OK", (dialog1, which1) -> {
+                    .setTitle(context.getString(R.string.fail))
+                    .setMessage(context.getString(R.string.open_with_fail))
+                    .setPositiveButton(context.getString(R.string.ok), (dialog1, which1) -> {
                     })
                     .show();
         }

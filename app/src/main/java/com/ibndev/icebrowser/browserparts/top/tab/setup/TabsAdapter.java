@@ -11,18 +11,19 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ibndev.icebrowser.R;
+import com.ibndev.icebrowser.browserparts.top.tab.TabManager;
 
 import java.util.List;
 
 public class TabsAdapter extends RecyclerView.Adapter<TabsAdapter.TabViewHolder> {
     private final List<String> tabTitles;
-    private final List<Bitmap> faviconBitmap;
+    private final TabManager tabManager;
     private final View.OnClickListener onItemClickListener;
     private final View.OnClickListener onCloseClickListener;
 
-    public TabsAdapter(List<Bitmap> faviconBitmap, List<String> tabTitles, View.OnClickListener onItemClickListener, View.OnClickListener onCloseClickListener) {
+    public TabsAdapter(TabManager tabManager, List<String> tabTitles, View.OnClickListener onItemClickListener, View.OnClickListener onCloseClickListener) {
         this.tabTitles = tabTitles;
-        this.faviconBitmap = faviconBitmap;
+        this.tabManager = tabManager;
         this.onItemClickListener = onItemClickListener;
         this.onCloseClickListener = onCloseClickListener;
     }
@@ -41,7 +42,7 @@ public class TabsAdapter extends RecyclerView.Adapter<TabsAdapter.TabViewHolder>
         holder.itemView.setOnClickListener(onItemClickListener);
         holder.closeTab.setTag(position);
         holder.closeTab.setOnClickListener(onCloseClickListener);
-        holder.favicon.setImageBitmap(faviconBitmap.get(position));
+        holder.favicon.setImageBitmap(tabManager.tabs.get(position).webview.getFavicon());
     }
 
     @Override

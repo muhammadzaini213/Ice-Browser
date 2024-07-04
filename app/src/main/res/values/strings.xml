@@ -3,6 +3,7 @@
 
     <string name="desktopUA" translatable="false">Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36</string>
 
+    <string name="window_close_onclick">Long press to close.</string>
     <!-- tab manager text-->
     <string name="file_chooser_open_fail">Can\'t open file chooser</string>
     <string name="open_file_try_download">Can\'t open files of this type. Try downloading instead.</string>
@@ -13,6 +14,8 @@
     <string name="filename">Filename: </string>
     <string name="size">Size: </string>
     <string name="url">URL: </string>
+    <string name="title">Title: </string>
+    <string name="cookie">Cookie</string>
     <string name="open">Open</string>
     <string name="ok">OK</string>
     <string name="yes">Yes</string>
@@ -24,6 +27,8 @@
     <string name="full_url">Full URL</string>
     <string name="image">Image: </string>
     <string name="image_options">Image Options</string>
+    <string name="permission_req">Permission Required</string>
+    <string name="download_fail">Can\'t Download URL</string>
 
     <string name="bookmarks">Bookmarks</string>
     <string name="rename">Rename</string>
@@ -39,7 +44,6 @@
     <string name="delete_all_bookmark_confirmation_desc">This action cannot be undone</string>
     <string name="delete_all">Delete all</string>
 
-    <string name="permission_req">Permission Required</string>
 
     <!-- main top bar content description-->
     <string name="main_top_navbar_tab_box_icon_desc">Tabs</string>
@@ -97,7 +101,13 @@
 
     <!-- Top bar menu-->
     <string name="open_with">Open with</string>
+    <string name="fail">Failed</string>
+    <string name="open_with_fail">No app can open this URL.</string>
+    <string name="remove_bookmark">Remove Bookmark</string>
     <string name="save_bookmark">Save bookmark</string>
+
+    <string name="bookmark_saved">Bookmark saved</string>
+    <string name="bookmark_removed">Bookmark removed</string>
 
     <!-- main bottom bar content descriptions-->
     <string name="main_bottom_navbar_prev_btn_desc">Previous page</string>
@@ -167,9 +177,62 @@
 
 
     <!-- floating window content-->
+    <string name="window_ice_bubble">Open iceloating</string>
 
     <!-- floating window top navbar-->
     <string name="window_main_top_navbar_close_button_desc">Close button</string>
-    <string name="window_main_top_navbar_menu_button_desc">Open Menu</string>
+    <string name="window_main_top_navbar_layout_set_button_desc">Open floating settings</string>
+    <string name="window_main_top_navbar_menu_button_desc">Open menu</string>
     <string name="window_main_resizer">Resize</string>
+    <string name="window_search_show_desc">Show search</string>
+    <string name="window_search_hide_desc">Hide search</string>
+
+    <!-- floating window layout settings popup menu item-->
+    <string name="window_popup_layout_set_item_hide">Hide</string>
+    <string name="window_popup_layout_set_item_topper">Topper</string>
+    <string name="window_popup_layout_set_item_new_window">New Window</string>
+    <string name="window_popup_layout_set_item_more">More</string>
+
+    <!-- floating window layout settings more popup menu item-->
+    <string name="window_popup_layout_set_item_hidden_mode">Hidden Mode</string>
+    <string name="window_popup_layout_set_item_static_bubble">Static bubble</string>
+    <string name="window_popup_layout_set_item_long_click">Long click to show</string>
+    <string name="window_popup_layout_set_item_no_focus">Non focusable</string>
+    <string name="window_popup_layout_set_item_anti_obscure">Anti obscure</string>
+    <string name="window_popup_layout_set_item_close_all_window">Close all window</string>
+
+    <!-- floating window browser menu popup item-->
+    <string name="window_popup_browser_menu_item_prev">Previous</string>
+    <string name="window_popup_browser_menu_item_forward">Forward</string>
+    <string name="window_popup_browser_menu_item_home">Home</string>
+    <string name="window_popup_browser_menu_item_refresh">Refresh</string>
+    <string name="window_popup_browser_menu_item_tabs">Tabs</string>
+    <string name="window_popup_browser_menu_item_more">More</string>
+
+    <!-- floating window browser menu more popup item-->
+    <string name="window_popup_browser_menu_item_1">Menu set 1</string>
+    <string name="window_popup_browser_menu_item_2">Menu set 2</string>
+    <string name="window_popup_browser_menu_item_3">Menu set 3</string>
+    <string name="window_popup_browser_menu_other">Other</string>
+
+    <!-- floating window browser menu more menu set 1 popup item-->
+    <string name="window_popup_browser_menu_item_javascript">Javascript</string>
+    <string name="window_popup_browser_menu_item_css">CSS</string>
+    <string name="window_popup_browser_menu_item_cache">Cache</string>
+    <string name="window_popup_browser_menu_item_dom">DOM</string>
+
+    <!-- floating window browser menu more menu set 2 popup item-->
+    <string name="window_popup_browser_menu_item_overview">Overview</string>
+    <string name="window_popup_browser_menu_item_zoom">Zoom</string>
+    <string name="window_popup_browser_menu_item_image">Image</string>
+    <string name="window_popup_browser_menu_item_loader">Loader</string>
+
+    <!-- floating window browser menu more menu set 3 popup item-->
+    <string name="window_popup_browser_menu_item_popup">Popup</string>
+    <string name="window_popup_browser_menu_item_text_small">Small text</string>
+    <string name="window_popup_browser_menu_item_text_normal">Normal text</string>
+    <string name="window_popup_browser_menu_item_text_big">Big text</string>
+
+
+
 </resources>

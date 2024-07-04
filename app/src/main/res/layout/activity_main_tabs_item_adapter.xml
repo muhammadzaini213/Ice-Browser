@@ -39,7 +39,7 @@
         android:layout_height="40dp"
         android:foreground="@drawable/ripple_rounded"
         android:contentDescription="@string/main_tabs_item_adapter_tab_close_desc"
-        android:src="@drawable/tabs_bookmark_item_menu_icon"
+        android:src="@drawable/tabs_close_icon"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

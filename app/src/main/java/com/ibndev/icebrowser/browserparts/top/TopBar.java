@@ -13,7 +13,8 @@ import java.util.List;
 
 public class TopBar {
     @SuppressLint("NotifyDataSetChanged")
-    public TopBar(Activity activity, TabManager tabManager, TabRecyclerView recyclerView, List<String> tabTitles, List<Bitmap> tabFavicon, TopPopupMenu menuHelper) {
+    public TopBar(Activity activity, TabManager tabManager, TabRecyclerView recyclerView, List<String> tabTitles, TopPopupMenu menuHelper) {
+
         activity.findViewById(R.id.main_top_navbar_menu_button).setOnClickListener(view ->
                 menuHelper.showPopupMenu(view, tabManager.getCurrentWebView().getUrl(), tabManager.getCurrentWebView().getTitle()));
 
@@ -21,11 +22,7 @@ public class TopBar {
             tabTitles.clear();
             for (int i = 0; i < tabManager.tabs.size(); i++) {
                 tabTitles.add(tabManager.tabs.get(i).webview.getTitle());
-            }
 
-            tabFavicon.clear();
-            for (int i = 0; i < tabManager.tabs.size(); i++) {
-                tabFavicon.add(tabManager.tabs.get(i).webview.getFavicon());
             }
             recyclerView.adapter.notifyDataSetChanged();
             activity.findViewById(R.id.main_tabs_layout).setVisibility(View.VISIBLE);

@@ -2,12 +2,10 @@ package com.ibndev.icebrowser.browserparts.bottom.dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.browserparts.bottom.sheet.bookmark.BookmarkAdapterListener;
-import com.ibndev.icebrowser.browserparts.bottom.sheet.bookmark.BookmarkDatabaseHelper;
 import com.ibndev.icebrowser.browserparts.bottom.sheet.bookmark.BookmarkSheet;
 
 public class ActionBookmarkDialog extends Dialog {

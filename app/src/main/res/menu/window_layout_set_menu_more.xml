@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_hidden_mode"
+        android:checkable="true"
+        android:title="@string/window_popup_layout_set_item_hidden_mode"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_static_bubble"
+        android:checkable="true"
+        android:title="@string/window_popup_layout_set_item_static_bubble"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_long_click"
+        android:checkable="true"
+        android:title="@string/window_popup_layout_set_item_long_click"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_no_focus"
+        android:checkable="true"
+        android:title="@string/window_popup_layout_set_item_no_focus"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_anti_obscure"
+        android:title="@string/window_popup_layout_set_item_anti_obscure"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_close_all_window"
+        android:title="@string/window_popup_layout_set_item_close_all_window"
+        app:showAsAction="ifRoom" />
+
+</menu>

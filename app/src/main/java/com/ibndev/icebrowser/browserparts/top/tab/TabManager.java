@@ -457,8 +457,6 @@ public class TabManager {
     public static class Tab {
         public WebView webview;
         public boolean isDesktopUA;
-
-
         public Tab(WebView w) {
             this.webview = w;
         }

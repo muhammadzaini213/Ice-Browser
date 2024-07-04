@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
-import android.widget.AutoCompleteTextView;
 
 import androidx.annotation.NonNull;
 
@@ -48,7 +47,6 @@ public class MainBrowserActivity extends Activity {
 
         getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(visibility -> new FullScreen(getWindow()));
 
-
         tabManager = new TabManager(this);
         recyclerView = new TabRecyclerView(this, tabManager, tabTitles, tabFavicon);
         autoComplete = new SearchAutoComplete(this, tabManager);
@@ -56,14 +54,12 @@ public class MainBrowserActivity extends Activity {
 
         new TabsLayout(this).tabsLayout(tabManager);
         new BottomBar(this, tabManager);
-        new TopBar(this, tabManager, recyclerView, tabTitles, tabFavicon, menuHelper);
+        new TopBar(this, tabManager, recyclerView, tabTitles, menuHelper);
 
-        AutoCompleteTextView et = findViewById(R.id.main_top_navbar_autocomplete);
-        tabManager.newTab(et.getText().toString());
+        tabManager.newTab("google.com");
 
         tabManager.getCurrentWebView().setVisibility(View.VISIBLE);
         tabManager.getCurrentWebView().requestFocus();
-
     }
 
 
