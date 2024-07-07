@@ -18,8 +18,8 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_menu_other"
-        android:title="@string/window_popup_browser_menu_other"
+        android:id="@+id/action_menu_open_with"
+        android:title="@string/open_with"
         app:showAsAction="ifRoom" />
 
 </menu>

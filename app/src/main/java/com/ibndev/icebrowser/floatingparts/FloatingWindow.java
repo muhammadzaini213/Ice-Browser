@@ -48,10 +48,13 @@ public class FloatingWindow extends Service {
             int LAYOUT_TYPE = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
             FloatingUtils utils = new FloatingUtils(FloatingWindow.this, LAYOUT_TYPE);
             utils.startFloating();
-            WindowNavbar navbar = new WindowNavbar(FloatingWindow.this, utils);
-            navbar.setNavbar();
 
-            new BrowserWindow(this);
+            WindowTabManager tabManager = new WindowTabManager(FloatingWindow.this);
+
+            WindowNavbar navbar = new WindowNavbar(FloatingWindow.this, utils);
+            navbar.setNavbar(tabManager);
+
+            new BrowserWindow(this, tabManager);
         }
 
 

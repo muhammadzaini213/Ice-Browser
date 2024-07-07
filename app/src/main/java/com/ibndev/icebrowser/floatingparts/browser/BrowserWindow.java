@@ -14,13 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BrowserWindow {
-    private final List<String> tabTitles = new ArrayList<>();
-    private WindowTabManager tabManager;
-    private SearchAutoComplete autoComplete;
 
-    public BrowserWindow (FloatingWindow floatingWindow){
-
-        tabManager = new WindowTabManager(floatingWindow);
+    public BrowserWindow (FloatingWindow floatingWindow, WindowTabManager tabManager){
 
         tabManager.newTab("google.com");
 
@@ -46,6 +41,10 @@ public class BrowserWindow {
 
             hideSearch.setVisibility(View.VISIBLE);
         });
+
+
+
+
     }
 
 

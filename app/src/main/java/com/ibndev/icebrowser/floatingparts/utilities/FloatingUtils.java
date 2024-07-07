@@ -35,6 +35,8 @@ public class FloatingUtils {
     int intwidth;
     int intheight;
 
+    public LayoutSetData layoutSetData;
+
     public FloatingUtils(FloatingWindow floatingWindow, int LAYOUT_TYPE) {
         context = floatingWindow.getApplicationContext();
         floatView = floatingWindow.floatView;
@@ -45,6 +47,7 @@ public class FloatingUtils {
         this.LAYOUT_TYPE = LAYOUT_TYPE;
 
         layout = new FloatingLayout();
+        layoutSetData = new LayoutSetData();
     }
 
 
@@ -94,7 +97,7 @@ public class FloatingUtils {
         touchableWrapper.setInsideTouchListener((view, event) -> {
 //            Toast.makeText(context, "Inside", Toast.LENGTH_LONG).show();
             // Make the floating window focusable
-            if (LayoutSetData.isNonFocusable) {
+            if (layoutSetData.isNonFocusable) {
                 floatWindowLayoutParam.flags =
                         WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
                                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
@@ -235,7 +238,7 @@ public class FloatingUtils {
                 // Handle the click event
                 // Do something when the floating view is clicked
                 // Example: show a toast
-                if (!LayoutSetData.isLongClick) {
+                if (!layoutSetData.isLongClick) {
                     showFloating();
                 }
                 return true;
@@ -243,7 +246,7 @@ public class FloatingUtils {
 
             @Override
             public void onLongPress(@NonNull MotionEvent e) {
-                if (LayoutSetData.isLongClick) {
+                if (layoutSetData.isLongClick) {
                     showFloating();
                 }
 
@@ -256,10 +259,10 @@ public class FloatingUtils {
         });
 
 
-        if (LayoutSetData.isStaticBubble) {
+        if (layoutSetData.isStaticBubble) {
             floatView.setOnTouchListener(null);
 
-            if (LayoutSetData.isLongClick) {
+            if (layoutSetData.isLongClick) {
                 floatView.setOnLongClickListener(view -> {
                     showFloating();
                     return true;
@@ -310,7 +313,7 @@ public class FloatingUtils {
 
         ImageView bubble = floatView.findViewById(R.id.window_ice_browser_bubble);
         bubble.setVisibility(View.VISIBLE);
-        if (LayoutSetData.isHiddenMode) {
+        if (layoutSetData.isHiddenMode) {
             bubble.setImageAlpha(0);
         } else {
             bubble.setImageAlpha(100);

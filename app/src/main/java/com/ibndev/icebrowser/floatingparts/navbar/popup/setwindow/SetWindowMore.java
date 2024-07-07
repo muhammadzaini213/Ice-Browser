@@ -16,10 +16,12 @@ public class SetWindowMore {
     Context context;
     ViewGroup floatView;
     FloatingUtils utils;
+    LayoutSetData layoutSetData;
 
     public SetWindowMore(FloatingWindow floatingWindow, FloatingUtils utils) {
         context = floatingWindow.getApplicationContext();
         floatView = floatingWindow.floatView;
+        layoutSetData = utils.layoutSetData;
         this.utils = utils;
     }
 
@@ -41,24 +43,24 @@ public class SetWindowMore {
         item.setChecked(!item.isChecked());
         if (item.isChecked()) {
            if(item.getItemId() == R.id.action_hidden_mode){
-               LayoutSetData.isHiddenMode = true;
+               layoutSetData.isHiddenMode = true;
            } else if (item.getItemId() == R.id.action_static_bubble) {
-               LayoutSetData.isStaticBubble = true;
+               layoutSetData.isStaticBubble = true;
            } else if (item.getItemId() == R.id.action_long_click) {
-               LayoutSetData.isLongClick = true;
+               layoutSetData.isLongClick = true;
            } else if (item.getItemId() == R.id.action_no_focus) {
-               LayoutSetData.isNonFocusable = true;
+               layoutSetData.isNonFocusable = true;
            }
             return true;
         } else {
             if(item.getItemId() == R.id.action_hidden_mode){
-                LayoutSetData.isHiddenMode = false;
+                layoutSetData.isHiddenMode = false;
             } else if (item.getItemId() == R.id.action_static_bubble) {
-                LayoutSetData.isStaticBubble = false;
+                layoutSetData.isStaticBubble = false;
             } else if (item.getItemId() == R.id.action_long_click) {
-                LayoutSetData.isLongClick = false;
+                layoutSetData.isLongClick = false;
             } else if (item.getItemId() == R.id.action_no_focus) {
-                LayoutSetData.isNonFocusable = false;
+                layoutSetData.isNonFocusable = false;
             }
             return false;
 

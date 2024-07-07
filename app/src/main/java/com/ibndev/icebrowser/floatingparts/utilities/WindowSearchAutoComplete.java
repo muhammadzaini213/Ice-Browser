@@ -12,7 +12,6 @@ import android.widget.EditText;
 
 import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.browserparts.top.autocomplete.SearchAutocompleteAdapter;
-import com.ibndev.icebrowser.browserparts.top.tab.TabManager;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
 import com.ibndev.icebrowser.floatingparts.browser.WindowTabManager;
 

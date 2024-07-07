@@ -2,12 +2,12 @@ package com.ibndev.icebrowser.floatingparts.utilities;
 
 public class LayoutSetData {
 
-    public static boolean isHiddenMode = false;
-    public static boolean isStaticBubble = false;
-    public static boolean isLongClick = false;
-    public static boolean isNonFocusable = false;
+    public boolean isHiddenMode = false;
+    public boolean isStaticBubble = false;
+    public boolean isLongClick = false;
+    public boolean isNonFocusable = false;
 
-    public static boolean isAntiObscureVolume = false;
-    public static boolean isAntiObscureShake = false;
+    public boolean isAntiObscureVolume = false;
+    public boolean isAntiObscureShake = false;
 
 }

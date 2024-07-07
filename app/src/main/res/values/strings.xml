@@ -63,6 +63,7 @@
     <string name="main_tabs_more_title">More</string>
     <string name="main_tabs_new_tab_title">New Tab</string>
     <string name="main_tabs_close_title">Close</string>
+    <string name="main_tabs_close_tab">Close this tab</string>
 
     <string name="main_tabs_item_adapter_favicon_desc">Favicon</string>
     <string name="main_tabs_item_adapter_tab_close_desc">Close tab</string>

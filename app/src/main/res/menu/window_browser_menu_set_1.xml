@@ -4,16 +4,19 @@
 
     <item
         android:id="@+id/action_javascript"
+        android:checkable="true"
         android:title="@string/window_popup_browser_menu_item_javascript"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_css"
+        android:checkable="true"
         android:title="@string/window_popup_browser_menu_item_css"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_cache"
+        android:checkable="true"
         android:title="@string/window_popup_browser_menu_item_cache"
         app:showAsAction="ifRoom" />
 
