@@ -1,6 +1,7 @@
 package com.ibndev.icebrowser.browserparts.top.tab.setup;
 
-import android.graphics.Bitmap;
+import android.app.Activity;
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ibndev.icebrowser.R;
@@ -20,12 +23,14 @@ public class TabsAdapter extends RecyclerView.Adapter<TabsAdapter.TabViewHolder>
     private final TabManager tabManager;
     private final View.OnClickListener onItemClickListener;
     private final View.OnClickListener onCloseClickListener;
+    private final Activity activity;
 
-    public TabsAdapter(TabManager tabManager, List<String> tabTitles, View.OnClickListener onItemClickListener, View.OnClickListener onCloseClickListener) {
+    public TabsAdapter(Activity activity, TabManager tabManager, List<String> tabTitles, View.OnClickListener onItemClickListener, View.OnClickListener onCloseClickListener) {
         this.tabTitles = tabTitles;
         this.tabManager = tabManager;
         this.onItemClickListener = onItemClickListener;
         this.onCloseClickListener = onCloseClickListener;
+        this.activity = activity;
     }
 
     @NonNull
@@ -43,6 +48,12 @@ public class TabsAdapter extends RecyclerView.Adapter<TabsAdapter.TabViewHolder>
         holder.closeTab.setTag(position);
         holder.closeTab.setOnClickListener(onCloseClickListener);
         holder.favicon.setImageBitmap(tabManager.tabs.get(position).webview.getFavicon());
+
+        if(position == tabManager.currentTabIndex){
+            holder.layout.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.background_active)));
+        } else {
+            holder.layout.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.background_normal)));
+        }
     }
 
     @Override
@@ -54,12 +65,14 @@ public class TabsAdapter extends RecyclerView.Adapter<TabsAdapter.TabViewHolder>
         public TextView textView;
         public ImageView closeTab;
         public ImageView favicon;
+        public ConstraintLayout layout;
 
         public TabViewHolder(View v) {
             super(v);
             textView = v.findViewById(R.id.main_tabs_item_adapter_tab_title);
             closeTab = v.findViewById(R.id.main_tabs_item_adapter_tab_close);
             favicon = v.findViewById(R.id.main_tabs_item_adapter_favicon);
+            layout = v.findViewById(R.id.main_tabs_item_layout);
         }
     }
 }

@@ -22,7 +22,6 @@ public class TopBar {
             tabTitles.clear();
             for (int i = 0; i < tabManager.tabs.size(); i++) {
                 tabTitles.add(tabManager.tabs.get(i).webview.getTitle());
-
             }
             recyclerView.adapter.notifyDataSetChanged();
             activity.findViewById(R.id.main_tabs_layout).setVisibility(View.VISIBLE);

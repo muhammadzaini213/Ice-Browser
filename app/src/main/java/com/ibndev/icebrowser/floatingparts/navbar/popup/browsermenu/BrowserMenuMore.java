@@ -44,13 +44,13 @@ public class BrowserMenuMore {
 
     private boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_menu_set_1) {
-            menu1.showPopupMenu();
+            menu1.showPopupMenu(tabManager);
             return true;
         } else if (item.getItemId() == R.id.action_menu_set_2) {
-            menu2.showPopupMenu();
+            menu2.showPopupMenu(tabManager);
             return true;
         } else if (item.getItemId() == R.id.action_menu_set_3) {
-            menu3.showPopupMenu();
+            menu3.showPopupMenu(tabManager);
             return true;
         } else if (item.getItemId() == R.id.action_menu_open_with) {
             openWith(context);

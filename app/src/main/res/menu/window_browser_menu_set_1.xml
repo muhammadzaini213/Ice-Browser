@@ -22,6 +22,7 @@
 
     <item
         android:id="@+id/action_dom"
+        android:checkable="true"
         android:title="@string/window_popup_browser_menu_item_dom"
         app:showAsAction="ifRoom" />
 

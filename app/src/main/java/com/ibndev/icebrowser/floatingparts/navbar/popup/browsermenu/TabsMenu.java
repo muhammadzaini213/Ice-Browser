@@ -2,6 +2,7 @@ package com.ibndev.icebrowser.floatingparts.navbar.popup.browsermenu;
 
 import android.content.Context;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
 
@@ -33,8 +34,13 @@ public class TabsMenu {
         menu.add(Menu.NONE, 123456, Menu.NONE, context.getString(R.string.main_tabs_new_tab_title));
 
         for (int i = 0; i < tabManager.tabs.size(); i++) {
-            menu.add(Menu.NONE, i, Menu.NONE, tabManager.tabs.get(i).webview.getTitle());
+            MenuItem item = menu.add(Menu.NONE, i, Menu.NONE, tabManager.tabs.get(i).webview.getTitle())
+                    .setCheckable(true);
+            if (i == tabManager.currentTabIndex) {
+                item.setChecked(true);
+            }
         }
+
 
         menu.add(Menu.NONE, 654321, Menu.NONE, context.getString(R.string.main_tabs_close_tab));
 

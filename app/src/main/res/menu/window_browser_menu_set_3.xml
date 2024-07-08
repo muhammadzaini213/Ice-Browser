@@ -4,21 +4,25 @@
 
     <item
         android:id="@+id/action_popup"
+        android:checkable="true"
         android:title="@string/window_popup_browser_menu_item_popup"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_text_small"
+        android:checkable="true"
         android:title="@string/window_popup_browser_menu_item_text_small"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_text_normal"
+        android:checkable="true"
         android:title="@string/window_popup_browser_menu_item_text_normal"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_text_big"
+        android:checkable="true"
         android:title="@string/window_popup_browser_menu_item_text_big"
         app:showAsAction="ifRoom" />
 

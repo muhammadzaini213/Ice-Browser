@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_tabs_item_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingHorizontal="20dp"
     android:layout_margin="10dp"
     android:background="@drawable/tabs_more_button_round"
-    android:backgroundTint="#555555"
+    android:backgroundTint="@color/background_normal"
     android:foreground="@drawable/ripple_rounded"
     android:orientation="horizontal">
 
