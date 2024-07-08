@@ -1,10 +1,8 @@
 package com.ibndev.icebrowser.browserparts.bottom.sheet.bookmark;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.database.sqlite.SQLiteDatabase;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 
 import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.browserparts.bottom.dialog.ActionBookmarkDialog;

@@ -6,10 +6,9 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -18,6 +17,7 @@ import com.ibndev.icebrowser.floatingparts.browser.BrowserWindow;
 import com.ibndev.icebrowser.floatingparts.browser.WindowTabManager;
 import com.ibndev.icebrowser.floatingparts.navbar.WindowNavbar;
 import com.ibndev.icebrowser.floatingparts.utilities.FloatingUtils;
+import com.ibndev.icebrowser.floatingparts.utilities.TouchableWrapper;
 
 public class FloatingWindow extends Service {
     @Nullable
@@ -30,14 +30,17 @@ public class FloatingWindow extends Service {
     public ViewGroup floatView;
     public WindowManager windowManager;
     public DisplayMetrics metrics;
-
     public boolean isFloatingActive;
 
-    @SuppressLint("InflateParams")
     @Override
     public void onCreate() {
         super.onCreate();
 
+        createWindow();
+    }
+
+    @SuppressLint("InflateParams")
+    public void createWindow() {
         metrics = getApplicationContext().getResources().getDisplayMetrics();
 
         LayoutInflater inflater = (LayoutInflater) getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -56,17 +59,11 @@ public class FloatingWindow extends Service {
 
             new BrowserWindow(this, tabManager);
         }
-
-
-
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (floatView != null && floatView.getParent() != null) {
-            windowManager.removeView(floatView);
-        }
-        stopSelf();
+
     }
 }

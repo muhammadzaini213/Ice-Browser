@@ -1,7 +1,6 @@
 package com.ibndev.icebrowser.floatingparts.navbar.popup.browsermenu;
 
 import android.content.Context;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -11,9 +10,6 @@ import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
 import com.ibndev.icebrowser.floatingparts.browser.WindowTabManager;
 import com.ibndev.icebrowser.floatingparts.utilities.FloatingUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BrowserMenu {
 

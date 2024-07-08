@@ -2,7 +2,6 @@ package com.ibndev.icebrowser.browserparts.top;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.view.View;
 
 import com.ibndev.icebrowser.R;

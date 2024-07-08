@@ -8,9 +8,9 @@ import android.view.ViewGroup;
 import android.widget.PopupMenu;
 
 import com.ibndev.icebrowser.R;
+import com.ibndev.icebrowser.floatingparts.FloatingWindow;
 import com.ibndev.icebrowser.floatingparts.browser.WindowTabManager;
 import com.ibndev.icebrowser.floatingparts.utilities.FloatingUtils;
-import com.ibndev.icebrowser.floatingparts.FloatingWindow;
 
 public class BrowserMenuMore {
     Context context;

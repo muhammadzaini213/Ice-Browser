@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:enabled="false"
+        android:title="@string/main_bookmark_delete_confirmation_dialog_title_desc"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_yes"
+        android:title="@string/yes"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_no"
+        android:title="@string/no"
+        app:showAsAction="ifRoom" />
+
+
+</menu>

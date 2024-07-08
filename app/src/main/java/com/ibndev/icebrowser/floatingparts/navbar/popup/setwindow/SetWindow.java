@@ -7,18 +7,19 @@ import android.view.ViewGroup;
 import android.widget.PopupMenu;
 
 import com.ibndev.icebrowser.R;
-import com.ibndev.icebrowser.floatingparts.utilities.FloatingUtils;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
+import com.ibndev.icebrowser.floatingparts.utilities.FloatingUtils;
 
 public class SetWindow
 {
     Context context;
     ViewGroup floatView;
     FloatingUtils utils;
-
+    FloatingWindow floatingWindow;
     SetWindowMore more;
 
     public SetWindow(FloatingWindow floatingWindow, FloatingUtils utils){
+        this.floatingWindow = floatingWindow;
         context = floatingWindow.getApplicationContext();
         floatView = floatingWindow.floatView;
         this.utils = utils;
@@ -39,6 +40,10 @@ public class SetWindow
             utils.hideFloating();
             return true;
         } else if (item.getItemId() == R.id.action_topper) {
+            utils.bypassFloating();
+            return true;
+        } else if (item.getItemId() == R.id.action_new_window) {
+            floatingWindow.createWindow();
             return true;
         } else if (item.getItemId() == R.id.action_more) {
             more.showPopupMenu();

@@ -14,7 +14,7 @@
             android:id="@+id/window_main_framelayout_webview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="68dp"
+            android:layout_marginTop="50dp"
             />
 
         <include
@@ -50,7 +50,7 @@
         android:layout_height="match_parent"
         android:visibility="gone"
         android:contentDescription="@string/window_ice_bubble"
-        android:src="@drawable/window_ice_logo"/>
+        android:src="@mipmap/ic_launcher_round"/>
 
 </FrameLayout>
 

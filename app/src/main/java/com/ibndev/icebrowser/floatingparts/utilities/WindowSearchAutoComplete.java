@@ -1,6 +1,5 @@
 package com.ibndev.icebrowser.floatingparts.utilities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;

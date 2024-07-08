@@ -3,6 +3,7 @@ package com.ibndev.icebrowser.floatingparts.utilities;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Observer;
 
 import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
@@ -25,7 +27,6 @@ public class FloatingUtils {
     DisplayMetrics metrics;
     boolean isFloatingActive;
     int LAYOUT_TYPE;
-
     Context context;
 
     WindowManager.LayoutParams floatWindowLayoutParam;
@@ -37,20 +38,34 @@ public class FloatingUtils {
 
     public LayoutSetData layoutSetData;
 
+    Observer<Boolean> observer;
+
     public FloatingUtils(FloatingWindow floatingWindow, int LAYOUT_TYPE) {
         context = floatingWindow.getApplicationContext();
         floatView = floatingWindow.floatView;
         windowManager = floatingWindow.windowManager;
-        isFloatingActive = floatingWindow.isFloatingActive;
         metrics = floatingWindow.metrics;
 
         this.LAYOUT_TYPE = LAYOUT_TYPE;
 
         layout = new FloatingLayout();
         layoutSetData = new LayoutSetData();
+
+        observer = visible -> {
+            if (windowManager != null && touchableWrapper != null) {
+                if (!visible && isFloatingActive) {
+                    windowManager.removeView(touchableWrapper);
+                    isBypassMode = false;
+                    isFloatingActive = false;
+                }
+            }
+        };
+
+        OverlayManager.getOverlayVisibility().observeForever(observer);
     }
 
 
+    boolean isAntiObscure;
     @SuppressLint("ClickableViewAccessibility")
     public void startFloating() {
         isFloatingActive = true;
@@ -89,7 +104,12 @@ public class FloatingUtils {
                             WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
             windowManager.updateViewLayout(touchableWrapper, floatWindowLayoutParam);
 
-//            Toast.makeText(context, "Outside", Toast.LENGTH_LONG).show();
+
+            //TODO: Add anti obscure feature with volume and shake sensor
+//            if(layoutSetData.isAntiObscureVolume || layoutSetData.isAntiObscureShake){
+//                windowManager.removeView(touchableWrapper);
+//                OverlayManager.getOverlayVisibility().removeObserver(observer);
+//            }
             return false;
         });
 
@@ -202,6 +222,9 @@ public class FloatingUtils {
 
         closeBtn.setOnLongClickListener(view -> {
             windowManager.removeView(touchableWrapper);
+            isFloatingActive = false;
+            isBypassMode = false;
+            OverlayManager.getOverlayVisibility().removeObserver(observer);
             return true;
         });
 
@@ -262,14 +285,7 @@ public class FloatingUtils {
         if (layoutSetData.isStaticBubble) {
             floatView.setOnTouchListener(null);
 
-            if (layoutSetData.isLongClick) {
-                floatView.setOnLongClickListener(view -> {
-                    showFloating();
-                    return true;
-                });
-            } else {
-                floatView.setOnClickListener(view -> showFloating());
-            }
+
         } else {
             floatView.setOnClickListener(null);
             floatView.setOnTouchListener(new View.OnTouchListener() {
@@ -309,6 +325,16 @@ public class FloatingUtils {
             });
         }
 
+        if (layoutSetData.isLongClick) {
+            floatView.setOnClickListener(null);
+            floatView.setOnLongClickListener(view -> {
+                showFloating();
+                return true;
+            });
+        } else {
+            floatView.setOnClickListener(view -> showFloating());
+        }
+
         floatView.findViewById(R.id.window_main_browser_layout).setVisibility(View.GONE);
 
         ImageView bubble = floatView.findViewById(R.id.window_ice_browser_bubble);
@@ -316,12 +342,13 @@ public class FloatingUtils {
         if (layoutSetData.isHiddenMode) {
             bubble.setImageAlpha(0);
         } else {
-            bubble.setImageAlpha(100);
+            bubble.setImageAlpha(1000);
         }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     public void showFloating() {
+        isBypassMode = false;
         intwidth = layout.width;
         intheight = layout.height;
         int minWidth = (int) (200 * metrics.density);
@@ -432,4 +459,33 @@ public class FloatingUtils {
         });
     }
 
+
+    boolean isBypassMode;
+
+    protected void updateLayout() {
+        Handler handler = new Handler();
+        handler.postDelayed(() -> {
+
+            if (isBypassMode) {
+                windowManager.removeView(touchableWrapper);
+                windowManager.addView(touchableWrapper, floatWindowLayoutParam);
+
+                windowManager.updateViewLayout(touchableWrapper, floatWindowLayoutParam);
+                updateLayout();
+            }
+
+        }, 5000);
+    }
+
+    public void bypassFloating() {
+        if (isBypassMode) {
+            isBypassMode = false;
+            showFloating();
+        } else {
+            isBypassMode = true;
+        }
+
+        hideFloating();
+        updateLayout();
+    }
 }

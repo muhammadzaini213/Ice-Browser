@@ -4,12 +4,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.ibndev.icebrowser.R;
-import com.ibndev.icebrowser.browserparts.top.tab.TabManager;
-import com.ibndev.icebrowser.floatingparts.browser.WindowTabManager;
-import com.ibndev.icebrowser.floatingparts.utilities.FloatingUtils;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
+import com.ibndev.icebrowser.floatingparts.browser.WindowTabManager;
 import com.ibndev.icebrowser.floatingparts.navbar.popup.browsermenu.BrowserMenu;
 import com.ibndev.icebrowser.floatingparts.navbar.popup.setwindow.SetWindow;
+import com.ibndev.icebrowser.floatingparts.utilities.FloatingUtils;
 
 public class WindowNavbar {
     FloatingWindow floatingWindow;

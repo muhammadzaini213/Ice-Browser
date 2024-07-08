@@ -6,12 +6,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 
 import com.ibndev.icebrowser.R;
-import com.ibndev.icebrowser.browserparts.top.autocomplete.SearchAutoComplete;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
 import com.ibndev.icebrowser.floatingparts.utilities.WindowSearchAutoComplete;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BrowserWindow {
 
