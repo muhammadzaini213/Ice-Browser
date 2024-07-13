@@ -16,14 +16,12 @@ public class CloseAllConfirmation {
     Context context;
     ViewGroup floatView;
     FloatingUtils utils;
-    LayoutSetData layoutSetData;
     FloatingWindow floatingWindow;
 
     public CloseAllConfirmation(FloatingWindow floatingWindow, FloatingUtils utils) {
         this.floatingWindow = floatingWindow;
         context = floatingWindow.getApplicationContext();
         floatView = floatingWindow.floatView;
-        layoutSetData = utils.layoutSetData;
         this.utils = utils;
     }
 

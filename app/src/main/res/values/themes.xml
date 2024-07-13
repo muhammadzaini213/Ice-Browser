@@ -28,4 +28,10 @@
         <item name="android:textColorPrimary">@color/white</item>
     </style>
 
+    <style name="keyboard_style" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:foreground">@drawable/ripple_rounded</item>
+        <item name="android:background">@color/background_dark</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
 </resources>

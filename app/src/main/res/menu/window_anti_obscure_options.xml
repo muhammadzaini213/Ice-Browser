@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_anti_obscure_desc"
+        android:title="@string/window_popup_layout_set_item_anti_obscure_option"
+        android:titleCondensed="@string/window_popup_layout_set_item_anti_obscure_option"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_anti_obscure_volume"
+        android:checkable="true"
+        android:title="@string/window_popup_layout_set_item_anti_obscure_volume"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_anti_obscure_shake"
+        android:title="@string/window_popup_layout_set_item_anti_obscure_shake"
+        android:checkable="true"
+        app:showAsAction="ifRoom" />
+</menu>

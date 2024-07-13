@@ -9,10 +9,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Patterns;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.HttpAuthHandler;
+import android.webkit.JavascriptInterface;
 import android.webkit.URLUtil;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -23,6 +26,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
@@ -37,10 +41,14 @@ public class WindowTabManager {
     Context context;
     ViewGroup floatView;
 
+    KeyboardView keyboardView;
+
     public WindowTabManager(FloatingWindow floatingWindow) {
         this.context = floatingWindow.getApplicationContext();
         this.floatView = floatingWindow.floatView;
         et = floatView.findViewById(R.id.window_main_top_navbar_autocomplete);
+
+        keyboardView = new KeyboardView(floatingWindow, WindowTabManager.this);
     }
 
     public WindowTabManager.Tab getCurrentTab() {
@@ -103,7 +111,7 @@ public class WindowTabManager {
         loadUrl(url, webview);
     }
 
-    @SuppressLint({"SetJavaScriptEnabled", "DefaultLocale"})
+    @SuppressLint({"SetJavaScriptEnabled", "DefaultLocale", "ClickableViewAccessibility"})
     public WebView createWebView(Bundle bundle, boolean isNightMode) {
         final ProgressBar progressBar = floatView.findViewById(R.id.window_main_progressbar);
         final AutoCompleteTextView et = floatView.findViewById(R.id.window_main_top_navbar_autocomplete);
@@ -159,6 +167,123 @@ public class WindowTabManager {
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                String jsMonitorEvents = "var isEditableElementFocused = false;" +
+                        "document.addEventListener('click', function() {" +
+                        "    var activeElement = document.activeElement;" +
+                        "    isEditableElementFocused = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA');" +
+                        "    console.log('Click detected. Is editable element focused:', isEditableElementFocused);" +
+                        "});" +
+                        "document.addEventListener('focusin', function() {" +
+                        "    var activeElement = document.activeElement;" +
+                        "    isEditableElementFocused = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA');" +
+                        "    console.log('Focus detected. Is editable element focused:', isEditableElementFocused);" +
+                        "});";
+
+// Inject JavaScript to monitor clicks and focus events
+                getCurrentWebView().evaluateJavascript(jsMonitorEvents, null);
+
+// Add a click listener to the WebView
+                getCurrentWebView().setOnTouchListener((v, event) -> {
+                        // Check the focus state of the editable element
+                        String jsCheckFocus = "isEditableElementFocused;";
+                        getCurrentWebView().evaluateJavascript(jsCheckFocus, new ValueCallback<String>() {
+                            @Override
+                            public void onReceiveValue(String value) {
+                                // Perform actions based on focus state
+                                if (Boolean.parseBoolean(value)) {
+                                    // Element is focused, do something
+                                    keyboardView.showKeyboard();
+                                } else {
+                                    // Element is not focused, do something else
+                                    keyboardView.hideKeyboard();
+                                }
+                            }
+                        });
+
+                    return false;
+                });
+
+
+                String erudaScript = "(function() {" +
+                        "var script = document.createElement('script');" +
+                        "script.src = 'https://cdn.jsdelivr.net/npm/eruda';" +
+                        "document.body.appendChild(script);" +
+                        "script.onload = function() {" +
+                        "eruda.init();" +
+                        "};" +
+                        "})();";
+                getCurrentWebView().evaluateJavascript(erudaScript, null);
+
+                String javascript = "javascript:function insertText(text) {\n" +
+                        "            var activeElement = document.activeElement;\n" +
+                        "            if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {\n" +
+                        "                var start = activeElement.selectionStart;\n" +
+                        "                var end = activeElement.selectionEnd;\n" +
+                        "                activeElement.value = activeElement.value.substring(0, start) + text + activeElement.value.substring(end);\n" +
+                        "                activeElement.setSelectionRange(start + text.length, start + text.length);\n" +
+                        "            } else if (activeElement && activeElement.contentEditable === 'true') {\n" +
+                        "                var selection = window.getSelection();\n" +
+                        "                var range = selection.getRangeAt(0);\n" +
+                        "                range.deleteContents();\n" +
+                        "                range.insertNode(document.createTextNode(text));\n" +
+                        "            }\n" +
+                        "        }\n" +
+                        "\n" +
+                        "        function deleteOneCharacter() {\n" +
+                        "            var activeElement = document.activeElement;\n" +
+                        "            if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {\n" +
+                        "                var start = activeElement.selectionStart;\n" +
+                        "                var end = activeElement.selectionEnd;\n" +
+                        "                if (start === end && start > 0) {\n" +
+                        "                    activeElement.value = activeElement.value.substring(0, start - 1) + activeElement.value.substring(end);\n" +
+                        "                    activeElement.setSelectionRange(start - 1, start - 1);\n" +
+                        "                } else if (start !== end) {\n" +
+                        "                    activeElement.value = activeElement.value.substring(0, start) + activeElement.value.substring(end);\n" +
+                        "                    activeElement.setSelectionRange(start, start);\n" +
+                        "                }\n" +
+                        "            } else if (activeElement && activeElement.contentEditable === 'true') {\n" +
+                        "                var selection = window.getSelection();\n" +
+                        "                if (selection.rangeCount > 0) {\n" +
+                        "                    var range = selection.getRangeAt(0);\n" +
+                        "                    if (range.startOffset === range.endOffset && range.startOffset > 0) {\n" +
+                        "                        range.setStart(range.startContainer, range.startOffset - 1);\n" +
+                        "                        range.deleteContents();\n" +
+                        "                    } else {\n" +
+                        "                        range.deleteContents();\n" +
+                        "                    }\n" +
+                        "                }\n" +
+                        "            }\n" +
+                        "        }\n" +
+                        "\n" +
+                        "        function deleteAllCharacters() {\n" +
+                        "            var activeElement = document.activeElement;\n" +
+                        "            if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {\n" +
+                        "                activeElement.value = '';\n" +
+                        "            } else if (activeElement && activeElement.contentEditable === 'true') {\n" +
+                        "                activeElement.innerHTML = '';\n" +
+                        "            }\n" +
+                        "        } " +
+                        "function sendEnterKey() {\n" +
+                        "    var activeElement = document.activeElement;\n" +
+                        "    if (activeElement) {\n" +
+                        "        var eventKeyDown = new KeyboardEvent('keydown', { keyCode: 13, which: 13, key: 'Enter', code: 'Enter' });\n" +
+                        "        var eventKeyUp = new KeyboardEvent('keyup', { keyCode: 13, which: 13, key: 'Enter', code: 'Enter' });\n" +
+                        "\n" +
+                        "        activeElement.dispatchEvent(eventKeyDown);\n" +
+                        "        activeElement.dispatchEvent(eventKeyUp);\n" +
+                        "\n" +
+                        "        // Check if the active element is a form element and submit it\n" +
+                        "        if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') {\n" +
+                        "            var form = activeElement.closest('form');\n" +
+                        "            if (form) {\n" +
+                        "                form.submit();\n" +
+                        "            }\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "}\n";
+
+                getCurrentWebView().evaluateJavascript(javascript, null);
+
 
             }
 

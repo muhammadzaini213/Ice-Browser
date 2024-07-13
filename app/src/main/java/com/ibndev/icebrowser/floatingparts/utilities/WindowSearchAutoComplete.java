@@ -53,7 +53,7 @@ public class WindowSearchAutoComplete {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                tabManager.getCurrentWebView().findAllAsync(s.toString());
+//                tabManager.getCurrentWebView().findAllAsync(s.toString());
             }
 
             @Override

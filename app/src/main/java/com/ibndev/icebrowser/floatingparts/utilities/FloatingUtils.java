@@ -1,8 +1,16 @@
 package com.ibndev.icebrowser.floatingparts.utilities;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.PixelFormat;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.media.AudioManager;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector;
@@ -20,12 +28,13 @@ import androidx.lifecycle.Observer;
 import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
 
-public class FloatingUtils {
+public class FloatingUtils implements SensorEventListener {
 
     ViewGroup floatView;
     WindowManager windowManager;
     DisplayMetrics metrics;
     boolean isFloatingActive;
+    boolean isFloatingShown;
     int LAYOUT_TYPE;
     Context context;
 
@@ -36,20 +45,22 @@ public class FloatingUtils {
     int intwidth;
     int intheight;
 
-    public LayoutSetData layoutSetData;
+    int volumePrev = 0;
 
     Observer<Boolean> observer;
+
+    private Sensor accelerometer;
+    private long lastUpdate;
+    private float last_x, last_y, last_z;
 
     public FloatingUtils(FloatingWindow floatingWindow, int LAYOUT_TYPE) {
         context = floatingWindow.getApplicationContext();
         floatView = floatingWindow.floatView;
         windowManager = floatingWindow.windowManager;
         metrics = floatingWindow.metrics;
-
         this.LAYOUT_TYPE = LAYOUT_TYPE;
 
         layout = new FloatingLayout();
-        layoutSetData = new LayoutSetData();
 
         observer = visible -> {
             if (windowManager != null && touchableWrapper != null) {
@@ -61,14 +72,26 @@ public class FloatingUtils {
             }
         };
 
+        SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager != null) {
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        }
+        lastUpdate = System.currentTimeMillis();
+        if (accelerometer != null) {
+            assert sensorManager != null;
+            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
         OverlayManager.getOverlayVisibility().observeForever(observer);
+
+        setBroadcastReceiver();
     }
 
-
-    boolean isAntiObscure;
     @SuppressLint("ClickableViewAccessibility")
     public void startFloating() {
         isFloatingActive = true;
+        isFloatingShown = true;
+
         int minWidth = (int) (200 * metrics.density);
         int minHeight = (int) (250 * metrics.density);
         intwidth = (int) (330 * metrics.density);
@@ -106,10 +129,11 @@ public class FloatingUtils {
 
 
             //TODO: Add anti obscure feature with volume and shake sensor
-//            if(layoutSetData.isAntiObscureVolume || layoutSetData.isAntiObscureShake){
-//                windowManager.removeView(touchableWrapper);
-//                OverlayManager.getOverlayVisibility().removeObserver(observer);
-//            }
+            if (LayoutSetData.isAntiObscureVolume || LayoutSetData.isAntiObscureShake) {
+                windowManager.removeView(touchableWrapper);
+                OverlayManager.getOverlayVisibility().removeObserver(observer);
+                isFloatingActive = false;
+            }
             return false;
         });
 
@@ -117,7 +141,7 @@ public class FloatingUtils {
         touchableWrapper.setInsideTouchListener((view, event) -> {
 //            Toast.makeText(context, "Inside", Toast.LENGTH_LONG).show();
             // Make the floating window focusable
-            if (layoutSetData.isNonFocusable) {
+            if (LayoutSetData.isNonFocusable) {
                 floatWindowLayoutParam.flags =
                         WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
                                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
@@ -233,7 +257,172 @@ public class FloatingUtils {
     }
 
     @SuppressLint("ClickableViewAccessibility")
+    public void antiObscureFloating() {
+        isFloatingActive = true;
+        int minWidth = (int) (200 * metrics.density);
+        int minHeight = (int) (250 * metrics.density);
+        intwidth = layout.width;
+        intheight = layout.height;
+
+
+        floatWindowLayoutParam = new WindowManager.LayoutParams(
+                intwidth,
+                intheight,
+                LAYOUT_TYPE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
+                        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+                PixelFormat.TRANSLUCENT
+        );
+
+        floatWindowLayoutParam.gravity = Gravity.START | Gravity.TOP;
+        floatWindowLayoutParam.x = layout.xPos;
+        floatWindowLayoutParam.y = layout.yPos;
+
+        touchableWrapper.setOutsideTouchListener((view, event) -> {
+            // Make the floating window not focusable
+            floatWindowLayoutParam.flags =
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+            windowManager.updateViewLayout(touchableWrapper, floatWindowLayoutParam);
+
+
+            //TODO: Add anti obscure feature with volume and shake sensor
+            if (LayoutSetData.isAntiObscureVolume || LayoutSetData.isAntiObscureShake) {
+                windowManager.removeView(touchableWrapper);
+                OverlayManager.getOverlayVisibility().removeObserver(observer);
+                isFloatingActive = false;
+            }
+            return false;
+        });
+
+        // Set the inside touch listener
+        touchableWrapper.setInsideTouchListener((view, event) -> {
+//            Toast.makeText(context, "Inside", Toast.LENGTH_LONG).show();
+            // Make the floating window focusable
+            if (LayoutSetData.isNonFocusable) {
+                floatWindowLayoutParam.flags =
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+            } else {
+                floatWindowLayoutParam.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
+                        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
+                        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+            }
+
+
+            windowManager.updateViewLayout(touchableWrapper, floatWindowLayoutParam);
+
+
+            return false;
+        });
+
+        touchableWrapper.setOnTouchListener(new View.OnTouchListener() {
+            final WindowManager.LayoutParams floatWindowLayoutUpdateParam = floatWindowLayoutParam;
+            double x;
+            double y;
+            double px;
+            double py;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        x = floatWindowLayoutUpdateParam.x;
+                        y = floatWindowLayoutUpdateParam.y;
+                        px = event.getRawX();
+                        py = event.getRawY();
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        int xPos = (int) ((x + event.getRawX()) - px);
+                        int yPos = (int) ((y + event.getRawY()) - py);
+
+                        floatWindowLayoutUpdateParam.x = xPos;
+                        floatWindowLayoutUpdateParam.y = yPos;
+
+                        layout.xPos = floatWindowLayoutUpdateParam.x;
+                        layout.yPos = floatWindowLayoutUpdateParam.y;
+
+                        windowManager.updateViewLayout(touchableWrapper, floatWindowLayoutUpdateParam);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        // You may want to add code here for when the touch is released
+                        break;
+                }
+                return true;
+            }
+        });
+
+        ImageView bottomRightResizer = floatView.findViewById(R.id.window_resizer);
+        bottomRightResizer.setOnTouchListener(new View.OnTouchListener() {
+            final WindowManager.LayoutParams floatWindowLayoutUpdateParam = floatWindowLayoutParam;
+            double initialWidth;
+            double initialHeight;
+            double initialTouchX;
+            double initialTouchY;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        initialWidth = floatWindowLayoutUpdateParam.width;
+                        initialHeight = floatWindowLayoutUpdateParam.height;
+                        initialTouchX = event.getRawX();
+                        initialTouchY = event.getRawY();
+                        return true;
+
+                    case MotionEvent.ACTION_MOVE:
+                        float newWidth = (float) (initialWidth + (event.getRawX() - initialTouchX));
+                        float newHeight = (float) (initialHeight + (event.getRawY() - initialTouchY));
+
+                        // Ensure the new width and height are not smaller than the minimum values
+                        if (newWidth < minWidth) {
+                            newWidth = minWidth;
+                        }
+                        if (newHeight < minHeight) {
+                            newHeight = minHeight;
+                        }
+
+                        floatWindowLayoutUpdateParam.width = (int) newWidth;
+                        floatWindowLayoutUpdateParam.height = (int) newHeight;
+
+                        layout.width = floatWindowLayoutUpdateParam.width;
+                        layout.height = floatWindowLayoutUpdateParam.height;
+
+                        windowManager.updateViewLayout(touchableWrapper, floatWindowLayoutUpdateParam);
+                        return true;
+
+                    case MotionEvent.ACTION_UP:
+                        // You may want to add code here for when the touch is released
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        ImageView closeBtn = floatView.findViewById(R.id.window_main_top_navbar_close_button);
+        closeBtn.setOnClickListener(view -> Toast.makeText(context, context.getString(R.string.window_close_onclick), Toast.LENGTH_LONG).show());
+
+        closeBtn.setOnLongClickListener(view -> {
+            windowManager.removeView(touchableWrapper);
+            isFloatingActive = false;
+            isBypassMode = false;
+            OverlayManager.getOverlayVisibility().removeObserver(observer);
+            return true;
+        });
+
+        windowManager.addView(touchableWrapper, floatWindowLayoutParam);
+
+
+    }
+
+
+    @SuppressLint("ClickableViewAccessibility")
     public void hideFloating() {
+        isFloatingShown = false;
         intwidth = (int) (50 * metrics.density);
         intheight = (int) (50 * metrics.density);
 
@@ -261,7 +450,7 @@ public class FloatingUtils {
                 // Handle the click event
                 // Do something when the floating view is clicked
                 // Example: show a toast
-                if (!layoutSetData.isLongClick) {
+                if (!LayoutSetData.isLongClick) {
                     showFloating();
                 }
                 return true;
@@ -269,7 +458,7 @@ public class FloatingUtils {
 
             @Override
             public void onLongPress(@NonNull MotionEvent e) {
-                if (layoutSetData.isLongClick) {
+                if (LayoutSetData.isLongClick) {
                     showFloating();
                 }
 
@@ -282,7 +471,7 @@ public class FloatingUtils {
         });
 
 
-        if (layoutSetData.isStaticBubble) {
+        if (LayoutSetData.isStaticBubble) {
             floatView.setOnTouchListener(null);
 
 
@@ -325,7 +514,7 @@ public class FloatingUtils {
             });
         }
 
-        if (layoutSetData.isLongClick) {
+        if (LayoutSetData.isLongClick) {
             floatView.setOnClickListener(null);
             floatView.setOnLongClickListener(view -> {
                 showFloating();
@@ -339,7 +528,7 @@ public class FloatingUtils {
 
         ImageView bubble = floatView.findViewById(R.id.window_ice_browser_bubble);
         bubble.setVisibility(View.VISIBLE);
-        if (layoutSetData.isHiddenMode) {
+        if (LayoutSetData.isHiddenMode) {
             bubble.setImageAlpha(0);
         } else {
             bubble.setImageAlpha(1000);
@@ -348,6 +537,7 @@ public class FloatingUtils {
 
     @SuppressLint("ClickableViewAccessibility")
     public void showFloating() {
+        isFloatingShown = false;
         isBypassMode = false;
         intwidth = layout.width;
         intheight = layout.height;
@@ -487,5 +677,82 @@ public class FloatingUtils {
 
         hideFloating();
         updateLayout();
+    }
+
+
+    private void setBroadcastReceiver() {
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+                /*
+                This function is only activated if volume is changed
+                 */
+
+                if ("android.media.VOLUME_CHANGED_ACTION".equals(intent.getAction())) {
+
+                    int volume = intent.getIntExtra("android.media.EXTRA_VOLUME_STREAM_VALUE", 0);
+
+                    if (!isFloatingActive && LayoutSetData.isAntiObscureVolume) {
+                        OverlayManager.getOverlayVisibility().observeForever(observer);
+                        antiObscureFloating();
+                        if(!isFloatingShown){
+                            hideFloating();
+                        }
+                        isFloatingActive = true;
+                    }
+                    volumePrev = volume;
+
+
+                }
+            }
+        };
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.media.VOLUME_CHANGED_ACTION");
+        context.registerReceiver(broadcastReceiver, filter);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        int SHAKE_THRESHOLD = 800;
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            long curTime = System.currentTimeMillis();
+            if ((curTime - lastUpdate) > 100) {
+                long diffTime = (curTime - lastUpdate);
+                lastUpdate = curTime;
+
+                float x = event.values[0];
+                float y = event.values[1];
+                float z = event.values[2];
+
+                float deltaX = x - last_x;
+                float deltaY = y - last_y;
+                float deltaZ = z - last_z;
+
+                last_x = x;
+                last_y = y;
+                last_z = z;
+
+                float speed = Math.abs(deltaX + deltaY + deltaZ) / diffTime * 10000;
+
+                if (speed > SHAKE_THRESHOLD) {
+                    onShake();
+                }
+            }
+        }
+    }
+
+    private void onShake() {
+        if (LayoutSetData.isAntiObscureShake && !isFloatingActive) {
+            OverlayManager.getOverlayVisibility().observeForever(observer);
+            antiObscureFloating();
+            isFloatingActive = true;
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
     }
 }

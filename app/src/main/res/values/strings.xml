@@ -2,7 +2,8 @@
     <string name="app_name" translatable="false">Ice Browser</string>
 
     <string name="desktopUA" translatable="false">Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36</string>
-
+    <string name="amp" translatable="false"><![CDATA[&]]></string>
+    <string name="quot" translatable="false">\"</string>
     <string name="window_close_onclick">Long press to close.</string>
     <!-- tab manager text-->
     <string name="file_chooser_open_fail">Can\'t open file chooser</string>
@@ -200,6 +201,11 @@
     <string name="window_popup_layout_set_item_long_click">Long click to show</string>
     <string name="window_popup_layout_set_item_no_focus">Non focusable</string>
     <string name="window_popup_layout_set_item_anti_obscure">Anti obscure</string>
+
+    <string name="window_popup_layout_set_item_anti_obscure_option">Which mode will you use?</string>
+    <string name="window_popup_layout_set_item_anti_obscure_volume">Volume</string>
+    <string name="window_popup_layout_set_item_anti_obscure_shake">Shake</string>
+
     <string name="window_popup_layout_set_item_close_all_window">Close all window</string>
 
     <!-- floating window browser menu popup item-->

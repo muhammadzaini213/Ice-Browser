@@ -12,20 +12,22 @@ import com.ibndev.icebrowser.floatingparts.navbar.popup.browsermenu.CloseAllConf
 import com.ibndev.icebrowser.floatingparts.utilities.FloatingUtils;
 import com.ibndev.icebrowser.floatingparts.utilities.LayoutSetData;
 
+import java.util.Set;
+
 public class SetWindowMore {
 
     Context context;
     ViewGroup floatView;
     FloatingUtils utils;
-    LayoutSetData layoutSetData;
     FloatingWindow floatingWindow;
+    SetAntiObscure setAntiObscure;
 
     public SetWindowMore(FloatingWindow floatingWindow, FloatingUtils utils) {
         this.floatingWindow = floatingWindow;
         context = floatingWindow.getApplicationContext();
         floatView = floatingWindow.floatView;
-        layoutSetData = utils.layoutSetData;
         this.utils = utils;
+        setAntiObscure = new SetAntiObscure(floatingWindow, utils);
     }
 
     PopupMenu popupMenu;
@@ -37,6 +39,8 @@ public class SetWindowMore {
             inflater.inflate(R.menu.window_layout_set_menu_more, popupMenu.getMenu());
         }
 
+        MenuItem antiObscure = popupMenu.getMenu().findItem(R.id.action_anti_obscure);
+        antiObscure.setChecked((LayoutSetData.isAntiObscureVolume || LayoutSetData.isAntiObscureShake));
 
         popupMenu.setOnMenuItemClickListener(this::onOptionsItemSelected);
         popupMenu.show();
@@ -46,31 +50,30 @@ public class SetWindowMore {
         item.setChecked(!item.isChecked());
         if (item.getItemId() == R.id.action_close_all_window) {
             new CloseAllConfirmation(floatingWindow, utils).showPopupMenu();
+        } else if (item.getItemId() == R.id.action_anti_obscure) {
+            setAntiObscure.showPopupMenu();
         }
+
         if (item.isChecked()) {
             if (item.getItemId() == R.id.action_hidden_mode) {
-                layoutSetData.isHiddenMode = true;
+                LayoutSetData.isHiddenMode = true;
             } else if (item.getItemId() == R.id.action_static_bubble) {
-                layoutSetData.isStaticBubble = true;
+                LayoutSetData.isStaticBubble = true;
             } else if (item.getItemId() == R.id.action_long_click) {
-                layoutSetData.isLongClick = true;
+                LayoutSetData.isLongClick = true;
             } else if (item.getItemId() == R.id.action_no_focus) {
-                layoutSetData.isNonFocusable = true;
-            } else if (item.getItemId() == R.id.action_anti_obscure) {
-                layoutSetData.isAntiObscureVolume = true;
+                LayoutSetData.isNonFocusable = true;
             }
             return true;
         } else {
             if (item.getItemId() == R.id.action_hidden_mode) {
-                layoutSetData.isHiddenMode = false;
+                LayoutSetData.isHiddenMode = false;
             } else if (item.getItemId() == R.id.action_static_bubble) {
-                layoutSetData.isStaticBubble = false;
+                LayoutSetData.isStaticBubble = false;
             } else if (item.getItemId() == R.id.action_long_click) {
-                layoutSetData.isLongClick = false;
+                LayoutSetData.isLongClick = false;
             } else if (item.getItemId() == R.id.action_no_focus) {
-                layoutSetData.isNonFocusable = false;
-            } else if (item.getItemId() == R.id.action_anti_obscure) {
-                layoutSetData.isAntiObscureVolume = false;
+                LayoutSetData.isNonFocusable = false;
             }
             return false;
 

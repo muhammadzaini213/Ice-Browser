@@ -2,13 +2,23 @@ package com.ibndev.icebrowser.floatingparts;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.GridView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -17,7 +27,6 @@ import com.ibndev.icebrowser.floatingparts.browser.BrowserWindow;
 import com.ibndev.icebrowser.floatingparts.browser.WindowTabManager;
 import com.ibndev.icebrowser.floatingparts.navbar.WindowNavbar;
 import com.ibndev.icebrowser.floatingparts.utilities.FloatingUtils;
-import com.ibndev.icebrowser.floatingparts.utilities.TouchableWrapper;
 
 public class FloatingWindow extends Service {
     @Nullable
@@ -36,8 +45,11 @@ public class FloatingWindow extends Service {
     public void onCreate() {
         super.onCreate();
 
+
         createWindow();
     }
+
+
 
     @SuppressLint("InflateParams")
     public void createWindow() {
@@ -58,6 +70,7 @@ public class FloatingWindow extends Service {
             navbar.setNavbar(tabManager);
 
             new BrowserWindow(this, tabManager);
+
         }
     }
 

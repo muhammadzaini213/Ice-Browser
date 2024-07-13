@@ -11,7 +11,8 @@ import com.ibndev.icebrowser.floatingparts.utilities.WindowSearchAutoComplete;
 
 public class BrowserWindow {
 
-    public BrowserWindow (FloatingWindow floatingWindow, WindowTabManager tabManager){
+
+    public BrowserWindow(FloatingWindow floatingWindow, WindowTabManager tabManager) {
 
         tabManager.newTab("google.com");
 
@@ -39,11 +40,6 @@ public class BrowserWindow {
         });
 
 
-
-
     }
-
-
-
 
 }

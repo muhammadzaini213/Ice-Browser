@@ -11,8 +11,10 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
 
     <application
@@ -36,7 +38,10 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".floatingparts.FloatingWindow" android:foregroundServiceType="specialUse"/>
 
+        <service
+            android:name=".floatingparts.FloatingWindow"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"/>
     </application>
 </manifest>

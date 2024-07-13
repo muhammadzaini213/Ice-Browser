@@ -29,6 +29,7 @@
     <item
         android:id="@+id/action_anti_obscure"
         android:title="@string/window_popup_layout_set_item_anti_obscure"
+        android:checkable="true"
         app:showAsAction="ifRoom" />
 
     <item
