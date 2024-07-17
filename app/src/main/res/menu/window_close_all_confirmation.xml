@@ -5,6 +5,7 @@
     <item
         android:enabled="false"
         android:title="@string/main_bookmark_delete_confirmation_dialog_title_desc"
+        android:titleCondensed="@string/main_bookmark_delete_confirmation_dialog_title_desc"
         app:showAsAction="ifRoom" />
 
     <item

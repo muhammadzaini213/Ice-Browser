@@ -21,6 +21,7 @@ public class BrowserMenu1 {
     WindowTabManager tabManager;
     WebSettings webSettings;
 
+    boolean desktopActive;
     boolean javascriptActive;
     boolean cssActive;
     boolean cacheActive;
@@ -49,10 +50,12 @@ public class BrowserMenu1 {
 
 
     private void initializeMenuChecked(PopupMenu popupMenu) {
+        MenuItem desktopItem = popupMenu.getMenu().findItem(R.id.action_desktop);
         MenuItem javascriptItem = popupMenu.getMenu().findItem(R.id.action_javascript);
         MenuItem cssItem = popupMenu.getMenu().findItem(R.id.action_css);
         MenuItem cacheItem = popupMenu.getMenu().findItem(R.id.action_cache);
         MenuItem domItem = popupMenu.getMenu().findItem(R.id.action_dom);
+
 
         String javascript =
                 "(function() { " +
@@ -77,18 +80,30 @@ public class BrowserMenu1 {
             cssItem.setChecked(cssActive);
         });
 
+        desktopActive = webSettings.getUserAgentString() == context.getString(R.string.desktopUA);
         javascriptActive = webSettings.getJavaScriptEnabled();
         cacheActive = webSettings.getCacheMode() == WebSettings.LOAD_DEFAULT;
         domActive = webSettings.getDomStorageEnabled();
 
 
+        desktopItem.setChecked(desktopActive);
         javascriptItem.setChecked(javascriptActive);
         cacheItem.setChecked(cacheActive);
         domItem.setChecked(domActive);
     }
 
     private boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_javascript) {
+        if (item.getItemId() == R.id.action_desktop) {
+            if (desktopActive){
+            tabManager.getCurrentWebView().getSettings().setUserAgentString("");
+            tabManager.getCurrentWebView().reload();
+            }
+            else {
+                tabManager.getCurrentWebView().getSettings().setUserAgentString(context.getString(R.string.desktopUA));
+                tabManager.getCurrentWebView().reload();
+            }
+
+        } else if (item.getItemId() == R.id.action_javascript) {
             tabManager.getCurrentWebView().getSettings().setJavaScriptEnabled(!javascriptActive);
         } else if (item.getItemId() == R.id.action_css) {
             if (cssActive) {

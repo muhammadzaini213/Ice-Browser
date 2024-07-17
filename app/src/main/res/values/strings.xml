@@ -28,8 +28,17 @@
     <string name="full_url">Full URL</string>
     <string name="image">Image: </string>
     <string name="image_options">Image Options</string>
-    <string name="permission_req">Permission Required</string>
+    <string name="overlay_permission_required">Overlay Permission Required</string>
+    <string name="overlay_need">This feature need overlay permission to work normally.</string>
+    <string name="dnd_permission_required">Allow do not disturb feature?</string>
+    <string name="dnd_need">This feature allows Floating Window to not easily killed by system (Optional).</string>
+    <string name="dnd_cancelled">Do Not Disturb permission rejected, some feature may not work properly. You can activate this later.</string>
+    <string name="dnd_not_active">Please activate Do not disturb permission in settings.</string>
+
     <string name="download_fail">Can\'t Download URL</string>
+    <string name="empty_clipboard">Clipboard is empty</string>
+
+    <string name="overlay_running">Overlay is running</string>
 
     <string name="bookmarks">Bookmarks</string>
     <string name="rename">Rename</string>
@@ -200,6 +209,7 @@
     <string name="window_popup_layout_set_item_static_bubble">Static bubble</string>
     <string name="window_popup_layout_set_item_long_click">Long click to show</string>
     <string name="window_popup_layout_set_item_no_focus">Non focusable</string>
+    <string name="window_popup_layout_set_item_dnd">Do not Disturb</string>
     <string name="window_popup_layout_set_item_anti_obscure">Anti obscure</string>
 
     <string name="window_popup_layout_set_item_anti_obscure_option">Which mode will you use?</string>
@@ -223,6 +233,7 @@
     <string name="window_popup_browser_menu_other">Other</string>
 
     <!-- floating window browser menu more menu set 1 popup item-->
+    <string name="window_popup_browser_menu_item_desktop">Desktop mode</string>
     <string name="window_popup_browser_menu_item_javascript">Javascript</string>
     <string name="window_popup_browser_menu_item_css">CSS</string>
     <string name="window_popup_browser_menu_item_cache">Cache</string>
@@ -241,5 +252,9 @@
     <string name="window_popup_browser_menu_item_text_big">Big text</string>
 
 
+
+    <!-- floating gallery-->
+    <string name="window_gallery_folder_item_desc">Gallery folder</string>
+    <string name="window_gallery_image_item_desc">Gallery picture</string>
 
 </resources>

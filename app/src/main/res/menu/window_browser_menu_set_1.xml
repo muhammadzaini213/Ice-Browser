@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_desktop"
+        android:checkable="true"
+        android:title="@string/window_popup_browser_menu_item_desktop"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_javascript"
         android:checkable="true"
         android:title="@string/window_popup_browser_menu_item_javascript"

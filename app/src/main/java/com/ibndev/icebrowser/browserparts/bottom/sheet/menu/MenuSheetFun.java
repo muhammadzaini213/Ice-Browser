@@ -1,7 +1,10 @@
 package com.ibndev.icebrowser.browserparts.bottom.sheet.menu;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.http.SslCertificate;
@@ -13,6 +16,7 @@ import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.browserparts.bottom.sheet.bookmark.BookmarkSheet;
 import com.ibndev.icebrowser.browserparts.top.tab.TabManager;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
+import com.ibndev.icebrowser.floatingparts.utilities.OverlayManager;
 import com.ibndev.icebrowser.setup.permission.OverlayPermission;
 import com.ibndev.icebrowser.utilities.ShowAndHideKeyboard;
 import com.ibndev.icebrowser.utilities.WebCertificate;
@@ -65,14 +69,25 @@ public class MenuSheetFun {
         }
     }
 
-    public void overlay(){
+    public void overlay() {
+        OverlayManager.setOverlayVisibility(false);
+        checkAndStopService(activity);
         OverlayPermission permission = new OverlayPermission(activity);
-        if(!permission.isPermissionGranted()){
+        if (!permission.isOverlayPermissionGranted()) {
             permission.requestOverlayDisplayPermission();
             return;
         }
-        Intent intent = new Intent(activity, FloatingWindow.class);
-        activity.startService(intent);
+
+        if (!permission.isDndPermissionGranted()) {
+            permission.requestDndPermission();
+        } else {
+            NotificationManager notificationManager = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
+
+            Intent intent = new Intent(activity, FloatingWindow.class);
+            activity.startService(intent);
+        }
+
     }
 
     public void tabInfo() {
@@ -89,5 +104,26 @@ public class MenuSheetFun {
         alertDialog.show();
     }
 
+    private boolean isServiceRunning(Context context) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (FloatingWindow.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Check and stop services if they are active
+    public void checkAndStopService(Context context) {
+        stopServiceIfRunning(context);
+    }
+
+    // Stop service if it is running
+    private void stopServiceIfRunning(Context context) {
+        if (isServiceRunning(context)) {
+            context.stopService(new Intent(context, FloatingWindow.class));
+        }
+    }
 
 }

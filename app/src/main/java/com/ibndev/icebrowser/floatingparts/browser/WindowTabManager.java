@@ -179,24 +179,15 @@ public class WindowTabManager {
                         "    console.log('Focus detected. Is editable element focused:', isEditableElementFocused);" +
                         "});";
 
-// Inject JavaScript to monitor clicks and focus events
                 getCurrentWebView().evaluateJavascript(jsMonitorEvents, null);
 
-// Add a click listener to the WebView
                 getCurrentWebView().setOnTouchListener((v, event) -> {
-                        // Check the focus state of the editable element
                         String jsCheckFocus = "isEditableElementFocused;";
-                        getCurrentWebView().evaluateJavascript(jsCheckFocus, new ValueCallback<String>() {
-                            @Override
-                            public void onReceiveValue(String value) {
-                                // Perform actions based on focus state
-                                if (Boolean.parseBoolean(value)) {
-                                    // Element is focused, do something
-                                    keyboardView.showKeyboard();
-                                } else {
-                                    // Element is not focused, do something else
-                                    keyboardView.hideKeyboard();
-                                }
+                        getCurrentWebView().evaluateJavascript(jsCheckFocus, value -> {
+                            if (Boolean.parseBoolean(value)) {
+                                keyboardView.showKeyboard();
+                            } else {
+                                keyboardView.hideKeyboard();
                             }
                         });
 
@@ -212,7 +203,7 @@ public class WindowTabManager {
                         "eruda.init();" +
                         "};" +
                         "})();";
-                getCurrentWebView().evaluateJavascript(erudaScript, null);
+//                getCurrentWebView().evaluateJavascript(erudaScript, null);
 
                 String javascript = "javascript:function insertText(text) {\n" +
                         "            var activeElement = document.activeElement;\n" +
@@ -221,6 +212,13 @@ public class WindowTabManager {
                         "                var end = activeElement.selectionEnd;\n" +
                         "                activeElement.value = activeElement.value.substring(0, start) + text + activeElement.value.substring(end);\n" +
                         "                activeElement.setSelectionRange(start + text.length, start + text.length);\n" +
+                        "var chatInputBox = document.querySelector('.chat-input-box');\n" +
+                        "\n" +
+                        "if (chatInputBox) {\n" +
+                        "    chatInputBox.setAttribute('modelvalue', text);\n" +
+                        "} else {\n" +
+                        "    console.error('Element not found');\n" +
+                        "}" +
                         "            } else if (activeElement && activeElement.contentEditable === 'true') {\n" +
                         "                var selection = window.getSelection();\n" +
                         "                var range = selection.getRangeAt(0);\n" +
@@ -240,6 +238,13 @@ public class WindowTabManager {
                         "                } else if (start !== end) {\n" +
                         "                    activeElement.value = activeElement.value.substring(0, start) + activeElement.value.substring(end);\n" +
                         "                    activeElement.setSelectionRange(start, start);\n" +
+                        "var chatInputBox = document.querySelector('.chat-input-box');\n" +
+                        "\n" +
+                        "if (chatInputBox) {\n" +
+                        "    chatInputBox.setAttribute('modelvalue', activeElement.value);\n" +
+                        "} else {\n" +
+                        "    console.error('Element not found');\n" +
+                        "}" +
                         "                }\n" +
                         "            } else if (activeElement && activeElement.contentEditable === 'true') {\n" +
                         "                var selection = window.getSelection();\n" +
@@ -259,6 +264,14 @@ public class WindowTabManager {
                         "            var activeElement = document.activeElement;\n" +
                         "            if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {\n" +
                         "                activeElement.value = '';\n" +
+                        "var chatInputBox = document.querySelector('.chat-input-box');\n" +
+                        "\n" +
+                        "// Change the 'modelvalue' attribute\n" +
+                        "if (chatInputBox) {\n" +
+                        "    chatInputBox.setAttribute('modelvalue', '');\n" +
+                        "} else {\n" +
+                        "    console.error('Element not found');\n" +
+                        "}" +
                         "            } else if (activeElement && activeElement.contentEditable === 'true') {\n" +
                         "                activeElement.innerHTML = '';\n" +
                         "            }\n" +

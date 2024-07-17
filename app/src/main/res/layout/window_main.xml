@@ -16,6 +16,14 @@
             android:layout_marginTop="50dp" />
 
         <include
+            layout="@layout/window_gallery"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="50dp"
+            />
+
+
+        <include
             android:id="@+id/window_main_top_bar_layout"
             layout="@layout/window_main_top_navbar" />
 
@@ -34,14 +42,12 @@
             android:id="@+id/keyboard_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:background="@color/background_dark"
             android:clickable="true"
             android:gravity="center_horizontal"
+            android:orientation="vertical"
             android:visibility="visible"
-            android:background="@color/background_dark"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
-
+            app:layout_constraintBottom_toBottomOf="parent" />
 
         <ImageView
             android:id="@+id/window_resizer"

@@ -50,6 +50,8 @@ public class MenuSheet {
         }
 
 
+        functions.checkAndStopService(activity);
+
     }
 
     public void show() {

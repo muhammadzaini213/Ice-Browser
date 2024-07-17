@@ -1,6 +1,10 @@
 package com.ibndev.icebrowser.floatingparts.browser;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -10,6 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -82,7 +87,7 @@ public class KeyboardView {
     }
 
     public void showKeyboard() {
-        if(!LayoutSetData.isNonFocusable){
+        if (!LayoutSetData.isNonFocusable) {
             keyboardContainer.setVisibility(View.GONE);
         } else {
             keyboardContainer.setVisibility(View.VISIBLE);
@@ -203,7 +208,30 @@ public class KeyboardView {
                         keyboardImage.setImageResource(R.drawable.keyboard_paste);
 
                         keyView.setOnClickListener(v -> {
-                            // Handle key press
+                            ClipboardManager clipboard = (ClipboardManager) floatingWindow.getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                            if (clipboard.hasPrimaryClip()) {
+                                ClipData clip = clipboard.getPrimaryClip();
+
+                                if (clip != null && clip.getItemCount() > 0) {
+                                    ClipData.Item item = clip.getItemAt(0);
+
+                                    CharSequence textToPaste = item.getText();
+
+                                    if (textToPaste != null) {
+                                        // Set the text to the EditText
+                                        if(autoCompleteTextView.isFocused()){
+                                            autoCompleteTextView.setText(textToPaste);
+                                        } else {
+                                            tabManager.getCurrentWebView().evaluateJavascript(
+                                                    "javascript:insertText('" + textToPaste + "');", null);
+                                        }
+                                    } else {
+                                        Toast.makeText(floatingWindow.getApplicationContext(), floatingWindow.getApplicationContext().getString(R.string.empty_clipboard), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            } else {
+                                Toast.makeText(floatingWindow.getApplicationContext(), floatingWindow.getApplicationContext().getString(R.string.empty_clipboard), Toast.LENGTH_SHORT).show();
+                            }
                         });
                         break;
                     case "ENTER":
@@ -213,7 +241,7 @@ public class KeyboardView {
 
                         keyView.setOnClickListener(v -> {
                             if (autoCompleteTextView.isFocused()) {
-                                autoCompleteTextView.onEditorAction(EditorInfo.IME_ACTION_GO);
+                                tabManager.loadUrl(autoCompleteTextView.getText().toString(), tabManager.getCurrentWebView());
                             } else {
                                 tabManager.getCurrentWebView().evaluateJavascript("javascript:sendEnterKey()", null);
                             }
@@ -334,7 +362,30 @@ public class KeyboardView {
                         keyboardImage.setImageResource(R.drawable.keyboard_paste);
 
                         keyView.setOnClickListener(v -> {
-                            // Handle key press
+                            ClipboardManager clipboard = (ClipboardManager) floatingWindow.getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                            if (clipboard.hasPrimaryClip()) {
+                                ClipData clip = clipboard.getPrimaryClip();
+
+                                if (clip != null && clip.getItemCount() > 0) {
+                                    ClipData.Item item = clip.getItemAt(0);
+
+                                    CharSequence textToPaste = item.getText();
+
+                                    if (textToPaste != null) {
+                                        // Set the text to the EditText
+                                        if(autoCompleteTextView.isFocused()){
+                                            autoCompleteTextView.setText(textToPaste);
+                                        } else {
+                                            tabManager.getCurrentWebView().evaluateJavascript(
+                                                    "javascript:insertText('" + textToPaste + "');", null);
+                                        }
+                                    } else {
+                                        Toast.makeText(floatingWindow.getApplicationContext(), floatingWindow.getApplicationContext().getString(R.string.empty_clipboard), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            } else {
+                                Toast.makeText(floatingWindow.getApplicationContext(), floatingWindow.getApplicationContext().getString(R.string.empty_clipboard), Toast.LENGTH_SHORT).show();
+                            }
                         });
                         break;
                     case "ENTER":
@@ -344,7 +395,7 @@ public class KeyboardView {
 
                         keyView.setOnClickListener(v -> {
                             if (autoCompleteTextView.isFocused()) {
-                                autoCompleteTextView.onEditorAction(EditorInfo.IME_ACTION_GO);
+                                tabManager.loadUrl(autoCompleteTextView.getText().toString(), tabManager.getCurrentWebView());
                             } else {
                                 tabManager.getCurrentWebView().evaluateJavascript("javascript:sendEnterKey()", null);
                             }
@@ -464,7 +515,30 @@ public class KeyboardView {
                         keyboardImage.setImageResource(R.drawable.keyboard_paste);
 
                         keyView.setOnClickListener(v -> {
-                            // Handle key press
+                            ClipboardManager clipboard = (ClipboardManager) floatingWindow.getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                            if (clipboard.hasPrimaryClip()) {
+                                ClipData clip = clipboard.getPrimaryClip();
+
+                                if (clip != null && clip.getItemCount() > 0) {
+                                    ClipData.Item item = clip.getItemAt(0);
+
+                                    CharSequence textToPaste = item.getText();
+
+                                    if (textToPaste != null) {
+                                        // Set the text to the EditText
+                                        if(autoCompleteTextView.isFocused()){
+                                            autoCompleteTextView.setText(textToPaste);
+                                        } else {
+                                            tabManager.getCurrentWebView().evaluateJavascript(
+                                                    "javascript:insertText('" + textToPaste + "');", null);
+                                        }
+                                    } else {
+                                        Toast.makeText(floatingWindow.getApplicationContext(), floatingWindow.getApplicationContext().getString(R.string.empty_clipboard), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            } else {
+                                Toast.makeText(floatingWindow.getApplicationContext(), floatingWindow.getApplicationContext().getString(R.string.empty_clipboard), Toast.LENGTH_SHORT).show();
+                            }
                         });
                         break;
                     case "ENTER":
@@ -474,7 +548,7 @@ public class KeyboardView {
 
                         keyView.setOnClickListener(v -> {
                             if (autoCompleteTextView.isFocused()) {
-                                autoCompleteTextView.onEditorAction(EditorInfo.IME_ACTION_GO);
+                                tabManager.loadUrl(autoCompleteTextView.getText().toString(), tabManager.getCurrentWebView());
                             } else {
                                 tabManager.getCurrentWebView().evaluateJavascript("javascript:sendEnterKey()", null);
                             }

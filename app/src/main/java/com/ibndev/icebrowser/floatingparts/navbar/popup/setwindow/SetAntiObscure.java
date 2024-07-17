@@ -36,7 +36,7 @@ public class SetAntiObscure {
             inflater.inflate(R.menu.window_anti_obscure_options, popupMenu.getMenu());
         }
 
-//        initializeMenuChecked(popupMenu);
+        initializeMenuChecked(popupMenu);
         popupMenu.setOnMenuItemClickListener(this::onOptionsItemSelected);
 
         popupMenu.show();
@@ -46,8 +46,8 @@ public class SetAntiObscure {
         MenuItem antiObscureVolume = popupMenu.getMenu().findItem(R.id.action_anti_obscure_volume);
         MenuItem antiObscureShake = popupMenu.getMenu().findItem(R.id.action_anti_obscure_shake);
 
-        antiObscureVolume.setChecked(antiObscureVolumeActive);
-        antiObscureShake.setChecked(antiObscureShakeActive);
+        antiObscureVolume.setChecked(LayoutSetData.isAntiObscureVolume);
+        antiObscureShake.setChecked(LayoutSetData.isAntiObscureShake);
 
     }
 

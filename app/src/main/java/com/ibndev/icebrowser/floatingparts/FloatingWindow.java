@@ -1,24 +1,14 @@
 package com.ibndev.icebrowser.floatingparts;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.media.AudioManager;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.GridView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -27,29 +17,30 @@ import com.ibndev.icebrowser.floatingparts.browser.BrowserWindow;
 import com.ibndev.icebrowser.floatingparts.browser.WindowTabManager;
 import com.ibndev.icebrowser.floatingparts.navbar.WindowNavbar;
 import com.ibndev.icebrowser.floatingparts.utilities.FloatingUtils;
+import com.ibndev.icebrowser.floatingparts.utilities.NotificationHelper;
+import com.ibndev.icebrowser.floatingparts.utilities.OverlayManager;
 
 public class FloatingWindow extends Service {
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
 
-
     public ViewGroup floatView;
     public WindowManager windowManager;
     public DisplayMetrics metrics;
-    public boolean isFloatingActive;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
+        NotificationHelper notificationHelper = new NotificationHelper(this, this);
+        notificationHelper.startForegroundService();
 
         createWindow();
     }
-
-
 
     @SuppressLint("InflateParams")
     public void createWindow() {
@@ -71,12 +62,14 @@ public class FloatingWindow extends Service {
 
             new BrowserWindow(this, tabManager);
 
+
         }
+
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        stopSelf();
     }
 }

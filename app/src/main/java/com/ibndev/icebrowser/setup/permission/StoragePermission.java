@@ -21,7 +21,7 @@ public class StoragePermission {
         }
         if (explanation != null && activity.shouldShowRequestPermissionRationale(permission)) {
             new AlertDialog.Builder(activity)
-                    .setTitle(activity.getString(R.string.permission_req))
+                    .setTitle(activity.getString(R.string.overlay_permission_required))
                     .setMessage(explanation)
                     .setPositiveButton(activity.getString(R.string.ok), (dialog, which) -> activity.requestPermissions(new String[]{permission}, requestCode))
                     .show();
