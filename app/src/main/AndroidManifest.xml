@@ -8,6 +8,7 @@
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -47,5 +48,7 @@
             android:name=".floatingparts.FloatingWindow"
             android:exported="false"
             android:foregroundServiceType="specialUse"/>
+
+        <receiver android:name=".floatingparts.utilities.IntentReceiver" />
     </application>
 </manifest>

@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
 import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -38,7 +39,7 @@ public class KeyboardView {
 
     private final String[][] shiftKeys = {
             {".", ",", "/", "?", "@", "(", ")", "x", "+", "-"},
-            {"Q", "W", "W", "R", "T", "Y", "U", "I", "O", "P"},
+            {"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"},
             {"A", "S", "D", "F", "G", "H", "J", "K", "L"},
             {"SHIFT", "Z", "X", "C", "V", "B", "N", "M", "DELETE"},
             {"HIDE", "CLEAR", "SYMBOL", "SPACE", "PASTE", "ENTER"}
@@ -89,6 +90,7 @@ public class KeyboardView {
     public void showKeyboard() {
         if (!LayoutSetData.isNonFocusable) {
             keyboardContainer.setVisibility(View.GONE);
+            return;
         } else {
             keyboardContainer.setVisibility(View.VISIBLE);
         }
@@ -152,8 +154,13 @@ public class KeyboardView {
                                     autoCompleteTextView.getText().delete(cursorPosition - 1, cursorPosition);
                                 }
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript(
-                                        "javascript:deleteOneCharacter();", null);
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                if (inputConnection != null) {
+                                    inputConnection.deleteSurroundingText(1, 0);
+                                }
                             }
                         });
                         break;
@@ -174,8 +181,13 @@ public class KeyboardView {
                                 cursorPosition = autoCompleteTextView.getSelectionStart();
                                 autoCompleteTextView.setText("");
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript(
-                                        "javascript:deleteAllCharacters();", null);
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                if (inputConnection != null) {
+                                    clearText();
+                                }
                             }
                         });
 
@@ -197,8 +209,13 @@ public class KeyboardView {
                                 cursorPosition = autoCompleteTextView.getSelectionStart();
                                 autoCompleteTextView.getText().insert(cursorPosition, " ");
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript(
-                                        "javascript:insertText('" + " " + "');", null);
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                if (inputConnection != null) {
+                                    inputConnection.commitText(" ", 1);
+                                }
                             }
                         });
                         break;
@@ -219,11 +236,13 @@ public class KeyboardView {
 
                                     if (textToPaste != null) {
                                         // Set the text to the EditText
-                                        if(autoCompleteTextView.isFocused()){
+                                        if (autoCompleteTextView.isFocused()) {
                                             autoCompleteTextView.setText(textToPaste);
                                         } else {
-                                            tabManager.getCurrentWebView().evaluateJavascript(
-                                                    "javascript:insertText('" + textToPaste + "');", null);
+                                            if (inputConnection == null) {
+                                                inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                            }
+                                            pasteFromClipboard(inputConnection);
                                         }
                                     } else {
                                         Toast.makeText(floatingWindow.getApplicationContext(), floatingWindow.getApplicationContext().getString(R.string.empty_clipboard), Toast.LENGTH_SHORT).show();
@@ -243,7 +262,12 @@ public class KeyboardView {
                             if (autoCompleteTextView.isFocused()) {
                                 tabManager.loadUrl(autoCompleteTextView.getText().toString(), tabManager.getCurrentWebView());
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript("javascript:sendEnterKey()", null);
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                inputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER));
+                                inputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER));
                             }
                         });
                         break;
@@ -252,13 +276,23 @@ public class KeyboardView {
                         TextView keyText = keyView.findViewById(R.id.key_text);
                         keyText.setText(key);
 
+
                         keyView.setOnClickListener(v -> {
                             if (autoCompleteTextView.isFocused()) {
                                 cursorPosition = autoCompleteTextView.getSelectionStart();
                                 autoCompleteTextView.getText().insert(cursorPosition, key);
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript(
-                                        "javascript:insertText('" + key + "');", null);
+//                                tabManager.getCurrentWebView().evaluateJavascript(
+//                                        "javascript:insertText('" + key + "');", null);
+
+
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                if (inputConnection != null) {
+                                    inputConnection.commitText(key, 1);
+                                }
                             }
 
                         });
@@ -271,6 +305,8 @@ public class KeyboardView {
         }
 
     }
+
+    InputConnection inputConnection;
 
     private void keyboardShift() {
         keyboardContainer.removeAllViews();
@@ -307,8 +343,13 @@ public class KeyboardView {
                                     autoCompleteTextView.getText().delete(cursorPosition - 1, cursorPosition);
                                 }
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript(
-                                        "javascript:deleteOneCharacter();", null);
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                if (inputConnection != null) {
+                                    inputConnection.deleteSurroundingText(1, 0);
+                                }
                             }
                         });
                         break;
@@ -329,8 +370,13 @@ public class KeyboardView {
                                 cursorPosition = autoCompleteTextView.getSelectionStart();
                                 autoCompleteTextView.setText("");
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript(
-                                        "javascript:deleteAllCharacters();", null);
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                if (inputConnection != null) {
+                                    clearText();
+                                }
                             }
                         });
                         break;
@@ -351,8 +397,13 @@ public class KeyboardView {
                                 cursorPosition = autoCompleteTextView.getSelectionStart();
                                 autoCompleteTextView.getText().insert(cursorPosition, " ");
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript(
-                                        "javascript:insertText('" + " " + "');", null);
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                if (inputConnection != null) {
+                                    inputConnection.commitText(" ", 1);
+                                }
                             }
                         });
                         break;
@@ -373,11 +424,13 @@ public class KeyboardView {
 
                                     if (textToPaste != null) {
                                         // Set the text to the EditText
-                                        if(autoCompleteTextView.isFocused()){
+                                        if (autoCompleteTextView.isFocused()) {
                                             autoCompleteTextView.setText(textToPaste);
                                         } else {
-                                            tabManager.getCurrentWebView().evaluateJavascript(
-                                                    "javascript:insertText('" + textToPaste + "');", null);
+                                            if (inputConnection == null) {
+                                                inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                            }
+                                            pasteFromClipboard(inputConnection);
                                         }
                                     } else {
                                         Toast.makeText(floatingWindow.getApplicationContext(), floatingWindow.getApplicationContext().getString(R.string.empty_clipboard), Toast.LENGTH_SHORT).show();
@@ -397,7 +450,12 @@ public class KeyboardView {
                             if (autoCompleteTextView.isFocused()) {
                                 tabManager.loadUrl(autoCompleteTextView.getText().toString(), tabManager.getCurrentWebView());
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript("javascript:sendEnterKey()", null);
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                inputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER));
+                                inputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER));
                             }
                         });
                         break;
@@ -411,8 +469,13 @@ public class KeyboardView {
                                 cursorPosition = autoCompleteTextView.getSelectionStart();
                                 autoCompleteTextView.getText().insert(cursorPosition, key);
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript(
-                                        "javascript:insertText('" + key + "');", null);
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                if (inputConnection != null) {
+                                    inputConnection.commitText(key, 1);
+                                }
                             }
 
                         });
@@ -460,8 +523,13 @@ public class KeyboardView {
                                     autoCompleteTextView.getText().delete(cursorPosition - 1, cursorPosition);
                                 }
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript(
-                                        "javascript:deleteOneCharacter();", null);
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                if (inputConnection != null) {
+                                    inputConnection.deleteSurroundingText(1, 0);
+                                }
                             }
                         });
                         break;
@@ -482,8 +550,13 @@ public class KeyboardView {
                                 cursorPosition = autoCompleteTextView.getSelectionStart();
                                 autoCompleteTextView.setText("");
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript(
-                                        "javascript:deleteAllCharacters();", null);
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                if (inputConnection != null) {
+                                    clearText();
+                                }
                             }
                         });
                         break;
@@ -504,8 +577,13 @@ public class KeyboardView {
                                 cursorPosition = autoCompleteTextView.getSelectionStart();
                                 autoCompleteTextView.getText().insert(cursorPosition, " ");
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript(
-                                        "javascript:insertText('" + " " + "');", null);
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                if (inputConnection != null) {
+                                    inputConnection.commitText(" ", 1);
+                                }
                             }
                         });
                         break;
@@ -526,11 +604,16 @@ public class KeyboardView {
 
                                     if (textToPaste != null) {
                                         // Set the text to the EditText
-                                        if(autoCompleteTextView.isFocused()){
+                                        if (autoCompleteTextView.isFocused()) {
                                             autoCompleteTextView.setText(textToPaste);
                                         } else {
-                                            tabManager.getCurrentWebView().evaluateJavascript(
-                                                    "javascript:insertText('" + textToPaste + "');", null);
+                                            if (inputConnection == null) {
+                                                inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                            }
+
+                                            if (inputConnection != null) {
+                                                pasteFromClipboard(inputConnection);
+                                            }
                                         }
                                     } else {
                                         Toast.makeText(floatingWindow.getApplicationContext(), floatingWindow.getApplicationContext().getString(R.string.empty_clipboard), Toast.LENGTH_SHORT).show();
@@ -550,7 +633,12 @@ public class KeyboardView {
                             if (autoCompleteTextView.isFocused()) {
                                 tabManager.loadUrl(autoCompleteTextView.getText().toString(), tabManager.getCurrentWebView());
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript("javascript:sendEnterKey()", null);
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                inputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER));
+                                inputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER));
                             }
                         });
                         break;
@@ -564,8 +652,13 @@ public class KeyboardView {
                                 cursorPosition = autoCompleteTextView.getSelectionStart();
                                 autoCompleteTextView.getText().insert(cursorPosition, key);
                             } else {
-                                tabManager.getCurrentWebView().evaluateJavascript(
-                                        "javascript:insertText('" + key + "');", null);
+                                if (inputConnection == null) {
+                                    inputConnection = tabManager.getCurrentWebView().onCreateInputConnection(new EditorInfo());
+                                }
+
+                                if (inputConnection != null) {
+                                    inputConnection.commitText(key, 1);
+                                }
                             }
                         });
                 }
@@ -574,6 +667,29 @@ public class KeyboardView {
                 row.addView(keyView);
             }
             keyboardContainer.addView(row);
+        }
+    }
+
+    private void clearText() {
+        // Calculate the length of the current text in the WebView
+        tabManager.getCurrentWebView().post(() -> {
+            // Execute JavaScript to clear the input field
+            tabManager.getCurrentWebView().evaluateJavascript("document.activeElement.value = '';", null);
+        });
+    }
+
+    private void pasteFromClipboard(InputConnection inputConnection) {
+        // Get text from clipboard
+        ClipboardManager clipboard = (ClipboardManager) floatingWindow.getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clipData = clipboard.getPrimaryClip();
+
+        if (clipData != null && clipData.getItemCount() > 0) {
+            CharSequence pasteText = clipData.getItemAt(0).getText();
+
+            // Commit text to input connection
+            if (pasteText != null) {
+                inputConnection.commitText(pasteText, 1);
+            }
         }
     }
 }

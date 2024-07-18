@@ -3,7 +3,6 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:id="@+id/key_image"
-    android:text="s"
     android:padding="5dp"
     android:layout_margin="2dp"
     android:gravity="center"

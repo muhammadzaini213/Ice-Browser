@@ -33,8 +33,6 @@ public class CloseAllConfirmation {
             MenuInflater inflater = popupMenu.getMenuInflater();
             inflater.inflate(R.menu.window_close_all_confirmation, popupMenu.getMenu());
         }
-
-
         popupMenu.setOnMenuItemClickListener(this::onOptionsItemSelected);
         popupMenu.show();
     }

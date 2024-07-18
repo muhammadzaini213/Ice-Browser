@@ -75,6 +75,12 @@ public class MenuSheetFun {
         OverlayPermission permission = new OverlayPermission(activity);
         if (!permission.isOverlayPermissionGranted()) {
             permission.requestOverlayDisplayPermission();
+
+            return;
+        }
+
+        if(!permission.isStoragePermissionGranted()){
+            permission.requestStoragePermission();
             return;
         }
 

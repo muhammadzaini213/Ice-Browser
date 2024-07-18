@@ -30,6 +30,8 @@
     <string name="image_options">Image Options</string>
     <string name="overlay_permission_required">Overlay Permission Required</string>
     <string name="overlay_need">This feature need overlay permission to work normally.</string>
+    <string name="storage_permission_required">Storage Permission Required</string>
+    <string name="storage_need">You need to allow this to make sure floating browser and gallery can work as intended.</string>
     <string name="dnd_permission_required">Allow do not disturb feature?</string>
     <string name="dnd_need">This feature allows Floating Window to not easily killed by system (Optional).</string>
     <string name="dnd_cancelled">Do Not Disturb permission rejected, some feature may not work properly. You can activate this later.</string>
@@ -202,6 +204,7 @@
     <string name="window_popup_layout_set_item_hide">Hide</string>
     <string name="window_popup_layout_set_item_topper">Topper</string>
     <string name="window_popup_layout_set_item_new_window">New Window</string>
+    <string name="window_popup_layout_set_item_gallery">Gallery</string>
     <string name="window_popup_layout_set_item_more">More</string>
 
     <!-- floating window layout settings more popup menu item-->

@@ -43,20 +43,22 @@ public class NotificationHelper {
     }
 
     private Notification buildNotification() {
-        Intent notificationIntent = new Intent(context, MainBrowserActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(
+        Intent notificationIntent = new Intent(context, IntentReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
                 0,
                 notificationIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE // Update flag usage
         );
 
+
         return new NotificationCompat.Builder(context, context.getString(R.string.app_name))
                 .setContentTitle(context.getString(R.string.app_name))
                 .setContentText(context.getString(R.string.overlay_running))
                 .setSmallIcon(R.drawable.bottomsheet_menu_overlay_icon)
                 .setContentIntent(pendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_HIGH) // Ensure high priority
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .addAction(R.drawable.tabs_close_icon, context.getString(R.string.window_popup_layout_set_item_close_all_window), pendingIntent)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .build();
     }
