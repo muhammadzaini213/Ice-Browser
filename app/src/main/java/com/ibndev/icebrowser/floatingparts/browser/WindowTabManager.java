@@ -9,13 +9,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Patterns;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.HttpAuthHandler;
-import android.webkit.JavascriptInterface;
 import android.webkit.URLUtil;
-import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -26,7 +23,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
@@ -182,14 +178,14 @@ public class WindowTabManager {
                 getCurrentWebView().evaluateJavascript(jsMonitorEvents, null);
 
                 getCurrentWebView().setOnTouchListener((v, event) -> {
-                        String jsCheckFocus = "isEditableElementFocused;";
-                        getCurrentWebView().evaluateJavascript(jsCheckFocus, value -> {
-                            if (Boolean.parseBoolean(value)) {
-                                keyboardView.showKeyboard();
-                            } else {
-                                keyboardView.hideKeyboard();
-                            }
-                        });
+                    String jsCheckFocus = "isEditableElementFocused;";
+                    getCurrentWebView().evaluateJavascript(jsCheckFocus, value -> {
+                        if (Boolean.parseBoolean(value)) {
+                            keyboardView.showKeyboard();
+                        } else {
+                            keyboardView.hideKeyboard();
+                        }
+                    });
 
                     return false;
                 });

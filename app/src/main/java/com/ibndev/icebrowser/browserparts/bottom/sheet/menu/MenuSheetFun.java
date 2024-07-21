@@ -79,7 +79,7 @@ public class MenuSheetFun {
             return;
         }
 
-        if(!permission.isStoragePermissionGranted()){
+        if (!permission.isStoragePermissionGranted()) {
             permission.requestStoragePermission();
             return;
         }

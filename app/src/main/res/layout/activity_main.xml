@@ -1,7 +1,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:ads="http://schemas.android.com/tools">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -45,6 +46,9 @@
             android:id="@+id/main_bottom_bar"
             layout="@layout/activity_main_bottom_bar" />
 
+
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <include
@@ -59,6 +63,9 @@
         android:visibility="gone">
 
     </FrameLayout>
+
+
+
 
 
 </FrameLayout>

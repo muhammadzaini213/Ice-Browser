@@ -18,6 +18,7 @@ public class SetWindow {
     FloatingUtils utils;
     FloatingWindow floatingWindow;
     SetWindowMore more;
+    GalleryWindow galleryWindow;
 
     public SetWindow(FloatingWindow floatingWindow, FloatingUtils utils) {
         this.floatingWindow = floatingWindow;
@@ -38,9 +39,6 @@ public class SetWindow {
         popupMenu.setOnMenuItemClickListener(this::onOptionsItemSelected);
         popupMenu.show();
     }
-
-
-    GalleryWindow galleryWindow;
 
     private boolean onOptionsItemSelected(MenuItem item) {
         item.setChecked(!item.isChecked());

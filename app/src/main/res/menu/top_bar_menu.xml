@@ -13,4 +13,11 @@
         android:title="@string/save_bookmark"
         app:showAsAction="ifRoom" />
 
+
+    <item
+        android:id="@+id/action_license_id"
+        android:icon="@drawable/menu_license_id"
+        android:title="@string/license_id_menu"
+        app:showAsAction="ifRoom" />
+
 </menu>

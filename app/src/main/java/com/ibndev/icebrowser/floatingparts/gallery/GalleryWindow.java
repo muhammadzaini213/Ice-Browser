@@ -22,12 +22,12 @@ public class GalleryWindow implements FolderAdapter.OnFolderClickListener, Image
 
     FloatingWindow floatingWindow;
 
-    private RecyclerView mRecyclerView;
+    private final RecyclerView mRecyclerView;
     private FolderAdapter folderAdapter;
     private List<File> mFolders;
     private List<File> mImageFiles;
 
-    public GalleryWindow(FloatingWindow floatingWindow){
+    public GalleryWindow(FloatingWindow floatingWindow) {
         this.floatingWindow = floatingWindow;
         mRecyclerView = floatingWindow.floatView.findViewById(R.id.window_gallery_recyclerview);
         mRecyclerView.setLayoutManager(new GridLayoutManager(floatingWindow.getApplicationContext(), 2));
@@ -40,7 +40,7 @@ public class GalleryWindow implements FolderAdapter.OnFolderClickListener, Image
         backBtn.setOnClickListener(view -> {
             CustomImageView zoomImageView = floatingWindow.floatView.findViewById(R.id.fullscreenImageView);
 
-            if(zoomImageView.getVisibility() == View.VISIBLE){
+            if (zoomImageView.getVisibility() == View.VISIBLE) {
                 zoomImageView = floatingWindow.floatView.findViewById(R.id.fullscreenImageView);
                 zoomImageView.setVisibility(View.GONE);
             } else {
@@ -53,7 +53,7 @@ public class GalleryWindow implements FolderAdapter.OnFolderClickListener, Image
     private void loadFolders() {
         // Load image folders
 
-        if(mFolders == null) {
+        if (mFolders == null) {
             Set<File> folderSet = new HashSet<>();
             File[] directories = new File(Environment.getExternalStorageDirectory().getAbsolutePath()).listFiles();
             if (directories != null) {
@@ -106,7 +106,7 @@ public class GalleryWindow implements FolderAdapter.OnFolderClickListener, Image
         mRecyclerView.setAdapter(imageAdapter);
     }
 
-    private void hideGallery(){
+    private void hideGallery() {
 
     }
 

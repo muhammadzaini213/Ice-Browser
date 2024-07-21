@@ -1,11 +1,7 @@
 package com.ibndev.icebrowser.floatingparts.navbar.popup.setwindow;
 
-import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.provider.Settings;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -18,8 +14,6 @@ import com.ibndev.icebrowser.floatingparts.navbar.popup.browsermenu.CloseAllConf
 import com.ibndev.icebrowser.floatingparts.utilities.FloatingUtils;
 import com.ibndev.icebrowser.floatingparts.utilities.LayoutSetData;
 
-import java.util.Set;
-
 public class SetWindowMore {
 
     Context context;
@@ -27,6 +21,7 @@ public class SetWindowMore {
     FloatingUtils utils;
     FloatingWindow floatingWindow;
     SetAntiObscure setAntiObscure;
+    PopupMenu popupMenu;
 
     public SetWindowMore(FloatingWindow floatingWindow, FloatingUtils utils) {
         this.floatingWindow = floatingWindow;
@@ -35,8 +30,6 @@ public class SetWindowMore {
         this.utils = utils;
         setAntiObscure = new SetAntiObscure(floatingWindow, utils);
     }
-
-    PopupMenu popupMenu;
 
     public void showPopupMenu() {
         if (popupMenu == null) {

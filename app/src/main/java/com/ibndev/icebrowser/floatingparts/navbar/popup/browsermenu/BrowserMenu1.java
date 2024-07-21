@@ -94,11 +94,10 @@ public class BrowserMenu1 {
 
     private boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_desktop) {
-            if (desktopActive){
-            tabManager.getCurrentWebView().getSettings().setUserAgentString("");
-            tabManager.getCurrentWebView().reload();
-            }
-            else {
+            if (desktopActive) {
+                tabManager.getCurrentWebView().getSettings().setUserAgentString("");
+                tabManager.getCurrentWebView().reload();
+            } else {
                 tabManager.getCurrentWebView().getSettings().setUserAgentString(context.getString(R.string.desktopUA));
                 tabManager.getCurrentWebView().reload();
             }

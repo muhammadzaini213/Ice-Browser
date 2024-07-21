@@ -45,6 +45,10 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
         return mFolders.size();
     }
 
+    public interface OnFolderClickListener {
+        void onFolderClick(File folder);
+    }
+
     public static class FolderViewHolder extends RecyclerView.ViewHolder {
         public TextView folderName;
 
@@ -52,9 +56,5 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderView
             super(itemView);
             folderName = itemView.findViewById(R.id.folderName);
         }
-    }
-
-    public interface OnFolderClickListener {
-        void onFolderClick(File folder);
     }
 }

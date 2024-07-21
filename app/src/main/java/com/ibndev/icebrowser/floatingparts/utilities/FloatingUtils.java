@@ -27,6 +27,7 @@ import androidx.lifecycle.Observer;
 
 import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
+import com.ibndev.icebrowser.utilities.Statics;
 
 public class FloatingUtils implements SensorEventListener {
 
@@ -48,10 +49,12 @@ public class FloatingUtils implements SensorEventListener {
     int volumePrev = 0;
 
     Observer<Boolean> observer;
-
+    boolean isBypassMode;
     private Sensor accelerometer;
     private long lastUpdate;
     private float last_x, last_y, last_z;
+
+    AdSetup adSetup;
 
     public FloatingUtils(FloatingWindow floatingWindow, int LAYOUT_TYPE) {
         context = floatingWindow.getApplicationContext();
@@ -59,6 +62,8 @@ public class FloatingUtils implements SensorEventListener {
         windowManager = floatingWindow.windowManager;
         metrics = floatingWindow.metrics;
         this.LAYOUT_TYPE = LAYOUT_TYPE;
+
+        adSetup = new AdSetup(floatingWindow);
 
         layout = new FloatingLayout();
 
@@ -419,7 +424,6 @@ public class FloatingUtils implements SensorEventListener {
 
     }
 
-
     @SuppressLint("ClickableViewAccessibility")
     public void hideFloating() {
         isFloatingShown = false;
@@ -647,10 +651,14 @@ public class FloatingUtils implements SensorEventListener {
                 return false;
             }
         });
+
+
+        if(!Statics.isPremium && adSetup.adCount <= 5){
+            adSetup.loadNativeAd();
+            adSetup.adCount++;
+        }
+
     }
-
-
-    boolean isBypassMode;
 
     protected void updateLayout() {
         Handler handler = new Handler();
@@ -696,7 +704,7 @@ public class FloatingUtils implements SensorEventListener {
                     if (!isFloatingActive && LayoutSetData.isAntiObscureVolume) {
                         OverlayManager.getOverlayVisibility().observeForever(observer);
                         antiObscureFloating();
-                        if(!isFloatingShown){
+                        if (!isFloatingShown) {
                             hideFloating();
                         }
                         isFloatingActive = true;

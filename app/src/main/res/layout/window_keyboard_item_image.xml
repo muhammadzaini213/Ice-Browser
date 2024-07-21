@@ -9,6 +9,7 @@
     android:foreground="@drawable/ripple_rounded"
     android:layout_weight="1"
     style="@style/keyboard_style"
+    android:contentDescription="@string/keyboard_item"
     android:background="@drawable/tabs_more_button_round"
     android:backgroundTint="@color/background_active"
     android:textStyle="bold" />

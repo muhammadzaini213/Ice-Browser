@@ -1,23 +1,25 @@
 package com.ibndev.icebrowser.floatingparts.gallery;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Matrix;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+
 import androidx.appcompat.widget.AppCompatImageView;
 
 public class CustomImageView extends AppCompatImageView {
 
-    private Matrix matrix = new Matrix();
-    private float[] matrixValues = new float[9];
+    private final Matrix matrix = new Matrix();
+    private final float[] matrixValues = new float[9];
     private float scale = 1f;
-    private float minScale = 1f;
-    private float maxScale = 5f;
+    private final float minScale = 1f;
+    private final float maxScale = 5f;
     private float lastX, lastY;
-    private ScaleGestureDetector scaleGestureDetector;
-    private GestureDetector gestureDetector;
+    private final ScaleGestureDetector scaleGestureDetector;
+    private final GestureDetector gestureDetector;
 
     public CustomImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -26,6 +28,7 @@ public class CustomImageView extends AppCompatImageView {
         setScaleType(ScaleType.MATRIX);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         scaleGestureDetector.onTouchEvent(event);

@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 
 public class OverlayManager {
 
-    private static MutableLiveData<Boolean> overlayVisible = new MutableLiveData<>(true);
+    private static final MutableLiveData<Boolean> overlayVisible = new MutableLiveData<>(true);
 
     public static LiveData<Boolean> getOverlayVisibility() {
         return overlayVisible;

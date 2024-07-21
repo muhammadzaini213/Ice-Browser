@@ -1,9 +1,9 @@
 package com.ibndev.icebrowser.floatingparts.utilities;
 
 import android.accessibilityservice.AccessibilityService;
-import android.view.accessibility.AccessibilityEvent;
-import android.view.KeyEvent;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.accessibility.AccessibilityEvent;
 
 public class VolumeButtonReceiver extends AccessibilityService {
     private static final String TAG = "VolumeButtonService";

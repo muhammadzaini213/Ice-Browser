@@ -49,7 +49,7 @@ public class TabsAdapter extends RecyclerView.Adapter<TabsAdapter.TabViewHolder>
         holder.closeTab.setOnClickListener(onCloseClickListener);
         holder.favicon.setImageBitmap(tabManager.tabs.get(position).webview.getFavicon());
 
-        if(position == tabManager.currentTabIndex){
+        if (position == tabManager.currentTabIndex) {
             holder.layout.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.background_active)));
         } else {
             holder.layout.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.background_normal)));

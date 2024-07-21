@@ -17,9 +17,9 @@ import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
 
-    private Context mContext;
-    private List<File> mImageFiles;
-    private OnImageClickListener mListener;
+    private final Context mContext;
+    private final List<File> mImageFiles;
+    private final OnImageClickListener mListener;
 
     public ImageAdapter(Context context, List<File> imageFiles, OnImageClickListener listener) {
         mContext = context;
@@ -47,6 +47,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         return mImageFiles.size();
     }
 
+    public interface OnImageClickListener {
+        void onImageClick(File folder);
+    }
+
     public static class ImageViewHolder extends RecyclerView.ViewHolder {
         public ImageView imageView;
 
@@ -54,10 +58,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
             super(itemView);
             imageView = itemView.findViewById(R.id.gallery_image);
         }
-    }
-
-    public interface OnImageClickListener {
-        void onImageClick(File folder);
     }
 }
 

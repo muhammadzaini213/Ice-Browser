@@ -25,10 +25,6 @@ import com.ibndev.icebrowser.floatingparts.utilities.LayoutSetData;
 
 public class KeyboardView {
 
-    FloatingWindow floatingWindow;
-    LinearLayout keyboardContainer;
-    WindowTabManager tabManager;
-
     private final String[][] nonShiftKeys = {
             {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"},
             {"q", "w", "e", "r", "t", "y", "u", "i", "o", "p"},
@@ -36,7 +32,6 @@ public class KeyboardView {
             {"SHIFT", "z", "x", "c", "v", "b", "n", "m", "DELETE"},
             {"HIDE", "CLEAR", "SYMBOL", "SPACE", "PASTE", "ENTER"}
     };
-
     private final String[][] shiftKeys = {
             {".", ",", "/", "?", "@", "(", ")", "x", "+", "-"},
             {"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"},
@@ -44,7 +39,6 @@ public class KeyboardView {
             {"SHIFT", "Z", "X", "C", "V", "B", "N", "M", "DELETE"},
             {"HIDE", "CLEAR", "SYMBOL", "SPACE", "PASTE", "ENTER"}
     };
-
     private final String[][] symbolKeys = {
             {"~", "`", "|", "•", "√", "π", "÷", "∆", "£", "¢"},
             {"€", "¥", "^", "°", "=", "{", "}", "\\", "%", "©"},
@@ -52,11 +46,14 @@ public class KeyboardView {
             {"#", "&", "*", "\"", "'", ":", ";", "!", "DELETE"},
             {"HIDE", "CLEAR", "SYMBOL", "SPACE", "PASTE", "ENTER"}
     };
-
+    FloatingWindow floatingWindow;
+    LinearLayout keyboardContainer;
+    WindowTabManager tabManager;
     AutoCompleteTextView autoCompleteTextView;
 
     int cursorPosition;
     int totalColumns;
+    InputConnection inputConnection;
 
     public KeyboardView(FloatingWindow floatingWindow, WindowTabManager tabManager) {
         this.floatingWindow = floatingWindow;
@@ -305,8 +302,6 @@ public class KeyboardView {
         }
 
     }
-
-    InputConnection inputConnection;
 
     private void keyboardShift() {
         keyboardContainer.removeAllViews();

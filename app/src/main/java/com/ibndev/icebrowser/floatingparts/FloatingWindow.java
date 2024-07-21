@@ -1,7 +1,6 @@
 package com.ibndev.icebrowser.floatingparts;
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -18,19 +17,18 @@ import com.ibndev.icebrowser.floatingparts.browser.WindowTabManager;
 import com.ibndev.icebrowser.floatingparts.navbar.WindowNavbar;
 import com.ibndev.icebrowser.floatingparts.utilities.FloatingUtils;
 import com.ibndev.icebrowser.floatingparts.utilities.NotificationHelper;
-import com.ibndev.icebrowser.floatingparts.utilities.OverlayManager;
 
 public class FloatingWindow extends Service {
+
+    public ViewGroup floatView;
+    public WindowManager windowManager;
+    public DisplayMetrics metrics;
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
-
-    public ViewGroup floatView;
-    public WindowManager windowManager;
-    public DisplayMetrics metrics;
 
     @Override
     public void onCreate() {

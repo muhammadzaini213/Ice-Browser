@@ -1,38 +1,46 @@
 package com.ibndev.icebrowser.floatingparts.browser;
 
-import android.os.Environment;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.RatingBar;
+import android.widget.TextView;
 
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.annotation.NonNull;
 
-import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdLoader;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.VideoController;
+import com.google.android.gms.ads.VideoOptions;
+import com.google.android.gms.ads.nativead.MediaView;
+import com.google.android.gms.ads.nativead.NativeAd;
+import com.google.android.gms.ads.nativead.NativeAdOptions;
+import com.google.android.gms.ads.nativead.NativeAdView;
 import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
-import com.ibndev.icebrowser.floatingparts.gallery.CustomImageView;
-import com.ibndev.icebrowser.floatingparts.gallery.FolderAdapter;
-import com.ibndev.icebrowser.floatingparts.gallery.GalleryWindow;
-import com.ibndev.icebrowser.floatingparts.gallery.ImageAdapter;
 import com.ibndev.icebrowser.floatingparts.utilities.WindowSearchAutoComplete;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
-public class BrowserWindow{
+public class BrowserWindow {
 
     FloatingWindow floatingWindow;
 
     public BrowserWindow(FloatingWindow floatingWindow, WindowTabManager tabManager) {
         this.floatingWindow = floatingWindow;
+
+        new Thread(
+                () -> {
+                    MobileAds.initialize(floatingWindow.getApplicationContext(), initializationStatus -> {});
+                })
+                .start();
+
+
         tabManager.newTab("google.com");
 
         tabManager.getCurrentWebView().setVisibility(View.VISIBLE);
@@ -59,6 +67,7 @@ public class BrowserWindow{
         });
 
     }
+
 
 
 }

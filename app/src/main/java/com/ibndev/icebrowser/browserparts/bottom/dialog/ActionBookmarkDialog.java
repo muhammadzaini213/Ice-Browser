@@ -34,7 +34,7 @@ public class ActionBookmarkDialog extends Dialog {
         setContentView(R.layout.activity_main_bookmark_menu_dialog);
 
         findViewById(R.id.main_bookmark_menu_dialog_rename).setOnClickListener(view -> {
-            if(renameDialog == null){
+            if (renameDialog == null) {
                 renameDialog = new RenameBookmarkDialog(activity, title, id, dialog);
             }
             renameDialog.show();
@@ -43,7 +43,7 @@ public class ActionBookmarkDialog extends Dialog {
 
 
         findViewById(R.id.main_bookmark_menu_dialog_change_url).setOnClickListener(view -> {
-            if(changeUrlDialog == null){
+            if (changeUrlDialog == null) {
                 changeUrlDialog = new ChangeBookmarkUrlDialog(activity, url, id, dialog);
             }
             changeUrlDialog.show();

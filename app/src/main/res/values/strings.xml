@@ -5,6 +5,12 @@
     <string name="amp" translatable="false"><![CDATA[&]]></string>
     <string name="quot" translatable="false">\"</string>
     <string name="window_close_onclick">Long press to close.</string>
+
+    <string name="ad_attribution" translatable="false">Ad</string>
+    <string name="refresh_ad" translatable="false">Refresh Ad</string>
+    <string name="start_muted" translatable="false">Start video ads muted</string>
+    <string name="video_status" translatable="false">Video status: </string>
+
     <!-- tab manager text-->
     <string name="file_chooser_open_fail">Can\'t open file chooser</string>
     <string name="open_file_try_download">Can\'t open files of this type. Try downloading instead.</string>
@@ -118,6 +124,13 @@
     <string name="open_with_fail">No app can open this URL.</string>
     <string name="remove_bookmark">Remove Bookmark</string>
     <string name="save_bookmark">Save bookmark</string>
+    <string name="license_id_menu">License ID</string>
+    <string name="license_id_activated">License ID found, premium feature activated</string>
+    <string name="license_empty">Enter your license ID</string>
+    <string name="license_used">License used in another device</string>
+    <string name="license_deactivated">This ID is currently not active</string>
+    <string name="license_not_found">ID not found</string>
+    <string name="license_active">You are in premium mode</string>
 
     <string name="bookmark_saved">Bookmark saved</string>
     <string name="bookmark_removed">Bookmark removed</string>
@@ -164,7 +177,7 @@
     <string name="main_bottomsheet_settings_clear_browser_data_title">Clear Browser Data</string>
     <string name="main_bottomsheet_settings_clear_browser_data_desc">Clear all browser data to save some storage.</string>
     <string name="main_bottomsheet_settings_delete_all_bookmarks_title">Delete All Bookmarks</string>
-    <string name="main_bottomsheet_settings_delete_all_bookmarks_desc">Delete all save bookmarks.</string>
+    <string name="main_bottomsheet_settings_delete_all_bookmarks_desc">Delete all saved bookmarks.</string>
 
     <!-- main bottomsheet bookmark description-->
     <string name="main_bottomsheet_bookmark_title">Bookmarks</string>
@@ -181,7 +194,7 @@
     <string name="main_bookmark_rename_edittext_hint">Enter bookmark name…</string>
 
     <string name="main_bookmark_change_url_dialog_title_desc">Change URL</string>
-    <string name="main_bookmark_change_url_edittext_hint">Enter bookmark url…</string>
+    <string name="main_bookmark_change_url_edittext_hint">Enter bookmark URL…</string>
 
     <!-- main bookmark bottomsheet description-->
     <string name="main_bookmark_item_adapter_favicon_desc">Favicon</string>
@@ -259,5 +272,9 @@
     <!-- floating gallery-->
     <string name="window_gallery_folder_item_desc">Gallery folder</string>
     <string name="window_gallery_image_item_desc">Gallery picture</string>
+
+    <!-- keyboard-->
+    <string name="keyboard_item">Keyboard item</string>
+
 
 </resources>

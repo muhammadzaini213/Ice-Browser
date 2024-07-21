@@ -9,7 +9,6 @@ import android.widget.PopupMenu;
 import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
 import com.ibndev.icebrowser.floatingparts.utilities.FloatingUtils;
-import com.ibndev.icebrowser.floatingparts.utilities.LayoutSetData;
 import com.ibndev.icebrowser.floatingparts.utilities.OverlayManager;
 
 public class CloseAllConfirmation {
@@ -17,6 +16,7 @@ public class CloseAllConfirmation {
     ViewGroup floatView;
     FloatingUtils utils;
     FloatingWindow floatingWindow;
+    PopupMenu popupMenu;
 
     public CloseAllConfirmation(FloatingWindow floatingWindow, FloatingUtils utils) {
         this.floatingWindow = floatingWindow;
@@ -24,8 +24,6 @@ public class CloseAllConfirmation {
         floatView = floatingWindow.floatView;
         this.utils = utils;
     }
-
-    PopupMenu popupMenu;
 
     public void showPopupMenu() {
         if (popupMenu == null) {
@@ -38,8 +36,9 @@ public class CloseAllConfirmation {
     }
 
     private boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.action_yes){
+        if (item.getItemId() == R.id.action_yes) {
             OverlayManager.setOverlayVisibility(false);
+            floatingWindow.stopSelf();
         }
         return true;
     }

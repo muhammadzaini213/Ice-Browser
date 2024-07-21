@@ -9,7 +9,6 @@ import android.content.Intent;
 
 import androidx.core.app.NotificationCompat;
 
-import com.ibndev.icebrowser.MainBrowserActivity;
 import com.ibndev.icebrowser.R;
 import com.ibndev.icebrowser.floatingparts.FloatingWindow;
 

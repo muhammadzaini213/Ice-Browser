@@ -68,7 +68,7 @@ public class BrowserMenu2 {
 
 
     private boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_overview){
+        if (item.getItemId() == R.id.action_overview) {
             tabManager.getCurrentWebView().getSettings().setUseWideViewPort(!overviewActive);
         } else if (item.getItemId() == R.id.action_zoom) {
             tabManager.getCurrentWebView().getSettings().setSupportZoom(!zoomActive);
